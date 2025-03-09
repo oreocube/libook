@@ -20,7 +20,9 @@ class LibraryRepositoryImpl @Inject constructor(
     }
 
     override suspend fun searchBooks(param: BookSearchParam): List<Book> {
-        TODO("Not yet implemented")
+        return libraryService.searchBooks(keyword = param.keyword).response.docs.map {
+            it.doc.toModel()
+        }
     }
 
     override suspend fun checkBookAvailability(param: BookAvailabilityCheckParam): BookAvailability {
