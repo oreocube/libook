@@ -6,7 +6,7 @@ import javax.inject.Inject
 class DeleteFavoriteLibraryUseCase @Inject constructor(
     private val favoriteRepository: FavoriteRepository,
 ) {
-    suspend operator fun invoke(libraryCode: Long) {
-        favoriteRepository.deleteFavoriteLibrary(libraryCode)
+    suspend operator fun invoke(id: String) {
+        favoriteRepository.deleteFavoriteLibrary(id)
     }
 }

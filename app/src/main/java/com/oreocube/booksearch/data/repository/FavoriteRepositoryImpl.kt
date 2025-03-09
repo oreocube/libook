@@ -1,17 +1,19 @@
 package com.oreocube.booksearch.data.repository
 
+import com.oreocube.booksearch.domain.model.LibraryShort
 import com.oreocube.booksearch.domain.repository.FavoriteRepository
+import javax.inject.Inject
 
-class FavoriteRepositoryImpl : FavoriteRepository {
-    override suspend fun getFavoriteLibraries(): List<Long> {
+class FavoriteRepositoryImpl @Inject constructor() : FavoriteRepository {
+    override suspend fun getFavoriteLibraries(): List<LibraryShort> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun addFavoriteLibrary(libraryCode: Long) {
+    override suspend fun addFavoriteLibrary(library: LibraryShort) {
         TODO("Not yet implemented")
     }
 
-    override suspend fun deleteFavoriteLibrary(libraryCode: Long) {
+    override suspend fun deleteFavoriteLibrary(id: String) {
         TODO("Not yet implemented")
     }
 }
