@@ -1,6 +1,7 @@
 package com.oreocube.booksearch.data.service
 
 import com.oreocube.booksearch.BuildConfig
+import com.oreocube.booksearch.data.response.BookAvailabilityResponse
 import com.oreocube.booksearch.data.response.BookSearchResponse
 import com.oreocube.booksearch.data.response.LibraryApiResponse
 import com.oreocube.booksearch.data.response.LibrarySearchResponse
@@ -26,6 +27,14 @@ interface LibraryService {
         @Query("authKey") authKey: String = BuildConfig.LIBRARY_API_AUTH_KEY,
         @Query("format") format: String = JSON_FORMAT,
     ): LibraryApiResponse<BookSearchResponse>
+
+    @GET("bookExist")
+    suspend fun checkBookAvailability(
+        @Query("libCode") libraryCode: String,
+        @Query("isbn13") isbn: String,
+        @Query("authKey") authKey: String = BuildConfig.LIBRARY_API_AUTH_KEY,
+        @Query("format") format: String = JSON_FORMAT,
+    ): LibraryApiResponse<BookAvailabilityResponse>
 
     companion object {
         private const val JSON_FORMAT = "json"

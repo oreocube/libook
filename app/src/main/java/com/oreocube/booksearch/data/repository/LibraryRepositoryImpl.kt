@@ -1,5 +1,6 @@
 package com.oreocube.booksearch.data.repository
 
+import com.oreocube.booksearch.data.response.BookAvailabilityDTO
 import com.oreocube.booksearch.data.service.LibraryService
 import com.oreocube.booksearch.domain.model.Book
 import com.oreocube.booksearch.domain.model.BookAvailability
@@ -26,6 +27,9 @@ class LibraryRepositoryImpl @Inject constructor(
     }
 
     override suspend fun checkBookAvailability(param: BookAvailabilityCheckParam): BookAvailability {
-        TODO("Not yet implemented")
+        return libraryService.checkBookAvailability(
+            libraryCode = param.libraryCode,
+            isbn = param.isbn,
+        ).response.result.run(BookAvailabilityDTO::toModel)
     }
 }
