@@ -35,7 +35,7 @@ data class LibraryDTO(
     @SerialName("tel")
     val tel: String,
     @SerialName("fax")
-    val fax: String,
+    val fax: String? = null,
     @SerialName("latitude")
     val latitude: String,
     @SerialName("longitude")

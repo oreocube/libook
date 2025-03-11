@@ -1,0 +1,24 @@
+package com.oreocube.booksearch.feature.region
+
+import androidx.navigation.NavController
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavOptions
+import androidx.navigation.compose.composable
+import kotlinx.serialization.Serializable
+
+@Serializable
+data object RegionRoute
+
+fun NavController.navigateToRegion(
+    navOptions: NavOptions? = null,
+) {
+    navigate(route = RegionRoute, navOptions)
+}
+
+fun NavGraphBuilder.regionScreen(
+    onSearchButtonClick: (Int) -> Unit,
+) {
+    composable<RegionRoute> {
+        RegionRoute(onSearchButtonClick = onSearchButtonClick)
+    }
+}

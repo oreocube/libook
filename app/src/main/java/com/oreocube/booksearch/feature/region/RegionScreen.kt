@@ -26,83 +26,86 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.oreocube.booksearch.core.ui.theme.Brown10
 import com.oreocube.booksearch.core.ui.theme.Brown60
-import com.oreocube.booksearch.core.ui.theme.Grey80
+import com.oreocube.booksearch.core.ui.theme.Gray80
 import com.oreocube.booksearch.domain.model.City
 import com.oreocube.booksearch.domain.model.District
 
 @Composable
 fun RegionRoute(
+    onSearchButtonClick: (Int) -> Unit,
     viewModel: RegionViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    when (uiState) {
-        is RegionUiState.Table -> {
-            RegionScreen(
-                modifier = Modifier.fillMaxSize(),
-                uiState = uiState as RegionUiState.Table,
-                onCityClick = viewModel::onCitySelected,
-                onDistrictClick = viewModel::onDistrictSelected,
-            )
-        }
-
-        else -> {}
-    }
+    RegionScreen(
+        modifier = Modifier.fillMaxSize(),
+        uiState = uiState,
+        onCityClick = viewModel::onCitySelected,
+        onDistrictClick = viewModel::onDistrictSelected,
+        onSearchButtonClick = onSearchButtonClick,
+    )
 }
 
 @Composable
 fun RegionScreen(
     modifier: Modifier = Modifier,
-    uiState: RegionUiState.Table,
+    uiState: RegionUiState,
     onCityClick: (Int) -> Unit = {},
     onDistrictClick: (Int) -> Unit = {},
-    onSearchButtonClick: () -> Unit = {},
+    onSearchButtonClick: (Int) -> Unit = {},
 ) {
-    Column(modifier = modifier) {
-        Row(modifier = Modifier.fillMaxWidth()) {
-            TableTitleItem(
-                modifier = Modifier.weight(1f),
-                text = "시·도",
-            )
-            VerticalDivider(
-                modifier = Modifier.height(IntrinsicSize.Min),
-            )
-            TableTitleItem(
-                modifier = Modifier.weight(1f),
-                text = "시·군·구",
-            )
+    when (uiState) {
+        is RegionUiState.Table -> {
+            Column(modifier = modifier) {
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    TableTitleItem(
+                        modifier = Modifier.weight(1f),
+                        text = "시·도",
+                    )
+                    VerticalDivider(
+                        modifier = Modifier.height(IntrinsicSize.Min),
+                    )
+                    TableTitleItem(
+                        modifier = Modifier.weight(1f),
+                        text = "시·군·구",
+                    )
+                }
+
+                RegionTable(
+                    modifier = Modifier.weight(1f),
+                    selectedCityId = uiState.selectedCityId,
+                    selectedDistrictId = uiState.selectedDistrictId,
+                    cities = uiState.cities,
+                    districts = uiState.districts,
+                    onCityClick = onCityClick,
+                    onDistrictClick = onDistrictClick,
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .background(
+                            color = Brown10,
+                            shape = RoundedCornerShape(10.dp)
+                        )
+                        .clickable {
+                            uiState.selectedDistrictId
+                                .takeIf { it != -1 }
+                                ?.run(onSearchButtonClick)
+                        }
+                        .padding(16.dp),
+                ) {
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = "도서관 찾기",
+                        textAlign = TextAlign.Center,
+                        color = Color.White,
+                    )
+                }
+            }
         }
 
-        RegionTable(
-            modifier = Modifier.weight(1f),
-            selectedCityId = uiState.selectedCityId,
-            selectedDistrictId = uiState.selectedDistrictId,
-            cities = uiState.cities,
-            districts = uiState.districts,
-            onCityClick = onCityClick,
-            onDistrictClick = onDistrictClick,
-        )
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-                .background(
-                    color = Brown10,
-                    shape = RoundedCornerShape(10.dp)
-                )
-                .clickable(
-                    enabled = true,
-                    onClick = onSearchButtonClick,
-                )
-                .padding(16.dp),
-        ) {
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = "도서관 찾기",
-                textAlign = TextAlign.Center,
-                color = Color.White,
-            )
-        }
+        else -> {}
     }
 }
 
@@ -113,7 +116,7 @@ private fun TableTitleItem(
 ) {
     Box(
         modifier = modifier
-            .background(color = Grey80)
+            .background(color = Gray80)
             .padding(16.dp),
     ) {
         Text(

@@ -5,7 +5,7 @@ data class Library(
     val name: String,
     val address: String,
     val tel: String,
-    val fax: String,
+    val fax: String?,
     val latitude: String,
     val longitude: String,
     val homepageUrl: String,
