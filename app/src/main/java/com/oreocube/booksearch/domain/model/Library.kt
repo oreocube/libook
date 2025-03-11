@@ -13,4 +13,9 @@ data class Library(
     val operatingTime: String,
     val bookCount: Long,
     val isFavorite: Boolean = false,
-)
+) {
+    fun toShort() = LibraryShort(
+        id = id,
+        name = name,
+    )
+}

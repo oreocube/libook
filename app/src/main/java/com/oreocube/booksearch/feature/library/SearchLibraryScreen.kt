@@ -34,7 +34,7 @@ fun SearchLibraryRoute(
 
     SearchLibraryScreen(
         uiState = uiState,
-        onStarClick = {},
+        onStarClick = viewModel::toggleLibraryStar,
     )
 }
 
