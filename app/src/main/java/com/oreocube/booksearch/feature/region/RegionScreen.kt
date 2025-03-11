@@ -16,11 +16,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.oreocube.booksearch.core.ui.theme.Brown10
 import com.oreocube.booksearch.core.ui.theme.Brown60
 import com.oreocube.booksearch.core.ui.theme.Grey80
@@ -28,13 +31,34 @@ import com.oreocube.booksearch.domain.model.City
 import com.oreocube.booksearch.domain.model.District
 
 @Composable
-fun RegionScreen(
-    selectedCityId: Int,
-    selectedDistrictId: Int,
-    cities: List<City>,
-    districts: List<District>,
+fun RegionRoute(
+    viewModel: RegionViewModel = hiltViewModel()
 ) {
-    Column(modifier = Modifier.fillMaxSize()) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    when (uiState) {
+        is RegionUiState.Table -> {
+            RegionScreen(
+                modifier = Modifier.fillMaxSize(),
+                uiState = uiState as RegionUiState.Table,
+                onCityClick = viewModel::onCitySelected,
+                onDistrictClick = viewModel::onDistrictSelected,
+            )
+        }
+
+        else -> {}
+    }
+}
+
+@Composable
+fun RegionScreen(
+    modifier: Modifier = Modifier,
+    uiState: RegionUiState.Table,
+    onCityClick: (Int) -> Unit = {},
+    onDistrictClick: (Int) -> Unit = {},
+    onSearchButtonClick: () -> Unit = {},
+) {
+    Column(modifier = modifier) {
         Row(modifier = Modifier.fillMaxWidth()) {
             TableTitleItem(
                 modifier = Modifier.weight(1f),
@@ -51,10 +75,12 @@ fun RegionScreen(
 
         RegionTable(
             modifier = Modifier.weight(1f),
-            selectedCityId = selectedCityId,
-            selectedDistrictId = selectedDistrictId,
-            cities = cities,
-            districts = districts,
+            selectedCityId = uiState.selectedCityId,
+            selectedDistrictId = uiState.selectedDistrictId,
+            cities = uiState.cities,
+            districts = uiState.districts,
+            onCityClick = onCityClick,
+            onDistrictClick = onDistrictClick,
         )
         Box(
             modifier = Modifier
@@ -63,6 +89,10 @@ fun RegionScreen(
                 .background(
                     color = Brown10,
                     shape = RoundedCornerShape(10.dp)
+                )
+                .clickable(
+                    enabled = true,
+                    onClick = onSearchButtonClick,
                 )
                 .padding(16.dp),
         ) {
@@ -101,6 +131,8 @@ private fun RegionTable(
     selectedDistrictId: Int,
     cities: List<City>,
     districts: List<District>,
+    onCityClick: (Int) -> Unit,
+    onDistrictClick: (Int) -> Unit,
 ) {
     Row(modifier = modifier) {
         LazyColumn(
@@ -113,7 +145,7 @@ private fun RegionTable(
                     RegionTableItem(
                         modifier = Modifier.fillMaxWidth(),
                         text = city.name,
-                        onClick = { TODO() },
+                        onClick = { onCityClick(city.id) },
                         isSelected = city.id == selectedCityId,
                         selectedTextColor = Color.White,
                         selectedBackgroundColor = Brown10,
@@ -132,7 +164,7 @@ private fun RegionTable(
                     RegionTableItem(
                         modifier = Modifier.fillMaxWidth(),
                         text = district.name,
-                        onClick = { TODO() },
+                        onClick = { onDistrictClick(district.id) },
                         isSelected = district.id == selectedDistrictId,
                         selectedTextColor = Brown10,
                         selectedBackgroundColor = Brown60,
@@ -174,15 +206,17 @@ private fun RegionTableItem(
 @Preview(showBackground = true)
 private fun RegionScreenPreview() {
     RegionScreen(
-        selectedCityId = 11,
-        selectedDistrictId = 11002,
-        cities = listOf(
-            City(id = 11, name = "서울"),
-            City(id = 21, name = "대구"),
-        ),
-        districts = listOf(
-            District(id = 11001, cityId = 11, name = "강남구"),
-            District(id = 11002, cityId = 11, name = "강동구"),
+        uiState = RegionUiState.Table(
+            selectedCityId = 11,
+            selectedDistrictId = 11002,
+            cities = listOf(
+                City(id = 11, name = "서울"),
+                City(id = 21, name = "대구"),
+            ),
+            districts = listOf(
+                District(id = 11001, cityId = 11, name = "강남구"),
+                District(id = 11002, cityId = 11, name = "강동구"),
+            )
         )
     )
 }
