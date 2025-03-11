@@ -51,7 +51,6 @@ fun SearchLibraryScreen(
                         LibraryItem(
                             modifier = Modifier.fillMaxWidth(),
                             library = library,
-                            isFavorite = false, // TODO
                             onStarClick = onStarClick,
                         )
                     }
@@ -67,11 +66,10 @@ fun SearchLibraryScreen(
 private fun LibraryItem(
     modifier: Modifier = Modifier,
     library: Library,
-    isFavorite: Boolean,
     onStarClick: (Library) -> Unit,
 ) {
-    val iconRes = remember(isFavorite) {
-        if (isFavorite) R.drawable.ic_bookmark_filled_24
+    val iconRes = remember(library.isFavorite) {
+        if (library.isFavorite) R.drawable.ic_bookmark_filled_24
         else R.drawable.ic_bookmark_border_24
     }
 
@@ -122,7 +120,6 @@ private fun LibraryItemPreview() {
             operatingTime = "평일 09:00~22:00",
             bookCount = 11000,
         ),
-        isFavorite = true,
         onStarClick = {},
     )
 }

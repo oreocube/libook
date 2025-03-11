@@ -12,4 +12,5 @@ data class Library(
     val closedTime: String,
     val operatingTime: String,
     val bookCount: Long,
+    val isFavorite: Boolean = false,
 )
