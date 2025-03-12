@@ -27,7 +27,7 @@ data class BookDTO(
     @SerialName("publisher")
     val publisher: String, // 출판사
     @SerialName("publication_year")
-    val publicationYear: String, // 출판년도
+    val publicationYear: String? = null, // 출판년도
     @SerialName("isbn13")
     val isbn13: String, // 13 자리 ISBN
     @SerialName("vol")
@@ -43,7 +43,7 @@ data class BookDTO(
         title = title,
         authors = authors,
         publisher = publisher,
-        publicationYear = publicationYear,
+        publicationYear = publicationYear.orEmpty(),
         isbn13 = isbn13,
         vol = vol,
         imageUrl = imageUrl,

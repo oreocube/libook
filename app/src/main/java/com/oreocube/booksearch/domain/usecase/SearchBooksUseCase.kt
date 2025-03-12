@@ -8,7 +8,9 @@ import javax.inject.Inject
 class SearchBooksUseCase @Inject constructor(
     private val libraryRepository: LibraryRepository,
 ) {
-    suspend operator fun invoke(param: BookSearchParam): List<Book> {
-        return libraryRepository.searchBooks(param)
+    suspend operator fun invoke(query: String): List<Book> {
+        return libraryRepository.searchBooks(
+            BookSearchParam(query.trim().replace(" ", ";"))
+        )
     }
 }

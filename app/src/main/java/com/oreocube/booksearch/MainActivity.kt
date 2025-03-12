@@ -6,9 +6,10 @@ import androidx.activity.compose.setContent
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.oreocube.booksearch.core.ui.theme.BooksearchTheme
+import com.oreocube.booksearch.feature.book.SearchBookRoute
+import com.oreocube.booksearch.feature.book.searchBookScreen
 import com.oreocube.booksearch.feature.library.navigateToSearchLibrary
 import com.oreocube.booksearch.feature.library.searchLibraryScreen
-import com.oreocube.booksearch.feature.region.RegionRoute
 import com.oreocube.booksearch.feature.region.regionScreen
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -22,12 +23,13 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 NavHost(
                     navController = navController,
-                    startDestination = RegionRoute,
+                    startDestination = SearchBookRoute,
                 ) {
                     regionScreen(
                         onSearchButtonClick = navController::navigateToSearchLibrary
                     )
                     searchLibraryScreen()
+                    searchBookScreen()
                 }
             }
         }
