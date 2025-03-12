@@ -15,9 +15,11 @@ fun NavController.navigateToSearchBook(
     navigate(route = SearchBookRoute, navOptions)
 }
 
-fun NavGraphBuilder.searchBookScreen() {
+fun NavGraphBuilder.searchBookScreen(
+    onBookClick: (String) -> Unit,
+) {
     composable<SearchBookRoute> {
-        SearchBookRoute()
+        SearchBookRoute(onBookClick)
     }
 }
 

@@ -7,6 +7,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.oreocube.booksearch.core.ui.theme.BooksearchTheme
 import com.oreocube.booksearch.feature.book.SearchBookRoute
+import com.oreocube.booksearch.feature.book.bookDetailScreen
+import com.oreocube.booksearch.feature.book.navigateToBookDetail
 import com.oreocube.booksearch.feature.book.searchBookScreen
 import com.oreocube.booksearch.feature.library.navigateToSearchLibrary
 import com.oreocube.booksearch.feature.library.searchLibraryScreen
@@ -29,7 +31,10 @@ class MainActivity : ComponentActivity() {
                         onSearchButtonClick = navController::navigateToSearchLibrary
                     )
                     searchLibraryScreen()
-                    searchBookScreen()
+                    searchBookScreen(
+                        onBookClick = navController::navigateToBookDetail
+                    )
+                    bookDetailScreen()
                 }
             }
         }

@@ -1,6 +1,7 @@
 package com.oreocube.booksearch.feature.book
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,6 +34,7 @@ import com.oreocube.booksearch.domain.model.Book
 
 @Composable
 fun SearchBookRoute(
+    onBookClick: (String) -> Unit,
     viewModel: SearchBookViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -42,6 +44,7 @@ fun SearchBookRoute(
         onInputChanged = viewModel::onInputChanged,
         onClearClicked = viewModel::onInputChanged,
         onQuerySubmitted = {},
+        onBookClick = onBookClick,
     )
 }
 
@@ -51,6 +54,7 @@ fun SearchBookScreen(
     onInputChanged: (String) -> Unit,
     onClearClicked: () -> Unit,
     onQuerySubmitted: (String) -> Unit,
+    onBookClick: (String) -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         BookSearchTextField(
@@ -63,7 +67,10 @@ fun SearchBookScreen(
         LazyColumn(modifier = Modifier.weight(1f)) {
             uiState.result.forEach { book ->
                 item(key = book.isbn13) {
-                    BookItem(book = book)
+                    BookItem(
+                        book = book,
+                        onItemClick = { onBookClick(book.isbn13) }
+                    )
                 }
             }
         }
@@ -111,10 +118,12 @@ private fun BookSearchTextField(
 private fun BookItem(
     modifier: Modifier = Modifier,
     book: Book,
+    onItemClick: () -> Unit
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .clickable(enabled = true, onClick = onItemClick)
             .padding(8.dp)
     ) {
         // TODO: 도서 이미지
@@ -149,7 +158,8 @@ private fun BookItemPreview() {
             imageUrl = "https://image.aladin.co.kr/product/28878/64/cover/8966263364_1.jpg",
             detailUrl = "https://data4library.kr/bookV?seq=6404790",
             loanCount = 695
-        )
+        ),
+        onItemClick = {}
     )
 }
 
@@ -161,6 +171,7 @@ private fun SearchBookScreenPreview1() {
         onInputChanged = {},
         onClearClicked = {},
         onQuerySubmitted = {},
+        onBookClick = {},
     )
 }
 
@@ -187,5 +198,6 @@ private fun SearchBookScreenPreview2() {
         onInputChanged = {},
         onClearClicked = {},
         onQuerySubmitted = {},
+        onBookClick = {},
     )
 }
