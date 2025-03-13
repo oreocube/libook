@@ -19,11 +19,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil3.compose.AsyncImage
 import com.oreocube.booksearch.core.ui.theme.Brown20
 import com.oreocube.booksearch.core.ui.theme.Gray10
 import com.oreocube.booksearch.core.ui.theme.Gray20
@@ -61,7 +63,7 @@ fun BookDetailScreen(
                     modifier = Modifier.fillMaxWidth(),
                     book = uiState.book,
                 )
-                HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
+                HorizontalDivider()
                 LibraryStatusForBook(
                     modifier = Modifier.fillMaxWidth(),
                     status = uiState.status,
@@ -76,39 +78,48 @@ fun BookDetailContent(
     modifier: Modifier = Modifier,
     book: BookDetail
 ) {
-    Column(modifier = modifier.fillMaxWidth()) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(1f)
-                .background(color = Gray10)
-        )
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-        ) {
-            Text(
-                text = book.title,
-                fontSize = 20.sp
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(all = 16.dp)
+    ) {
+        Row(modifier = Modifier.fillMaxWidth()) {
+            AsyncImage(
+                modifier = Modifier
+                    .weight(1f)
+                    .aspectRatio(1f),
+                model = book.imageUrl,
+                contentDescription = "book image",
             )
-            Text(
-                text = book.authors,
-                fontSize = 14.sp,
-                color = Gray20
-            )
-            Text(
-                text = "${book.publisher} · ${book.publicationYear}",
-                fontSize = 14.sp,
-                color = Gray20,
-            )
-            Text(
-                modifier = Modifier.padding(top = 8.dp),
-                text = book.description,
-                fontSize = 16.sp,
-                color = Gray10
-            )
+            Column(
+                modifier = Modifier
+                    .weight(2f)
+                    .padding(start = 8.dp),
+            ) {
+                Text(
+                    text = book.title,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                )
+                Text(
+                    text = book.authors,
+                    fontSize = 14.sp,
+                    color = Gray20
+                )
+                Text(
+                    text = "${book.publisher} · ${book.publicationYear}",
+                    fontSize = 14.sp,
+                    color = Gray20,
+                )
+            }
         }
+
+        Text(
+            modifier = Modifier.padding(top = 16.dp),
+            text = book.description,
+            fontSize = 16.sp,
+            color = Gray10
+        )
     }
 }
 
@@ -120,9 +131,13 @@ private fun LibraryStatusForBook(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp)
+            .padding(all = 16.dp)
     ) {
-        Text(text = "도서 소장 도서관", fontSize = 18.sp)
+        Text(
+            text = "소장 도서관",
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+        )
         status.forEach { (library, availability) ->
             Row(
                 modifier = Modifier

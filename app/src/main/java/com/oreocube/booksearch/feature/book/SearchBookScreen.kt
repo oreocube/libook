@@ -1,8 +1,6 @@
 package com.oreocube.booksearch.feature.book
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,6 +10,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -22,14 +21,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil3.compose.AsyncImage
 import com.oreocube.booksearch.R
 import com.oreocube.booksearch.core.ui.theme.Gray10
+import com.oreocube.booksearch.core.ui.theme.Gray20
 import com.oreocube.booksearch.domain.model.Book
 
 @Composable
@@ -65,12 +67,13 @@ fun SearchBookScreen(
             onQuerySubmitted = onQuerySubmitted,
         )
         LazyColumn(modifier = Modifier.weight(1f)) {
-            uiState.result.forEach { book ->
+            uiState.result.forEachIndexed { index, book ->
                 item(key = book.isbn13) {
                     BookItem(
                         book = book,
                         onItemClick = { onBookClick(book.isbn13) }
                     )
+                    HorizontalDivider()
                 }
             }
         }
@@ -126,20 +129,32 @@ private fun BookItem(
             .clickable(enabled = true, onClick = onItemClick)
             .padding(8.dp)
     ) {
-        // TODO: 도서 이미지
-        Box(
-            modifier = Modifier
-                .size(80.dp)
-                .background(color = Gray10)
+        AsyncImage(
+            modifier = Modifier.size(80.dp),
+            model = book.imageUrl,
+            contentDescription = "book image",
         )
         Column(
             modifier = Modifier
                 .padding(start = 8.dp)
                 .fillMaxWidth()
         ) {
-            Text(text = book.title, fontSize = 18.sp)
-            Text(text = book.authors, fontSize = 14.sp)
-            Text(text = "${book.publisher} · ${book.publicationYear}", fontSize = 14.sp)
+            Text(
+                text = book.title,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = Gray10,
+            )
+            Text(
+                text = book.authors,
+                fontSize = 14.sp,
+                color = Gray20,
+            )
+            Text(
+                text = "${book.publisher} · ${book.publicationYear}",
+                fontSize = 14.sp,
+                color = Gray20,
+            )
         }
     }
 }
