@@ -9,6 +9,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -16,26 +17,54 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.oreocube.booksearch.R
 import com.oreocube.booksearch.core.ui.theme.Brown20
 import com.oreocube.booksearch.domain.model.LibraryShort
 
 @Composable
-fun FavoriteLibraryRoute() {
+fun FavoriteLibraryRoute(
+    viewModel: FavoriteLibraryViewModel = hiltViewModel()
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    FavoriteLibraryScreen(
+        uiState = uiState,
+        onStarClick = viewModel::deleteFavoriteLibrary,
+    )
 }
 
 @Composable
-fun FavoriteLibraryScreen(
-    libraries: List<LibraryShort>,
-    onStarClick: (LibraryShort) -> Unit,
+private fun FavoriteLibraryScreen(
+    uiState: FavoriteLibraryUiState,
+    onStarClick: (String) -> Unit,
 ) {
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
+    when (uiState) {
+        is FavoriteLibraryUiState.Data -> {
+            FavoriteLibraryList(
+                modifier = Modifier.fillMaxSize(),
+                libraries = uiState.libraries,
+                onStarClick = onStarClick,
+            )
+        }
+
+        else -> {}
+    }
+}
+
+@Composable
+fun FavoriteLibraryList(
+    modifier: Modifier = Modifier,
+    libraries: List<LibraryShort>,
+    onStarClick: (String) -> Unit,
+) {
+    LazyColumn(modifier = modifier) {
         libraries.forEach { library ->
             item(key = library.id) {
                 FavoriteLibraryItem(
                     library = library,
-                    onStarClick = onStarClick,
+                    onStarClick = { onStarClick(library.id) },
                 )
             }
         }
@@ -76,9 +105,11 @@ private fun FavoriteLibraryItem(
 @Preview(showBackground = true)
 fun FavoriteLibraryScreenPreview() {
     FavoriteLibraryScreen(
-        libraries = listOf(
-            LibraryShort(id = "11", name = "자바도서관"),
-            LibraryShort(id = "12", name = "코틀린도서관"),
+        uiState = FavoriteLibraryUiState.Data(
+            libraries = listOf(
+                LibraryShort(id = "11", name = "자바도서관"),
+                LibraryShort(id = "12", name = "코틀린도서관"),
+            )
         ),
         onStarClick = {},
     )

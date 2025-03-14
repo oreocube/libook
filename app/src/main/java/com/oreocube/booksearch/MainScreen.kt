@@ -12,12 +12,12 @@ fun MainScreen(
     navController: NavHostController = rememberNavController()
 ) {
     Scaffold(
-        topBar = {
-            TODO()
-        },
-        bottomBar = {
-            TODO()
-        },
+//        topBar = {
+//            TODO()
+//        },
+//        bottomBar = {
+//            TODO()
+//        },
     ) { innerPadding ->
         MainNavHost(
             modifier = Modifier.padding(innerPadding),
