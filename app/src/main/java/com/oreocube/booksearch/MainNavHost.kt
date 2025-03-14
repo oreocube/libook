@@ -4,11 +4,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.rememberNavController
 import com.oreocube.booksearch.feature.book.SearchBookRoute
 import com.oreocube.booksearch.feature.book.bookDetailScreen
 import com.oreocube.booksearch.feature.book.navigateToBookDetail
 import com.oreocube.booksearch.feature.book.searchBookScreen
+import com.oreocube.booksearch.feature.favorite.library.favoriteLibraryScreen
 import com.oreocube.booksearch.feature.library.navigateToSearchLibrary
 import com.oreocube.booksearch.feature.library.searchLibraryScreen
 import com.oreocube.booksearch.feature.region.regionScreen
@@ -31,5 +31,6 @@ fun MainNavHost(
             onBookClick = navController::navigateToBookDetail
         )
         bookDetailScreen()
+        favoriteLibraryScreen()
     }
 }
