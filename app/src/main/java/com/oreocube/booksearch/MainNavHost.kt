@@ -2,7 +2,6 @@ package com.oreocube.booksearch
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import com.oreocube.booksearch.feature.book.SearchBookRoute
 import com.oreocube.booksearch.feature.book.bookDetailScreen
@@ -16,8 +15,9 @@ import com.oreocube.booksearch.feature.region.regionScreen
 @Composable
 fun MainNavHost(
     modifier: Modifier = Modifier,
-    navController: NavHostController,
+    appState: BookSearchAppState,
 ) {
+    val navController = appState.navController
     NavHost(
         modifier = modifier,
         navController = navController,

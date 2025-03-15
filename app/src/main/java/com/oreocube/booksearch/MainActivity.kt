@@ -13,7 +13,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             BooksearchTheme {
-                MainScreen()
+                MainScreen(
+                    appState = rememberBookSearchAppState()
+                )
             }
         }
     }
