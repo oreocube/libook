@@ -5,8 +5,10 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
+import com.oreocube.booksearch.core.navigation.TopLevelDestination
 import com.oreocube.booksearch.core.ui.component.BookSearchNavigationDefaults
 import com.oreocube.booksearch.core.ui.component.BookSearchNavigationItem
 
@@ -16,21 +18,24 @@ fun MainScreen(
 ) {
     Scaffold(
         bottomBar = {
-            NavigationBar(
-                containerColor = BookSearchNavigationDefaults.containerColor,
-            ) {
-                val currentDestination = appState.currentDestination
+            val currentDestination = appState.currentDestination
+            val isTopLevelDestination = currentDestination.isTopLevelDestination()
 
-                appState.topLevelDestinations.forEach { destination ->
-                    val selected = currentDestination?.hierarchy?.any {
-                        it.hasRoute(destination.route)
-                    } == true
+            if (isTopLevelDestination) {
+                NavigationBar(
+                    containerColor = BookSearchNavigationDefaults.containerColor,
+                ) {
+                    appState.topLevelDestinations.forEach { destination ->
+                        val selected = currentDestination?.hierarchy?.any {
+                            it.hasRoute(destination.route)
+                        } == true
 
-                    BookSearchNavigationItem(
-                        destination = destination,
-                        selected = selected,
-                        onClick = { appState.navigateToTopLevelDestination(destination) },
-                    )
+                        BookSearchNavigationItem(
+                            destination = destination,
+                            selected = selected,
+                            onClick = { appState.navigateToTopLevelDestination(destination) },
+                        )
+                    }
                 }
             }
         },
@@ -40,4 +45,8 @@ fun MainScreen(
             appState = appState,
         )
     }
+}
+
+private fun NavDestination?.isTopLevelDestination(): Boolean {
+    return TopLevelDestination.entries.any { this?.hasRoute(it.route) == true }
 }
