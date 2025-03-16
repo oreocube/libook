@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
+import com.oreocube.booksearch.core.ui.component.BookSearchNavigationDefaults
 import com.oreocube.booksearch.core.ui.component.BookSearchNavigationItem
 
 @Composable
@@ -15,7 +16,9 @@ fun MainScreen(
 ) {
     Scaffold(
         bottomBar = {
-            NavigationBar {
+            NavigationBar(
+                containerColor = BookSearchNavigationDefaults.containerColor,
+            ) {
                 val currentDestination = appState.currentDestination
 
                 appState.topLevelDestinations.forEach { destination ->
