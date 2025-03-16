@@ -3,6 +3,7 @@ package com.oreocube.booksearch.core.ui.component
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
@@ -14,6 +15,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.oreocube.booksearch.core.navigation.TopLevelDestination
 import com.oreocube.booksearch.core.ui.theme.BooksearchTheme
 import com.oreocube.booksearch.core.ui.theme.Brown20
+
+@Composable
+fun BookSearchNavigationBar(
+    isVisible: Boolean,
+    content: @Composable RowScope.() -> Unit,
+) {
+    if (isVisible) {
+        NavigationBar(
+            content = content,
+            containerColor = BookSearchNavigationDefaults.containerColor,
+        )
+    }
+}
 
 @Composable
 fun RowScope.BookSearchNavigationItem(

@@ -1,7 +1,6 @@
 package com.oreocube.booksearch
 
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -9,7 +8,7 @@ import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import com.oreocube.booksearch.core.navigation.TopLevelDestination
-import com.oreocube.booksearch.core.ui.component.BookSearchNavigationDefaults
+import com.oreocube.booksearch.core.ui.component.BookSearchNavigationBar
 import com.oreocube.booksearch.core.ui.component.BookSearchNavigationItem
 
 @Composable
@@ -21,21 +20,19 @@ fun MainScreen(
             val currentDestination = appState.currentDestination
             val isTopLevelDestination = currentDestination.isTopLevelDestination()
 
-            if (isTopLevelDestination) {
-                NavigationBar(
-                    containerColor = BookSearchNavigationDefaults.containerColor,
-                ) {
-                    appState.topLevelDestinations.forEach { destination ->
-                        val selected = currentDestination?.hierarchy?.any {
-                            it.hasRoute(destination.route)
-                        } == true
+            BookSearchNavigationBar(
+                isVisible = isTopLevelDestination,
+            ) {
+                appState.topLevelDestinations.forEach { destination ->
+                    val selected = currentDestination?.hierarchy?.any {
+                        it.hasRoute(destination.route)
+                    } == true
 
-                        BookSearchNavigationItem(
-                            destination = destination,
-                            selected = selected,
-                            onClick = { appState.navigateToTopLevelDestination(destination) },
-                        )
-                    }
+                    BookSearchNavigationItem(
+                        destination = destination,
+                        selected = selected,
+                        onClick = { appState.navigateToTopLevelDestination(destination) },
+                    )
                 }
             }
         },
