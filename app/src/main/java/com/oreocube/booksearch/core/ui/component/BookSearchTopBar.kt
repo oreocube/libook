@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,12 +24,12 @@ import com.oreocube.booksearch.R
 import com.oreocube.booksearch.core.ui.theme.Gray20
 
 private val topAppBarHeight = 80.dp
-private val topAppBarItemSpacing = 16.dp
+private val topAppBarItemSpacing = 8.dp
 
 @Composable
 fun BookSearchTopBar(
     modifier: Modifier = Modifier,
-    title: String,
+    title: String = "",
     description: String = "",
     navigationIcon: (@Composable () -> Unit)? = null,
     menuIcon: (@Composable () -> Unit)? = null,
@@ -37,7 +38,8 @@ fun BookSearchTopBar(
         modifier = modifier
             .fillMaxWidth()
             .height(topAppBarHeight)
-            .background(color = Color.White),
+            .background(color = Color.White)
+            .padding(horizontal = topAppBarItemSpacing),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (navigationIcon != null) {
@@ -94,10 +96,14 @@ private fun BookSearchTopBarPreview2() {
         title = "관심 도서관",
         description = "자주 가는 도서관을 저장할 수 있어요",
         menuIcon = {
-            Icon(
-                painter = painterResource(R.drawable.ic_search_24),
-                contentDescription = stringResource(R.string.menu_search_library)
-            )
+            IconButton(
+                onClick = {}
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_search_24),
+                    contentDescription = stringResource(R.string.menu_search_library)
+                )
+            }
         }
     )
 }
@@ -109,10 +115,14 @@ private fun BookSearchTopBarPreview3() {
         title = "관심 도서관",
         description = "자주 가는 도서관을 저장할 수 있어요",
         navigationIcon = {
-            Icon(
-                painter = painterResource(R.drawable.ic_arrow_back_24),
-                contentDescription = stringResource(R.string.menu_search_library)
-            )
+            IconButton(
+                onClick = {}
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_arrow_back_24),
+                    contentDescription = stringResource(R.string.menu_search_library)
+                )
+            }
         }
     )
 }
