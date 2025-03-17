@@ -1,5 +1,10 @@
 package com.oreocube.booksearch.core.ui.component
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideIn
+import androidx.compose.animation.slideOut
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material3.Icon
@@ -12,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import com.oreocube.booksearch.core.navigation.TopLevelDestination
 import com.oreocube.booksearch.core.ui.theme.BooksearchTheme
 import com.oreocube.booksearch.core.ui.theme.Brown20
@@ -21,7 +27,11 @@ fun BookSearchNavigationBar(
     isVisible: Boolean,
     content: @Composable RowScope.() -> Unit,
 ) {
-    if (isVisible) {
+    AnimatedVisibility(
+        visible = isVisible,
+        enter = fadeIn() + slideIn { IntOffset(0, it.height) },
+        exit = fadeOut() + slideOut { IntOffset(0, it.height) }
+    ) {
         NavigationBar(
             content = content,
             containerColor = BookSearchNavigationDefaults.containerColor,
