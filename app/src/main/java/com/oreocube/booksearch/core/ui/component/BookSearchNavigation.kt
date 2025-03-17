@@ -80,7 +80,7 @@ private fun BookSearchNavigationItemPreview() {
             topLevelDestination.forEach { destination ->
                 BookSearchNavigationItem(
                     destination = destination,
-                    selected = destination == TopLevelDestination.SEARCH_BOOK,
+                    selected = destination == TopLevelDestination.HOME,
                     onClick = {},
                 )
             }

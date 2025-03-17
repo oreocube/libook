@@ -3,8 +3,8 @@ package com.oreocube.booksearch.core.navigation
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.oreocube.booksearch.R
-import com.oreocube.booksearch.feature.book.SearchBookRoute
 import com.oreocube.booksearch.feature.favorite.library.FavoriteLibraryRoute
+import com.oreocube.booksearch.feature.home.HomeRoute
 import kotlin.reflect.KClass
 
 enum class TopLevelDestination(
@@ -13,8 +13,8 @@ enum class TopLevelDestination(
     @DrawableRes val icon: Int,
     @DrawableRes val selectedIcon: Int,
 ) {
-    SEARCH_BOOK(
-        route = SearchBookRoute::class,
+    HOME(
+        route = HomeRoute::class,
         label = R.string.menu_search_book,
         icon = R.drawable.ic_search_24,
         selectedIcon = R.drawable.ic_search_24,

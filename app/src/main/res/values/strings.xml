@@ -8,4 +8,6 @@
     <string name="menu_back">뒤로 가기</string>
     <string name="menu_search_library_result">검색 결과</string>
     <string name="menu_description_search_library_result">북마크 아이콘을 눌러 관심 도서관을 추가할 수 있어요</string>
+    <string name="display_app_name">LiBook</string>
+    <string name="app_summary">읽고 싶은 책을, 자주 가는 도서관에서</string>
 </resources>

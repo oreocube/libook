@@ -3,11 +3,13 @@ package com.oreocube.booksearch
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
-import com.oreocube.booksearch.feature.book.SearchBookRoute
 import com.oreocube.booksearch.feature.book.bookDetailScreen
 import com.oreocube.booksearch.feature.book.navigateToBookDetail
+import com.oreocube.booksearch.feature.book.navigateToSearchBook
 import com.oreocube.booksearch.feature.book.searchBookScreen
 import com.oreocube.booksearch.feature.favorite.library.favoriteLibraryScreen
+import com.oreocube.booksearch.feature.home.HomeRoute
+import com.oreocube.booksearch.feature.home.homeScreen
 import com.oreocube.booksearch.feature.library.navigateToSearchLibrary
 import com.oreocube.booksearch.feature.library.searchLibraryScreen
 import com.oreocube.booksearch.feature.region.navigateToRegion
@@ -22,8 +24,11 @@ fun MainNavHost(
     NavHost(
         modifier = modifier,
         navController = navController,
-        startDestination = SearchBookRoute,
+        startDestination = HomeRoute,
     ) {
+        homeScreen(
+            onSearchBarClick = navController::navigateToSearchBook
+        )
         regionScreen(
             onBackClick = navController::popBackStack,
             onSearchButtonClick = navController::navigateToSearchLibrary

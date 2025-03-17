@@ -10,8 +10,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
 import com.oreocube.booksearch.core.navigation.TopLevelDestination
-import com.oreocube.booksearch.feature.book.navigateToSearchBook
 import com.oreocube.booksearch.feature.favorite.library.navigateToFavoriteLibrary
+import com.oreocube.booksearch.feature.home.navigateToHome
 
 @Stable
 class BookSearchAppState(
@@ -32,7 +32,7 @@ class BookSearchAppState(
         }
 
         when (destination) {
-            TopLevelDestination.SEARCH_BOOK -> navController.navigateToSearchBook(navOptions)
+            TopLevelDestination.HOME -> navController.navigateToHome(navOptions)
             TopLevelDestination.FAVORITE_LIBRARY -> navController.navigateToFavoriteLibrary(
                 navOptions
             )

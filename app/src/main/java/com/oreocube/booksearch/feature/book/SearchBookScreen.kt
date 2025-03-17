@@ -21,7 +21,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,7 +30,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.oreocube.booksearch.R
-import com.oreocube.booksearch.core.ui.component.BookSearchTopBar
 import com.oreocube.booksearch.core.ui.theme.Gray10
 import com.oreocube.booksearch.core.ui.theme.Gray20
 import com.oreocube.booksearch.domain.model.Book
@@ -61,7 +59,6 @@ fun SearchBookScreen(
     onBookClick: (String) -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
-        BookSearchTopBar(title = stringResource(R.string.menu_search_book))
         BookSearchTextField(
             modifier = Modifier.fillMaxWidth(),
             input = uiState.query,
