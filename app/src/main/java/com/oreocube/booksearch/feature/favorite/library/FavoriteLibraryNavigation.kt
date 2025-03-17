@@ -15,8 +15,12 @@ fun NavController.navigateToFavoriteLibrary(
     navigate(route = FavoriteLibraryRoute, navOptions)
 }
 
-fun NavGraphBuilder.favoriteLibraryScreen() {
+fun NavGraphBuilder.favoriteLibraryScreen(
+    onSearchClick: () -> Unit,
+) {
     composable<FavoriteLibraryRoute> {
-        FavoriteLibraryRoute()
+        FavoriteLibraryRoute(
+            onSearchClick = onSearchClick,
+        )
     }
 }

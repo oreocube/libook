@@ -10,6 +10,7 @@ import com.oreocube.booksearch.feature.book.searchBookScreen
 import com.oreocube.booksearch.feature.favorite.library.favoriteLibraryScreen
 import com.oreocube.booksearch.feature.library.navigateToSearchLibrary
 import com.oreocube.booksearch.feature.library.searchLibraryScreen
+import com.oreocube.booksearch.feature.region.navigateToRegion
 import com.oreocube.booksearch.feature.region.regionScreen
 
 @Composable
@@ -31,6 +32,8 @@ fun MainNavHost(
             onBookClick = navController::navigateToBookDetail
         )
         bookDetailScreen()
-        favoriteLibraryScreen()
+        favoriteLibraryScreen(
+            onSearchClick = navController::navigateToRegion
+        )
     }
 }

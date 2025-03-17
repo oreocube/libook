@@ -1,5 +1,6 @@
 package com.oreocube.booksearch.feature.favorite.library
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,17 +15,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.oreocube.booksearch.R
+import com.oreocube.booksearch.core.ui.component.BookSearchTopBar
 import com.oreocube.booksearch.core.ui.theme.Brown20
 import com.oreocube.booksearch.domain.model.LibraryShort
 
 @Composable
 fun FavoriteLibraryRoute(
+    onSearchClick: () -> Unit,
     viewModel: FavoriteLibraryViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -32,24 +36,40 @@ fun FavoriteLibraryRoute(
     FavoriteLibraryScreen(
         uiState = uiState,
         onStarClick = viewModel::deleteFavoriteLibrary,
+        onSearchClick = onSearchClick,
     )
 }
 
 @Composable
 private fun FavoriteLibraryScreen(
     uiState: FavoriteLibraryUiState,
+    onSearchClick: () -> Unit,
     onStarClick: (String) -> Unit,
 ) {
-    when (uiState) {
-        is FavoriteLibraryUiState.Data -> {
-            FavoriteLibraryList(
-                modifier = Modifier.fillMaxSize(),
-                libraries = uiState.libraries,
-                onStarClick = onStarClick,
-            )
-        }
+    Column(modifier = Modifier.fillMaxSize()) {
+        BookSearchTopBar(
+            title = stringResource(R.string.menu_favorite_library),
+            description = stringResource(R.string.menu_description_favorite_library),
+            menuIcon = {
+                IconButton(onClick = onSearchClick) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_search_24),
+                        contentDescription = stringResource(R.string.menu_search_library)
+                    )
+                }
+            }
+        )
+        when (uiState) {
+            is FavoriteLibraryUiState.Data -> {
+                FavoriteLibraryList(
+                    modifier = Modifier.fillMaxSize(),
+                    libraries = uiState.libraries,
+                    onStarClick = onStarClick,
+                )
+            }
 
-        else -> {}
+            else -> {}
+        }
     }
 }
 
@@ -111,6 +131,7 @@ fun FavoriteLibraryScreenPreview() {
                 LibraryShort(id = "12", name = "코틀린도서관"),
             )
         ),
+        onSearchClick = {},
         onStarClick = {},
     )
 }
