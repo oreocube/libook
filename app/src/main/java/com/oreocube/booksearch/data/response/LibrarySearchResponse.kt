@@ -47,7 +47,7 @@ data class LibraryDTO(
     @SerialName("operatingTime")
     val operatingTime: String,
     @SerialName("BookCount")
-    val bookCount: Long,
+    val bookCount: String?,
 ) {
     fun toModel() = Library(
         id = id,
@@ -60,6 +60,6 @@ data class LibraryDTO(
         homepageUrl = homepageUrl,
         closedTime = closedTime,
         operatingTime = operatingTime,
-        bookCount = bookCount,
+        bookCount = bookCount?.toLongOrNull() ?: 0,
     )
 }
