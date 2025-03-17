@@ -1,6 +1,7 @@
 package com.oreocube.booksearch.core.ui.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,23 +23,36 @@ import com.oreocube.booksearch.R
 import com.oreocube.booksearch.core.ui.theme.Gray20
 
 private val topAppBarHeight = 80.dp
+private val topAppBarItemSpacing = 16.dp
 
 @Composable
 fun BookSearchTopBar(
     modifier: Modifier = Modifier,
     title: String,
     description: String = "",
-    menuIcon: @Composable () -> Unit = {},
+    navigationIcon: (@Composable () -> Unit)? = null,
+    menuIcon: (@Composable () -> Unit)? = null,
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
             .height(topAppBarHeight)
-            .background(color = Color.White)
-            .padding(horizontal = 16.dp),
+            .background(color = Color.White),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Column(modifier = Modifier.weight(1f)) {
+        if (navigationIcon != null) {
+            Box(
+                modifier = Modifier
+                    .padding(start = topAppBarItemSpacing)
+            ) {
+                navigationIcon()
+            }
+        }
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(horizontal = topAppBarItemSpacing)
+        ) {
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleLarge,
@@ -54,7 +68,14 @@ fun BookSearchTopBar(
                 )
             }
         }
-        menuIcon()
+        if (menuIcon != null) {
+            Box(
+                modifier = Modifier
+                    .padding(end = topAppBarItemSpacing),
+            ) {
+                menuIcon()
+            }
+        }
     }
 }
 
@@ -75,6 +96,21 @@ private fun BookSearchTopBarPreview2() {
         menuIcon = {
             Icon(
                 painter = painterResource(R.drawable.ic_search_24),
+                contentDescription = stringResource(R.string.menu_search_library)
+            )
+        }
+    )
+}
+
+@Composable
+@Preview
+private fun BookSearchTopBarPreview3() {
+    BookSearchTopBar(
+        title = "관심 도서관",
+        description = "자주 가는 도서관을 저장할 수 있어요",
+        navigationIcon = {
+            Icon(
+                painter = painterResource(R.drawable.ic_arrow_back_24),
                 contentDescription = stringResource(R.string.menu_search_library)
             )
         }

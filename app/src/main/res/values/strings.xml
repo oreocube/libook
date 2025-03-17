@@ -5,4 +5,5 @@
     <string name="menu_description_favorite_library">자주 가는 도서관을 저장할 수 있어요</string>
     <string name="menu_search_library">도서관 찾기</string>
     <string name="menu_description_search_library">선택된 지역에 위치한 도서관을 검색할 수 있어요</string>
+    <string name="menu_back">뒤로가기</string>
 </resources>

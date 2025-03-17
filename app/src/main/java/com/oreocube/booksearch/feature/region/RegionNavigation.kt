@@ -16,9 +16,13 @@ fun NavController.navigateToRegion(
 }
 
 fun NavGraphBuilder.regionScreen(
+    onBackClick: () -> Unit,
     onSearchButtonClick: (Int) -> Unit,
 ) {
     composable<RegionRoute> {
-        RegionRoute(onSearchButtonClick = onSearchButtonClick)
+        RegionRoute(
+            onBackClick = onBackClick,
+            onSearchButtonClick = onSearchButtonClick
+        )
     }
 }

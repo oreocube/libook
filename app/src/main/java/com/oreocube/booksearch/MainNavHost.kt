@@ -25,6 +25,7 @@ fun MainNavHost(
         startDestination = SearchBookRoute,
     ) {
         regionScreen(
+            onBackClick = navController::popBackStack,
             onSearchButtonClick = navController::navigateToSearchLibrary
         )
         searchLibraryScreen()
