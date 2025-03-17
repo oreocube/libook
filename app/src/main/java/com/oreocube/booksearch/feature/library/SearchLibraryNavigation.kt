@@ -14,8 +14,12 @@ fun NavController.navigateToSearchLibrary(districtId: Int) {
     navigate(route = SearchLibraryRoute(districtId = districtId))
 }
 
-fun NavGraphBuilder.searchLibraryScreen() {
+fun NavGraphBuilder.searchLibraryScreen(
+    onBackClick: () -> Unit,
+) {
     composable<SearchLibraryRoute> {
-        SearchLibraryRoute()
+        SearchLibraryRoute(
+            onBackClick = onBackClick,
+        )
     }
 }

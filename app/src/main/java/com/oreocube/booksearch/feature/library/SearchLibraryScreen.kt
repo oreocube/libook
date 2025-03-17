@@ -16,24 +16,28 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.oreocube.booksearch.R
+import com.oreocube.booksearch.core.ui.component.BookSearchTopBar
 import com.oreocube.booksearch.core.ui.theme.Brown20
 import com.oreocube.booksearch.core.ui.theme.Gray10
 import com.oreocube.booksearch.domain.model.Library
 
 @Composable
 fun SearchLibraryRoute(
+    onBackClick: () -> Unit,
     viewModel: SearchLibraryViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     SearchLibraryScreen(
         uiState = uiState,
+        onBackClick = onBackClick,
         onStarClick = viewModel::toggleLibraryStar,
     )
 }
@@ -41,24 +45,40 @@ fun SearchLibraryRoute(
 @Composable
 fun SearchLibraryScreen(
     uiState: SearchLibraryUiState,
+    onBackClick: () -> Unit,
     onStarClick: (Library) -> Unit,
 ) {
-    when (uiState) {
-        is SearchLibraryUiState.Result -> {
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
-                uiState.list.forEach { library ->
-                    item {
-                        LibraryItem(
-                            modifier = Modifier.fillMaxWidth(),
-                            library = library,
-                            onStarClick = onStarClick,
-                        )
+    Column {
+        BookSearchTopBar(
+            title = stringResource(R.string.menu_search_library_result),
+            description = stringResource(R.string.menu_description_search_library_result),
+            navigationIcon = {
+                IconButton(onClick = onBackClick) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_arrow_back_24),
+                        contentDescription = stringResource(R.string.menu_back),
+                    )
+                }
+            }
+        )
+
+        when (uiState) {
+            is SearchLibraryUiState.Result -> {
+                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                    uiState.list.forEach { library ->
+                        item {
+                            LibraryItem(
+                                modifier = Modifier.fillMaxWidth(),
+                                library = library,
+                                onStarClick = onStarClick,
+                            )
+                        }
                     }
                 }
             }
-        }
 
-        else -> {}
+            else -> {}
+        }
     }
 }
 

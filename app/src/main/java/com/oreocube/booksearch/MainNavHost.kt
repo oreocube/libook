@@ -28,7 +28,9 @@ fun MainNavHost(
             onBackClick = navController::popBackStack,
             onSearchButtonClick = navController::navigateToSearchLibrary
         )
-        searchLibraryScreen()
+        searchLibraryScreen(
+            onBackClick = navController::popBackStack,
+        )
         searchBookScreen(
             onBookClick = navController::navigateToBookDetail
         )
