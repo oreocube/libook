@@ -14,8 +14,12 @@ fun NavController.navigateToBookDetail(isbn: String) {
     navigate(route = BookDetailRoute(isbn = isbn))
 }
 
-fun NavGraphBuilder.bookDetailScreen() {
+fun NavGraphBuilder.bookDetailScreen(
+    onBackClick: () -> Unit,
+) {
     composable<BookDetailRoute> {
-        BookDetailRoute()
+        BookDetailRoute(
+            onBackClick = onBackClick,
+        )
     }
 }

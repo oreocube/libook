@@ -34,7 +34,9 @@ fun MainNavHost(
         searchBookScreen(
             onBookClick = navController::navigateToBookDetail
         )
-        bookDetailScreen()
+        bookDetailScreen(
+            onBackClick = navController::popBackStack,
+        )
         favoriteLibraryScreen(
             onSearchClick = navController::navigateToRegion
         )

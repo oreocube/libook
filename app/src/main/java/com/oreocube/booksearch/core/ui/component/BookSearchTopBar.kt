@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import com.oreocube.booksearch.R
 import com.oreocube.booksearch.core.ui.theme.Gray20
 
-private val topAppBarHeight = 80.dp
+private val topAppBarHeight = 72.dp
 private val topAppBarItemSpacing = 8.dp
 
 @Composable

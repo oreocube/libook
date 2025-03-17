@@ -12,6 +12,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -19,6 +21,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -26,6 +30,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
+import com.oreocube.booksearch.R
+import com.oreocube.booksearch.core.ui.component.BookSearchTopBar
 import com.oreocube.booksearch.core.ui.theme.Brown20
 import com.oreocube.booksearch.core.ui.theme.Gray10
 import com.oreocube.booksearch.core.ui.theme.Gray20
@@ -38,6 +44,7 @@ import com.oreocube.booksearch.domain.model.LibraryShort
 
 @Composable
 fun BookDetailRoute(
+    onBackClick: () -> Unit,
     viewModel: BookDetailViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -45,6 +52,7 @@ fun BookDetailRoute(
     BookDetailScreen(
         modifier = Modifier.fillMaxSize(),
         uiState = uiState,
+        onBackClick = onBackClick,
     )
 }
 
@@ -52,22 +60,35 @@ fun BookDetailRoute(
 fun BookDetailScreen(
     modifier: Modifier = Modifier,
     uiState: BookDetailUiState,
+    onBackClick: () -> Unit,
 ) {
-    when (uiState) {
-        is BookDetailUiState.Loading -> {}
-        is BookDetailUiState.Data -> {
-            val scrollState = rememberScrollState()
+    Column(modifier = modifier) {
+        BookSearchTopBar(
+            navigationIcon = {
+                IconButton(onClick = onBackClick) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_arrow_back_24),
+                        contentDescription = stringResource(R.string.menu_back),
+                    )
+                }
+            }
+        )
+        when (uiState) {
+            is BookDetailUiState.Loading -> {}
+            is BookDetailUiState.Data -> {
+                val scrollState = rememberScrollState()
 
-            Column(modifier = modifier.verticalScroll(scrollState)) {
-                BookDetailContent(
-                    modifier = Modifier.fillMaxWidth(),
-                    book = uiState.book,
-                )
-                HorizontalDivider()
-                LibraryStatusForBook(
-                    modifier = Modifier.fillMaxWidth(),
-                    status = uiState.status,
-                )
+                Column(modifier = modifier.verticalScroll(scrollState)) {
+                    BookDetailContent(
+                        modifier = Modifier.fillMaxWidth(),
+                        book = uiState.book,
+                    )
+                    HorizontalDivider()
+                    LibraryStatusForBook(
+                        modifier = Modifier.fillMaxWidth(),
+                        status = uiState.status,
+                    )
+                }
             }
         }
     }
@@ -224,6 +245,7 @@ private fun BookDetailScreenPreview() {
                     loanAvailable = true
                 ),
             )
-        )
+        ),
+        onBackClick = {},
     )
 }
