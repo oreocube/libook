@@ -18,6 +18,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,11 +36,13 @@ import com.oreocube.booksearch.core.ui.theme.Brown60
 import com.oreocube.booksearch.core.ui.theme.Gray80
 import com.oreocube.booksearch.domain.model.City
 import com.oreocube.booksearch.domain.model.District
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun RegionRoute(
     onBackClick: () -> Unit,
     onSearchButtonClick: (Int) -> Unit,
+    onShowSnackBar: (String) -> Unit,
     viewModel: RegionViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -50,8 +53,22 @@ fun RegionRoute(
         onBackClick = onBackClick,
         onCityClick = viewModel::onCitySelected,
         onDistrictClick = viewModel::onDistrictSelected,
-        onSearchButtonClick = onSearchButtonClick,
+        onSearchButtonClick = viewModel::onSearchButtonClicked,
     )
+
+    LaunchedEffect(Unit) {
+        viewModel.eventFlow.collectLatest { event ->
+            when (event) {
+                is RegionUiEvent.NavigateToSearchBook -> {
+                    onSearchButtonClick(event.districtId)
+                }
+
+                is RegionUiEvent.Error -> {
+                    onShowSnackBar(event.message)
+                }
+            }
+        }
+    }
 }
 
 @Composable
@@ -110,9 +127,7 @@ fun RegionScreen(
                             shape = RoundedCornerShape(10.dp)
                         )
                         .clickable {
-                            uiState.selectedDistrictId
-                                .takeIf { it != -1 }
-                                ?.run(onSearchButtonClick)
+                            onSearchButtonClick(uiState.selectedDistrictId)
                         }
                         .padding(16.dp),
                 ) {

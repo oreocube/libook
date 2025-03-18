@@ -8,9 +8,11 @@ import com.oreocube.booksearch.domain.model.param.DistrictSearchParam
 import com.oreocube.booksearch.domain.usecase.GetCitiesUseCase
 import com.oreocube.booksearch.domain.usecase.GetDistrictsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -23,6 +25,9 @@ class RegionViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow<RegionUiState>(RegionUiState.Loading)
     val uiState: StateFlow<RegionUiState> = _uiState.asStateFlow()
+
+    private val _eventChannel = Channel<RegionUiEvent>(Channel.BUFFERED)
+    val eventFlow = _eventChannel.receiveAsFlow()
 
     init {
         getCities()
@@ -71,6 +76,16 @@ class RegionViewModel @Inject constructor(
             }
         }
     }
+
+    fun onSearchButtonClicked(id: Int) {
+        viewModelScope.launch {
+            if (id == -1) {
+                _eventChannel.send(RegionUiEvent.Error("지역을 선택해주세요."))
+            } else {
+                _eventChannel.send(RegionUiEvent.NavigateToSearchBook(id))
+            }
+        }
+    }
 }
 
 sealed class RegionUiState {
@@ -81,4 +96,9 @@ sealed class RegionUiState {
         val cities: List<City>,
         val districts: List<District> = emptyList(),
     ) : RegionUiState()
+}
+
+sealed class RegionUiEvent {
+    data class NavigateToSearchBook(val districtId: Int) : RegionUiEvent()
+    data class Error(val message: String) : RegionUiEvent()
 }

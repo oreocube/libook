@@ -19,6 +19,7 @@ import com.oreocube.booksearch.feature.region.regionScreen
 fun MainNavHost(
     modifier: Modifier = Modifier,
     appState: BookSearchAppState,
+    onShowSnackBar: (String) -> Unit,
 ) {
     val navController = appState.navController
     NavHost(
@@ -31,7 +32,8 @@ fun MainNavHost(
         )
         regionScreen(
             onBackClick = navController::popBackStack,
-            onSearchButtonClick = navController::navigateToSearchLibrary
+            onSearchButtonClick = navController::navigateToSearchLibrary,
+            onShowSnackBar = onShowSnackBar,
         )
         searchLibraryScreen(
             onBackClick = navController::popBackStack,

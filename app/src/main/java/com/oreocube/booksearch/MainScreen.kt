@@ -2,22 +2,37 @@ package com.oreocube.booksearch
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import com.oreocube.booksearch.core.navigation.TopLevelDestination
 import com.oreocube.booksearch.core.ui.component.BookSearchNavigationBar
 import com.oreocube.booksearch.core.ui.component.BookSearchNavigationItem
+import kotlinx.coroutines.launch
 
 @Composable
 fun MainScreen(
     appState: BookSearchAppState,
 ) {
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+
     Scaffold(
         containerColor = Color.White,
+        snackbarHost = {
+            SnackbarHost(
+                modifier = Modifier.padding(bottom = 80.dp),
+                hostState = snackbarHostState,
+            )
+        },
         bottomBar = {
             val currentDestination = appState.currentDestination
             val isTopLevelDestination = currentDestination.isTopLevelDestination()
@@ -42,6 +57,11 @@ fun MainScreen(
         MainNavHost(
             modifier = Modifier.padding(innerPadding),
             appState = appState,
+            onShowSnackBar = { message ->
+                coroutineScope.launch {
+                    snackbarHostState.showSnackbar(message)
+                }
+            }
         )
     }
 }
