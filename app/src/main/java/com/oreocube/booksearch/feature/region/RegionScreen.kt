@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -24,12 +23,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.oreocube.booksearch.R
+import com.oreocube.booksearch.core.ui.component.BookSearchButton
 import com.oreocube.booksearch.core.ui.component.BookSearchTopBar
 import com.oreocube.booksearch.core.ui.theme.Brown10
 import com.oreocube.booksearch.core.ui.theme.Brown60
@@ -118,26 +117,13 @@ fun RegionScreen(
                     onCityClick = onCityClick,
                     onDistrictClick = onDistrictClick,
                 )
-                Box(
+                BookSearchButton(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp)
-                        .background(
-                            color = Brown10,
-                            shape = RoundedCornerShape(10.dp)
-                        )
-                        .clickable {
-                            onSearchButtonClick(uiState.selectedDistrictId)
-                        }
                         .padding(16.dp),
-                ) {
-                    Text(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = "도서관 찾기",
-                        textAlign = TextAlign.Center,
-                        color = Color.White,
-                    )
-                }
+                    text = stringResource(R.string.menu_search_library),
+                    onClick = { onSearchButtonClick(uiState.selectedDistrictId) }
+                )
             }
         }
 
