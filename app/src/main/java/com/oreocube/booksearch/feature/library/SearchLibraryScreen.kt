@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -26,6 +27,7 @@ import com.oreocube.booksearch.R
 import com.oreocube.booksearch.core.ui.component.BookSearchTopBar
 import com.oreocube.booksearch.core.ui.theme.Brown20
 import com.oreocube.booksearch.core.ui.theme.Gray10
+import com.oreocube.booksearch.core.ui.theme.Gray20
 import com.oreocube.booksearch.domain.model.Library
 
 @Composable
@@ -48,7 +50,7 @@ fun SearchLibraryScreen(
     onBackClick: () -> Unit,
     onStarClick: (Library) -> Unit,
 ) {
-    Column {
+    Column(modifier = Modifier.fillMaxSize()) {
         BookSearchTopBar(
             title = stringResource(R.string.menu_search_library_result),
             description = stringResource(R.string.menu_description_search_library_result),
@@ -64,9 +66,20 @@ fun SearchLibraryScreen(
 
         when (uiState) {
             is SearchLibraryUiState.Result -> {
-                LazyColumn(modifier = Modifier.fillMaxSize()) {
-                    uiState.list.forEach { library ->
-                        item {
+                if (uiState.list.isEmpty()) {
+                    Text(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
+                        text = stringResource(R.string.no_result),
+                        color = Gray20,
+                    )
+                } else {
+                    LazyColumn {
+                        items(
+                            items = uiState.list,
+                            key = { library -> library.id }
+                        ) { library ->
                             LibraryItem(
                                 modifier = Modifier.fillMaxWidth(),
                                 library = library,
