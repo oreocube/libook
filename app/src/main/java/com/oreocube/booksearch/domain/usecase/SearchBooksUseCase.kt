@@ -10,7 +10,7 @@ class SearchBooksUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(query: String): List<Book> {
         return libraryRepository.searchBooks(
-            BookSearchParam(query.trim().replace(" ", ";"))
+            BookSearchParam(query)
         )
     }
 }

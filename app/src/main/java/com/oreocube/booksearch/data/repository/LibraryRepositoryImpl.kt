@@ -24,7 +24,7 @@ class LibraryRepositoryImpl @Inject constructor(
     }
 
     override suspend fun searchBooks(param: BookSearchParam): List<Book> {
-        return libraryService.searchBooks(keyword = param.keyword).response.docs.map {
+        return libraryService.searchBooks(title = param.title).response.docs.map {
             it.doc.toModel()
         }
     }

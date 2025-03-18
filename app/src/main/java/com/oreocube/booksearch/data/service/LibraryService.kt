@@ -22,7 +22,7 @@ interface LibraryService {
 
     @GET("srchBooks")
     suspend fun searchBooks(
-        @Query("keyword") keyword: String,
+        @Query("title") title: String,
         @Query("pageNo") page: Int = 1,
         @Query("pageSize") pageSize: Int = 300,
         @Query("authKey") authKey: String = BuildConfig.LIBRARY_API_AUTH_KEY,
