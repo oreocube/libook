@@ -17,9 +17,15 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -32,6 +38,7 @@ import coil3.compose.AsyncImage
 import com.oreocube.booksearch.R
 import com.oreocube.booksearch.core.ui.theme.Gray10
 import com.oreocube.booksearch.core.ui.theme.Gray20
+import com.oreocube.booksearch.core.ui.theme.Gray40
 import com.oreocube.booksearch.domain.model.Book
 
 @Composable
@@ -45,7 +52,6 @@ fun SearchBookRoute(
         uiState = uiState,
         onInputChanged = viewModel::onInputChanged,
         onClearClicked = viewModel::onInputChanged,
-        onQuerySubmitted = {},
         onBookClick = onBookClick,
     )
 }
@@ -55,16 +61,24 @@ fun SearchBookScreen(
     uiState: SearchBookUiState,
     onInputChanged: (String) -> Unit,
     onClearClicked: () -> Unit,
-    onQuerySubmitted: (String) -> Unit,
     onBookClick: (String) -> Unit,
 ) {
+    val focusManager = LocalFocusManager.current
+    val focusRequester = remember { FocusRequester() }
+    val keyboardController = LocalSoftwareKeyboardController.current
+
     Column(modifier = Modifier.fillMaxSize()) {
         BookSearchTextField(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .focusRequester(focusRequester),
             input = uiState.query,
             onInputChanged = onInputChanged,
             onClearClicked = onClearClicked,
-            onQuerySubmitted = onQuerySubmitted,
+            onQuerySubmitted = {
+                keyboardController?.hide()
+                focusManager.clearFocus()
+            },
         )
         LazyColumn(modifier = Modifier.weight(1f)) {
             uiState.result.forEachIndexed { index, book ->
@@ -73,10 +87,16 @@ fun SearchBookScreen(
                         book = book,
                         onItemClick = { onBookClick(book.isbn13) }
                     )
-                    HorizontalDivider()
+                    if (index != uiState.result.lastIndex) {
+                        HorizontalDivider(color = Gray40)
+                    }
                 }
             }
         }
+    }
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
     }
 }
 
@@ -185,7 +205,6 @@ private fun SearchBookScreenPreview1() {
         uiState = SearchBookUiState(),
         onInputChanged = {},
         onClearClicked = {},
-        onQuerySubmitted = {},
         onBookClick = {},
     )
 }
@@ -212,7 +231,6 @@ private fun SearchBookScreenPreview2() {
         ),
         onInputChanged = {},
         onClearClicked = {},
-        onQuerySubmitted = {},
         onBookClick = {},
     )
 }
