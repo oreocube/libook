@@ -57,7 +57,7 @@ fun MainScreen(
         MainNavHost(
             modifier = Modifier.padding(innerPadding),
             appState = appState,
-            onShowSnackBar = { message ->
+            onShowSnackbar = { message ->
                 coroutineScope.launch {
                     snackbarHostState.showSnackbar(message)
                 }

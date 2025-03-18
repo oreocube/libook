@@ -11,6 +11,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -33,6 +34,7 @@ import com.oreocube.booksearch.domain.model.Library
 @Composable
 fun SearchLibraryRoute(
     onBackClick: () -> Unit,
+    onShowSnackbar: (String) -> Unit,
     viewModel: SearchLibraryViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -42,6 +44,16 @@ fun SearchLibraryRoute(
         onBackClick = onBackClick,
         onStarClick = viewModel::toggleLibraryStar,
     )
+
+    LaunchedEffect(Unit) {
+        viewModel.eventFlow.collect { event ->
+            when (event) {
+                is SearchLibraryUiEvent.Error -> {
+                    onShowSnackbar(event.message)
+                }
+            }
+        }
+    }
 }
 
 @Composable

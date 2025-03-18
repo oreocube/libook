@@ -11,11 +11,14 @@ import com.oreocube.booksearch.domain.usecase.DeleteFavoriteLibraryUseCase
 import com.oreocube.booksearch.domain.usecase.GetFavoriteLibrariesUseCase
 import com.oreocube.booksearch.domain.usecase.GetLibrariesByRegionUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -36,6 +39,9 @@ class SearchLibraryViewModel @Inject constructor(
         initialValue = searchLibraryRoute.districtId,
     )
 
+    private val _eventChannel = Channel<SearchLibraryUiEvent>(Channel.BUFFERED)
+    val eventFlow = _eventChannel.receiveAsFlow()
+
     private val favoriteLibraryIds: StateFlow<Set<String>> = getFavoriteLibrariesUseCase()
         .map { list -> list.map { it.id }.toSet() }
         .stateIn(
@@ -50,6 +56,9 @@ class SearchLibraryViewModel @Inject constructor(
         }.combine(favoriteLibraryIds) { libraries, favoriteSet ->
             val searchResult = libraries.map { it.copy(isFavorite = it.id in favoriteSet) }
             SearchLibraryUiState.Result(list = searchResult)
+        }
+        .catch {
+            _eventChannel.send(SearchLibraryUiEvent.Error("도서관을 불러오는데 실패했습니다."))
         }
         .stateIn(
             scope = viewModelScope,
@@ -75,4 +84,8 @@ sealed class SearchLibraryUiState {
     data class Result(
         val list: List<Library>
     ) : SearchLibraryUiState()
+}
+
+sealed class SearchLibraryUiEvent {
+    data class Error(val message: String) : SearchLibraryUiEvent()
 }

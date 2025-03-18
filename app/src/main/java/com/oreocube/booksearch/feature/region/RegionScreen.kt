@@ -42,7 +42,7 @@ import kotlinx.coroutines.flow.collectLatest
 fun RegionRoute(
     onBackClick: () -> Unit,
     onSearchButtonClick: (Int) -> Unit,
-    onShowSnackBar: (String) -> Unit,
+    onShowSnackbar: (String) -> Unit,
     viewModel: RegionViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -64,7 +64,7 @@ fun RegionRoute(
                 }
 
                 is RegionUiEvent.Error -> {
-                    onShowSnackBar(event.message)
+                    onShowSnackbar(event.message)
                 }
             }
         }
