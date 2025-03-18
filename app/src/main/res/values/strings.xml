@@ -12,5 +12,6 @@
     <string name="app_summary">읽고 싶은 책을, 자주 가는 도서관에서</string>
     <string name="search_book_hint">책 제목을 두 글자 이상 입력해주세요</string>
     <string name="no_favorite_library">저장한 관심 도서관이 없어요!</string>
+    <string name="no_favorite_library_and_extra_information">관심 도서관을 추가하고,\n도서관에 이 책이 있는지 확인해보세요</string>
     <string name="no_result">검색 결과가 없습니다.</string>
 </resources>

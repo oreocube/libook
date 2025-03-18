@@ -1,6 +1,8 @@
 package com.oreocube.booksearch.feature.book
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,6 +16,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -24,6 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -45,6 +49,7 @@ import com.oreocube.booksearch.domain.model.LibraryShort
 @Composable
 fun BookDetailRoute(
     onBackClick: () -> Unit,
+    onAddLibraryClick: () -> Unit,
     viewModel: BookDetailViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -53,6 +58,7 @@ fun BookDetailRoute(
         modifier = Modifier.fillMaxSize(),
         uiState = uiState,
         onBackClick = onBackClick,
+        onAddLibraryClick = onAddLibraryClick,
     )
 }
 
@@ -61,6 +67,7 @@ fun BookDetailScreen(
     modifier: Modifier = Modifier,
     uiState: BookDetailUiState,
     onBackClick: () -> Unit,
+    onAddLibraryClick: () -> Unit,
 ) {
     Column(modifier = modifier) {
         BookSearchTopBar(
@@ -87,6 +94,7 @@ fun BookDetailScreen(
                     LibraryStatusForBook(
                         modifier = Modifier.fillMaxWidth(),
                         status = uiState.status,
+                        onAddLibraryClick = onAddLibraryClick,
                     )
                 }
             }
@@ -95,7 +103,7 @@ fun BookDetailScreen(
 }
 
 @Composable
-fun BookDetailContent(
+private fun BookDetailContent(
     modifier: Modifier = Modifier,
     book: BookDetail
 ) {
@@ -147,7 +155,8 @@ fun BookDetailContent(
 @Composable
 private fun LibraryStatusForBook(
     modifier: Modifier = Modifier,
-    status: List<Pair<LibraryShort, BookAvailability>>
+    status: List<Pair<LibraryShort, BookAvailability>>,
+    onAddLibraryClick: () -> Unit,
 ) {
     Column(
         modifier = modifier
@@ -159,28 +168,76 @@ private fun LibraryStatusForBook(
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
         )
-        status.forEach { (library, availability) ->
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(text = library.name, fontSize = 16.sp)
-                StatusLabel(
-                    modifier = Modifier.padding(start = 8.dp),
-                    text = if (availability.hasBook) "보유" else "미보유",
-                    containerColor = if (availability.hasBook) Brown20 else Gray30
-                )
-
-                if (availability.hasBook) {
+        if (status.isEmpty()) {
+            EmptyFavoriteLibraryContent(
+                onAddLibraryClick = onAddLibraryClick
+            )
+        } else {
+            status.forEach { (library, availability) ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(text = library.name, fontSize = 16.sp)
                     StatusLabel(
                         modifier = Modifier.padding(start = 8.dp),
-                        text = if (availability.loanAvailable) "대출가능" else "대출중",
-                        containerColor = if (availability.loanAvailable) Green30 else Red30
+                        text = if (availability.hasBook) "보유" else "미보유",
+                        containerColor = if (availability.hasBook) Brown20 else Gray30
                     )
+
+                    if (availability.hasBook) {
+                        StatusLabel(
+                            modifier = Modifier.padding(start = 8.dp),
+                            text = if (availability.loanAvailable) "대출가능" else "대출중",
+                            containerColor = if (availability.loanAvailable) Green30 else Red30
+                        )
+                    }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun EmptyFavoriteLibraryContent(
+    onAddLibraryClick: () -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 36.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+        Text(
+            modifier = Modifier.fillMaxWidth(),
+            text = stringResource(R.string.no_favorite_library_and_extra_information),
+            style = MaterialTheme.typography.bodyMedium,
+            color = Gray20,
+            textAlign = TextAlign.Center,
+        )
+        Row(
+            modifier = Modifier
+                .padding(top = 16.dp)
+                .clip(shape = RoundedCornerShape(32.dp))
+                .background(color = Brown20)
+                .clickable(onClick = onAddLibraryClick)
+                .padding(horizontal = 24.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(
+                tint = Color.White,
+                painter = painterResource(R.drawable.ic_search_24),
+                contentDescription = stringResource(R.string.menu_search_library)
+            )
+            Text(
+                modifier = Modifier.padding(start = 8.dp),
+                text = stringResource(R.string.menu_search_library),
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color.White,
+            )
         }
     }
 }
@@ -207,13 +264,23 @@ private fun StatusLabel(
 
 @Composable
 @Preview(showBackground = true)
-private fun LibraryStatusForBookPreview() {
+private fun LibraryStatusForBookPreview1() {
     LibraryStatusForBook(
         status = listOf(
             LibraryShort("1", "도서관1") to BookAvailability(hasBook = true, loanAvailable = false),
             LibraryShort("1", "도서관2") to BookAvailability(hasBook = false, loanAvailable = false),
             LibraryShort("1", "도서관3") to BookAvailability(hasBook = true, loanAvailable = true),
-        )
+        ),
+        onAddLibraryClick = {},
+    )
+}
+
+@Composable
+@Preview(showBackground = true)
+private fun LibraryStatusForBookPreview2() {
+    LibraryStatusForBook(
+        status = emptyList(),
+        onAddLibraryClick = {},
     )
 }
 
@@ -247,5 +314,6 @@ private fun BookDetailScreenPreview() {
             )
         ),
         onBackClick = {},
+        onAddLibraryClick = {},
     )
 }

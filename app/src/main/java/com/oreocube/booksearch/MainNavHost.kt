@@ -7,7 +7,6 @@ import com.oreocube.booksearch.feature.book.bookDetailScreen
 import com.oreocube.booksearch.feature.book.navigateToBookDetail
 import com.oreocube.booksearch.feature.book.navigateToSearchBook
 import com.oreocube.booksearch.feature.book.searchBookScreen
-import com.oreocube.booksearch.feature.favorite.library.FavoriteLibraryRoute
 import com.oreocube.booksearch.feature.favorite.library.favoriteLibraryScreen
 import com.oreocube.booksearch.feature.home.HomeRoute
 import com.oreocube.booksearch.feature.home.homeScreen
@@ -40,7 +39,8 @@ fun MainNavHost(
             onBackClick = navController::popBackStack,
             onShowSnackbar = onShowSnackbar,
             onCompleteClick = {
-                navController.popBackStack(FavoriteLibraryRoute, inclusive = false)
+                navController.popBackStack()
+                navController.popBackStack()
             },
         )
         searchBookScreen(
@@ -48,6 +48,7 @@ fun MainNavHost(
         )
         bookDetailScreen(
             onBackClick = navController::popBackStack,
+            onAddLibraryClick = navController::navigateToRegion
         )
         favoriteLibraryScreen(
             onSearchClick = navController::navigateToRegion
