@@ -9,6 +9,6 @@ class GetDistrictsUseCase @Inject constructor(
     private val regionRepository: RegionRepository,
 ) {
     suspend operator fun invoke(param: DistrictSearchParam): List<District> {
-        return regionRepository.getDistricts(param)
+        return regionRepository.getDistricts(param).sortedBy(District::name)
     }
 }
