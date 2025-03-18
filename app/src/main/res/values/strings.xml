@@ -10,4 +10,5 @@
     <string name="menu_description_search_library_result">북마크 아이콘을 눌러 관심 도서관을 추가할 수 있어요</string>
     <string name="display_app_name">LiBook</string>
     <string name="app_summary">읽고 싶은 책을, 자주 가는 도서관에서</string>
+    <string name="search_book_hint">책 제목을 두 글자 이상 입력해주세요</string>
 </resources>

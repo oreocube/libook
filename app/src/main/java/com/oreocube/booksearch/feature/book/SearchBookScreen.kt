@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -27,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
@@ -36,8 +38,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.oreocube.booksearch.R
+import com.oreocube.booksearch.core.ui.theme.Brown30
 import com.oreocube.booksearch.core.ui.theme.Gray10
 import com.oreocube.booksearch.core.ui.theme.Gray20
+import com.oreocube.booksearch.core.ui.theme.Gray30
 import com.oreocube.booksearch.core.ui.theme.Gray40
 import com.oreocube.booksearch.domain.model.Book
 
@@ -106,13 +110,13 @@ private fun BookSearchTextField(
     input: String,
     onInputChanged: (String) -> Unit,
     onClearClicked: () -> Unit,
-    onQuerySubmitted: (String) -> Unit,
+    onQuerySubmitted: () -> Unit,
 ) {
     TextField(
         modifier = modifier,
         value = input,
         onValueChange = onInputChanged,
-        label = { Text("검색어를 입력하세요") },
+        placeholder = { Text(text = stringResource(R.string.search_book_hint)) },
         trailingIcon = {
             if (input.isNotBlank())
                 IconButton(onClick = onClearClicked) {
@@ -122,17 +126,40 @@ private fun BookSearchTextField(
                     )
                 }
         },
+        singleLine = true,
         keyboardOptions = KeyboardOptions.Default.copy(
             imeAction = ImeAction.Done
         ),
         keyboardActions = KeyboardActions(
-            onDone = { onQuerySubmitted(input) }
+            onDone = { onQuerySubmitted() }
         ),
         colors = TextFieldDefaults.colors().copy(
             focusedContainerColor = Color.Transparent,
             errorContainerColor = Color.Transparent,
             disabledContainerColor = Color.Transparent,
             unfocusedContainerColor = Color.Transparent,
+            focusedTextColor = Color.Black,
+            errorTextColor = Color.Black,
+            disabledTextColor = Color.Black,
+            unfocusedTextColor = Color.Black,
+            focusedPlaceholderColor = Gray30,
+            errorPlaceholderColor = Gray30,
+            disabledPlaceholderColor = Gray30,
+            unfocusedPlaceholderColor = Gray30,
+            focusedIndicatorColor = Brown30,
+            errorIndicatorColor = Brown30,
+            disabledIndicatorColor = Brown30,
+            unfocusedIndicatorColor = Brown30,
+            cursorColor = Brown30,
+            errorCursorColor = Brown30,
+            focusedTrailingIconColor = Brown30,
+            errorTrailingIconColor = Brown30,
+            disabledTrailingIconColor = Brown30,
+            unfocusedTrailingIconColor = Brown30,
+            textSelectionColors = TextSelectionColors(
+                handleColor = Brown30,
+                backgroundColor = Brown30.copy(alpha = 0.4f)
+            ),
         )
     )
 }
