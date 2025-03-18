@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.oreocube.booksearch.R
+import com.oreocube.booksearch.core.ui.component.BookSearchButton
 import com.oreocube.booksearch.core.ui.component.BookSearchTopBar
 import com.oreocube.booksearch.core.ui.theme.Brown20
 import com.oreocube.booksearch.core.ui.theme.Gray10
@@ -34,6 +35,7 @@ import com.oreocube.booksearch.domain.model.Library
 @Composable
 fun SearchLibraryRoute(
     onBackClick: () -> Unit,
+    onCompleteClick: () -> Unit,
     onShowSnackbar: (String) -> Unit,
     viewModel: SearchLibraryViewModel = hiltViewModel()
 ) {
@@ -43,6 +45,7 @@ fun SearchLibraryRoute(
         uiState = uiState,
         onBackClick = onBackClick,
         onStarClick = viewModel::toggleLibraryStar,
+        onCompleteClick = onCompleteClick,
     )
 
     LaunchedEffect(Unit) {
@@ -61,6 +64,7 @@ fun SearchLibraryScreen(
     uiState: SearchLibraryUiState,
     onBackClick: () -> Unit,
     onStarClick: (Library) -> Unit,
+    onCompleteClick: () -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         BookSearchTopBar(
@@ -87,7 +91,7 @@ fun SearchLibraryScreen(
                         color = Gray20,
                     )
                 } else {
-                    LazyColumn {
+                    LazyColumn(modifier = Modifier.weight(1f)) {
                         items(
                             items = uiState.list,
                             key = { library -> library.id }
@@ -99,6 +103,13 @@ fun SearchLibraryScreen(
                             )
                         }
                     }
+                    BookSearchButton(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        text = "완료",
+                        onClick = onCompleteClick,
+                    )
                 }
             }
 
