@@ -44,11 +44,13 @@ fun MainNavHost(
             },
         )
         searchBookScreen(
-            onBookClick = navController::navigateToBookDetail
+            onBookClick = navController::navigateToBookDetail,
+            onShowSnackbar = onShowSnackbar,
         )
         bookDetailScreen(
             onBackClick = navController::popBackStack,
-            onAddLibraryClick = navController::navigateToRegion
+            onAddLibraryClick = navController::navigateToRegion,
+            onShowSnackbar = onShowSnackbar,
         )
         favoriteLibraryScreen(
             onSearchClick = navController::navigateToRegion

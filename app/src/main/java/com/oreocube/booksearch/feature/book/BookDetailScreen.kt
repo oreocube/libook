@@ -19,6 +19,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,6 +51,7 @@ import com.oreocube.booksearch.domain.model.LibraryShort
 fun BookDetailRoute(
     onBackClick: () -> Unit,
     onAddLibraryClick: () -> Unit,
+    onShowSnackbar: (String) -> Unit,
     viewModel: BookDetailViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -60,6 +62,16 @@ fun BookDetailRoute(
         onBackClick = onBackClick,
         onAddLibraryClick = onAddLibraryClick,
     )
+
+    LaunchedEffect(Unit) {
+        viewModel.eventFlow.collect { event ->
+            when (event) {
+                is BookDetailUiEvent.Error -> {
+                    onShowSnackbar(event.message)
+                }
+            }
+        }
+    }
 }
 
 @Composable

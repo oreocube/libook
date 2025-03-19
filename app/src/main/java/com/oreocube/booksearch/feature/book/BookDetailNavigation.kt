@@ -17,11 +17,13 @@ fun NavController.navigateToBookDetail(isbn: String) {
 fun NavGraphBuilder.bookDetailScreen(
     onBackClick: () -> Unit,
     onAddLibraryClick: () -> Unit,
+    onShowSnackbar: (String) -> Unit,
 ) {
     composable<BookDetailRoute> {
         BookDetailRoute(
             onBackClick = onBackClick,
             onAddLibraryClick = onAddLibraryClick,
+            onShowSnackbar = onShowSnackbar,
         )
     }
 }

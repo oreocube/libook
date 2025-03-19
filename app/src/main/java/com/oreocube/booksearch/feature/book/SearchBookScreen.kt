@@ -37,6 +37,7 @@ import com.oreocube.booksearch.domain.model.Book
 @Composable
 fun SearchBookRoute(
     onBookClick: (String) -> Unit,
+    onShowSnackbar: (String) -> Unit,
     viewModel: SearchBookViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -47,6 +48,16 @@ fun SearchBookRoute(
         onClearClicked = viewModel::onInputChanged,
         onBookClick = onBookClick,
     )
+
+    LaunchedEffect(Unit) {
+        viewModel.eventFlow.collect { event ->
+            when (event) {
+                is SearchBookUiEvent.Error -> {
+                    onShowSnackbar(event.message)
+                }
+            }
+        }
+    }
 }
 
 @Composable

@@ -1,5 +1,7 @@
 package com.oreocube.booksearch
 
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -26,6 +28,9 @@ fun MainScreen(
     val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
+        modifier = Modifier
+            .fillMaxSize()
+            .imePadding(),
         containerColor = Color.White,
         snackbarHost = {
             SnackbarHost(
