@@ -35,34 +35,43 @@ class RegionViewModel @Inject constructor(
 
     private fun getCities() {
         viewModelScope.launch {
-            val cities = getCitiesUseCase()
-            val selectedCityId = cities.firstOrNull()?.id ?: -1
+            runCatching {
+                getCitiesUseCase()
+            }.onSuccess { cities ->
+                val selectedCityId = cities.firstOrNull()?.id ?: -1
 
-            _uiState.value = RegionUiState.Table(
-                selectedCityId = selectedCityId,
-                cities = cities,
-            )
+                _uiState.value = RegionUiState.Table(
+                    selectedCityId = selectedCityId,
+                    cities = cities,
+                )
 
-            if (selectedCityId != -1) {
-                onCitySelected(selectedCityId)
+                if (selectedCityId != -1) {
+                    onCitySelected(selectedCityId)
+                }
+            }.onFailure {
+                _eventChannel.send(RegionUiEvent.Error("데이터를 불러오지 못했습니다."))
             }
         }
     }
 
     fun onCitySelected(id: Int) {
         viewModelScope.launch {
-            val districts = getDistrictsUseCase(DistrictSearchParam(cityId = id))
-
-            _uiState.update { state ->
-                if (state is RegionUiState.Table) {
-                    state.copy(
-                        selectedCityId = id,
-                        selectedDistrictId = -1,
-                        districts = districts,
-                    )
-                } else {
-                    state
+            runCatching {
+                getDistrictsUseCase(DistrictSearchParam(cityId = id))
+            }.onSuccess { districts ->
+                _uiState.update { state ->
+                    if (state is RegionUiState.Table) {
+                        state.copy(
+                            selectedCityId = id,
+                            selectedDistrictId = -1,
+                            districts = districts,
+                        )
+                    } else {
+                        state
+                    }
                 }
+            }.onFailure {
+                _eventChannel.send(RegionUiEvent.Error("데이터를 불러오지 못했습니다."))
             }
         }
     }
