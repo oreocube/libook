@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.gms)
     alias(libs.plugins.secrets)
+    alias(libs.plugins.crashlytics)
 }
 
 android {
@@ -73,6 +74,8 @@ dependencies {
     implementation(libs.room.runtime)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.firestore)
+    implementation(libs.firebase.crashlytics)
+    implementation(libs.firebase.analytics)
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
     testImplementation(libs.junit)
