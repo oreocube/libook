@@ -38,14 +38,14 @@ class RegionViewModel @Inject constructor(
             runCatching {
                 getCitiesUseCase()
             }.onSuccess { cities ->
-                val selectedCityId = cities.firstOrNull()?.id ?: -1
+                val selectedCityId = cities.firstOrNull()?.id ?: UNSELECTED
 
                 _uiState.value = RegionUiState.Table(
                     selectedCityId = selectedCityId,
                     cities = cities,
                 )
 
-                if (selectedCityId != -1) {
+                if (selectedCityId != UNSELECTED) {
                     onCitySelected(selectedCityId)
                 }
             }.onFailure {
@@ -63,7 +63,7 @@ class RegionViewModel @Inject constructor(
                     if (state is RegionUiState.Table) {
                         state.copy(
                             selectedCityId = id,
-                            selectedDistrictId = -1,
+                            selectedDistrictId = UNSELECTED,
                             districts = districts,
                         )
                     } else {
@@ -94,6 +94,10 @@ class RegionViewModel @Inject constructor(
                 _eventChannel.send(RegionUiEvent.NavigateToSearchBook(id))
             }
         }
+    }
+    
+    companion object {
+        private const val UNSELECTED = -1
     }
 }
 
