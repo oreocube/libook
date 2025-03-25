@@ -2,4 +2,9 @@
 <resources>
 
     <style name="Theme.Booksearch" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="Theme.Booksearch.Splash" parent="Theme.SplashScreen">
+        <item name="android:windowBackground">@color/gray_10</item>
+        <item name="postSplashScreenTheme">@style/Theme.Booksearch</item>
+    </style>
 </resources>

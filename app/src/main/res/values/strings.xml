@@ -1,3 +1,18 @@
 <resources>
-    <string name="app_name">book-search</string>
+    <string name="app_name">LiBook</string>
+    <string name="app_name_debug">LiBook-dev</string>
+    <string name="menu_search_book">도서 검색</string>
+    <string name="menu_favorite_library">관심 도서관</string>
+    <string name="menu_description_favorite_library">자주 가는 도서관을 저장할 수 있어요</string>
+    <string name="menu_search_library">도서관 찾기</string>
+    <string name="menu_description_search_library">선택된 지역에 위치한 도서관을 검색할 수 있어요</string>
+    <string name="menu_back">뒤로 가기</string>
+    <string name="menu_search_library_result">검색 결과</string>
+    <string name="menu_description_search_library_result">북마크 아이콘을 눌러 관심 도서관을 추가할 수 있어요</string>
+    <string name="display_app_name">LiBook</string>
+    <string name="app_summary">읽고 싶은 책을, 자주 가는 도서관에서</string>
+    <string name="search_book_hint">책 제목을 두 글자 이상 입력해주세요</string>
+    <string name="no_favorite_library">저장한 관심 도서관이 없어요!</string>
+    <string name="no_favorite_library_and_extra_information">관심 도서관을 추가하고,\n도서관에 이 책이 있는지 확인해보세요</string>
+    <string name="no_result">검색 결과가 없습니다.</string>
 </resources>
