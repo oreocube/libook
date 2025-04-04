@@ -82,6 +82,28 @@ fun BookSearchTopBar(
 }
 
 @Composable
+fun BookSearchTopBar(
+    modifier: Modifier = Modifier,
+    title: String = "",
+    description: String = "",
+    onNavigationIconClick: () -> Unit,
+) {
+    BookSearchTopBar(
+        modifier = modifier,
+        title = title,
+        description = description,
+        navigationIcon = {
+            IconButton(onClick = onNavigationIconClick) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_arrow_back_24),
+                    contentDescription = stringResource(R.string.menu_back),
+                )
+            }
+        }
+    )
+}
+
+@Composable
 @Preview
 private fun BookSearchTopBarPreview1() {
     BookSearchTopBar(
@@ -114,15 +136,6 @@ private fun BookSearchTopBarPreview3() {
     BookSearchTopBar(
         title = "관심 도서관",
         description = "자주 가는 도서관을 저장할 수 있어요",
-        navigationIcon = {
-            IconButton(
-                onClick = {}
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_arrow_back_24),
-                    contentDescription = stringResource(R.string.menu_search_library)
-                )
-            }
-        }
+        onNavigationIconClick = {},
     )
 }

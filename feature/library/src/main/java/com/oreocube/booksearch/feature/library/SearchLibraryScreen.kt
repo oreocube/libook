@@ -24,12 +24,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.oreocube.booksearch.core.ui.R
 import com.oreocube.booksearch.core.ui.component.BookSearchButton
 import com.oreocube.booksearch.core.ui.component.BookSearchTopBar
 import com.oreocube.booksearch.core.ui.theme.Brown20
 import com.oreocube.booksearch.core.ui.theme.Gray10
 import com.oreocube.booksearch.core.ui.theme.Gray20
-import com.oreocube.booksearch.core.ui.R
 import com.oreocube.booksearch.domain.model.Library
 
 @Composable
@@ -70,14 +70,7 @@ fun SearchLibraryScreen(
         BookSearchTopBar(
             title = stringResource(R.string.menu_search_library_result),
             description = stringResource(R.string.menu_description_search_library_result),
-            navigationIcon = {
-                IconButton(onClick = onBackClick) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_arrow_back_24),
-                        contentDescription = stringResource(R.string.menu_back),
-                    )
-                }
-            }
+            onNavigationIconClick = onBackClick,
         )
 
         when (uiState) {

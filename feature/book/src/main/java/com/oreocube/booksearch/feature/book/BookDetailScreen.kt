@@ -15,7 +15,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -82,16 +81,7 @@ fun BookDetailScreen(
     onAddLibraryClick: () -> Unit,
 ) {
     Column(modifier = modifier) {
-        BookSearchTopBar(
-            navigationIcon = {
-                IconButton(onClick = onBackClick) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_arrow_back_24),
-                        contentDescription = stringResource(R.string.menu_back),
-                    )
-                }
-            }
-        )
+        BookSearchTopBar(onNavigationIconClick = onBackClick)
         when (uiState) {
             is BookDetailUiState.Loading -> {}
             is BookDetailUiState.Data -> {
