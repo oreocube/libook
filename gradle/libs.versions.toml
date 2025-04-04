@@ -76,3 +76,7 @@ crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "crashlyti
 secrets = { id = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin", version.ref = "secrets" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 android-library = { id = "com.android.library", version.ref = "agp" }
+
+booksearch-android-library = { id = "booksearch.android.library"}
+booksearch-android-compose = { id = "booksearch.android.compose"}
+booksearch-android-feature = { id = "booksearch.android.feature"}

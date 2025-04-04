@@ -1,5 +1,5 @@
 plugins {
-    id("booksearch.android.feature")
+    alias(libs.plugins.booksearch.android.feature)
 }
 
 android {

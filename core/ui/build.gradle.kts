@@ -1,6 +1,6 @@
 plugins {
-    id("booksearch.android.library")
-    id("booksearch.android.compose")
+    alias(libs.plugins.booksearch.android.library)
+    alias(libs.plugins.booksearch.android.compose)
 }
 
 android {
