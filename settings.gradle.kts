@@ -21,3 +21,11 @@ dependencyResolutionManagement {
 
 rootProject.name = "book-search"
 include(":app")
+include(":core:ui")
+include(":domain")
+include(":data")
+include(":feature:home")
+include(":feature:favorite")
+include(":feature:library")
+include(":feature:book")
+include(":feature:region")

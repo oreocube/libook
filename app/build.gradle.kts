@@ -59,6 +59,15 @@ secrets {
 
 dependencies {
 
+    implementation(project(":core:ui"))
+    implementation(project(":domain"))
+    implementation(project(":data"))
+    implementation(project(":feature:home"))
+    implementation(project(":feature:favorite"))
+    implementation(project(":feature:library"))
+    implementation(project(":feature:region"))
+    implementation(project(":feature:book"))
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
