@@ -1,5 +1,4 @@
 pluginManagement {
-    includeBuild("build-logic")
     repositories {
         google {
             content {
@@ -13,20 +12,15 @@ pluginManagement {
     }
 }
 dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
         mavenCentral()
     }
+    versionCatalogs {
+        create("libs") {
+            from(files("../gradle/libs.versions.toml"))
+        }
+    }
 }
-
-rootProject.name = "book-search"
-include(":app")
-include(":core:ui")
-include(":domain")
-include(":data")
-include(":feature:home")
-include(":feature:favorite")
-include(":feature:library")
-include(":feature:book")
-include(":feature:region")
+rootProject.name = "build-logic"
+include(":convention")
