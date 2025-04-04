@@ -1,4 +1,4 @@
-package com.oreocube.booksearch.di
+package com.oreocube.booksearch.data.di
 
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.FirebaseFirestore

@@ -1,6 +1,6 @@
-package com.oreocube.booksearch.di
+package com.oreocube.booksearch.data.di
 
-import com.oreocube.booksearch.BuildConfig
+import com.oreocube.booksearch.data.BuildConfig
 import com.oreocube.booksearch.data.service.LibraryService
 import dagger.Module
 import dagger.Provides

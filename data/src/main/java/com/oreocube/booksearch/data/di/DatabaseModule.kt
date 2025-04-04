@@ -1,4 +1,4 @@
-package com.oreocube.booksearch.di
+package com.oreocube.booksearch.data.di
 
 import android.content.Context
 import androidx.room.Room

@@ -1,6 +1,6 @@
 package com.oreocube.booksearch.data.service
 
-import com.oreocube.booksearch.BuildConfig
+import com.oreocube.booksearch.data.BuildConfig
 import com.oreocube.booksearch.data.response.BookAvailabilityResponse
 import com.oreocube.booksearch.data.response.BookDetailResponse
 import com.oreocube.booksearch.data.response.BookSearchResponse

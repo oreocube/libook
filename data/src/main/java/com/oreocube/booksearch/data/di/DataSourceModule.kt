@@ -1,4 +1,4 @@
-package com.oreocube.booksearch.di
+package com.oreocube.booksearch.data.di
 
 import com.oreocube.booksearch.data.datasource.RegionDataSource
 import com.oreocube.booksearch.data.datasource.RegionDataSourceImpl

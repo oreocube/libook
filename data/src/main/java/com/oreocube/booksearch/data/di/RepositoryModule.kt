@@ -1,4 +1,4 @@
-package com.oreocube.booksearch.di
+package com.oreocube.booksearch.data.di
 
 import com.oreocube.booksearch.data.repository.FavoriteRepositoryImpl
 import com.oreocube.booksearch.data.repository.LibraryRepositoryImpl
