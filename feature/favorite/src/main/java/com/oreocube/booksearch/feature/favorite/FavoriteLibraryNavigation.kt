@@ -1,4 +1,4 @@
-package com.oreocube.booksearch.feature.favorite.library
+package com.oreocube.booksearch.feature.favorite
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder

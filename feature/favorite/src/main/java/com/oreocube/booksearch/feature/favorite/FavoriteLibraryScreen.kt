@@ -1,4 +1,4 @@
-package com.oreocube.booksearch.feature.favorite.library
+package com.oreocube.booksearch.feature.favorite
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.oreocube.booksearch.R
+import com.oreocube.booksearch.core.ui.R
 import com.oreocube.booksearch.core.ui.component.BookSearchTopBar
 import com.oreocube.booksearch.core.ui.theme.Brown20
 import com.oreocube.booksearch.core.ui.theme.Gray20

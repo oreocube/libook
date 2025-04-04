@@ -26,7 +26,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.oreocube.booksearch.R
+import com.oreocube.booksearch.core.ui.R
 import com.oreocube.booksearch.core.ui.theme.Brown20
 import com.oreocube.booksearch.core.ui.theme.Gray20
 

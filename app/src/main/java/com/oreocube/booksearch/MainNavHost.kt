@@ -7,7 +7,7 @@ import com.oreocube.booksearch.feature.book.bookDetailScreen
 import com.oreocube.booksearch.feature.book.navigateToBookDetail
 import com.oreocube.booksearch.feature.book.navigateToSearchBook
 import com.oreocube.booksearch.feature.book.searchBookScreen
-import com.oreocube.booksearch.feature.favorite.library.favoriteLibraryScreen
+import com.oreocube.booksearch.feature.favorite.favoriteLibraryScreen
 import com.oreocube.booksearch.feature.home.HomeRoute
 import com.oreocube.booksearch.feature.home.homeScreen
 import com.oreocube.booksearch.feature.library.navigateToSearchLibrary
