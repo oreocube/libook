@@ -2,8 +2,8 @@ package com.oreocube.booksearch.core.navigation
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import com.oreocube.booksearch.R
-import com.oreocube.booksearch.feature.favorite.library.FavoriteLibraryRoute
+import com.oreocube.booksearch.core.ui.R
+import com.oreocube.booksearch.feature.favorite.FavoriteLibraryRoute
 import com.oreocube.booksearch.feature.home.HomeRoute
 import kotlin.reflect.KClass
 
