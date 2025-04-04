@@ -9,7 +9,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
-import com.oreocube.booksearch.core.navigation.TopLevelDestination
+import com.oreocube.booksearch.navigation.TopLevelDestination
 import com.oreocube.booksearch.feature.favorite.navigateToFavoriteLibrary
 import com.oreocube.booksearch.feature.home.navigateToHome
 

@@ -1,4 +1,4 @@
-package com.oreocube.booksearch.core.navigation
+package com.oreocube.booksearch.navigation
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes

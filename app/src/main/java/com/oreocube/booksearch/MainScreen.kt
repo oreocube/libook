@@ -15,9 +15,9 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
-import com.oreocube.booksearch.core.navigation.TopLevelDestination
-import com.oreocube.booksearch.core.ui.component.BookSearchNavigationBar
-import com.oreocube.booksearch.core.ui.component.BookSearchNavigationItem
+import com.oreocube.booksearch.navigation.TopLevelDestination
+import com.oreocube.booksearch.navigation.BookSearchNavigationBar
+import com.oreocube.booksearch.navigation.BookSearchNavigationItem
 import kotlinx.coroutines.launch
 
 @Composable

@@ -1,4 +1,4 @@
-package com.oreocube.booksearch.core.ui.component
+package com.oreocube.booksearch.navigation
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -18,7 +18,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
-import com.oreocube.booksearch.core.navigation.TopLevelDestination
 import com.oreocube.booksearch.core.ui.theme.BooksearchTheme
 import com.oreocube.booksearch.core.ui.theme.Brown20
 
