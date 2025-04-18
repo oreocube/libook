@@ -17,6 +17,7 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -107,12 +108,13 @@ fun RegionScreen(
                     onCityClick = onCityClick,
                     onDistrictClick = onDistrictClick,
                 )
+                val currentDistrictId by rememberUpdatedState(uiState.selectedDistrictId)
                 BookSearchButton(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp),
                     text = stringResource(R.string.menu_search_library),
-                    onClick = { onSearchButtonClick(uiState.selectedDistrictId) }
+                    onClick = { onSearchButtonClick(currentDistrictId) }
                 )
             }
         }
