@@ -85,23 +85,36 @@ fun SearchBookScreen(
                 focusManager.clearFocus()
             },
         )
-        LazyColumn(modifier = Modifier.weight(1f)) {
-            uiState.result.forEachIndexed { index, book ->
-                item(key = book.isbn13) {
-                    BookItem(
-                        book = book,
-                        onItemClick = { onBookClick(book.isbn13) }
-                    )
-                    if (index != uiState.result.lastIndex) {
-                        HorizontalDivider(color = Gray40)
-                    }
-                }
-            }
-        }
+        SearchResult(
+            modifier = Modifier.weight(1f),
+            result = uiState.result,
+            onBookClick = onBookClick,
+        )
     }
 
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
+    }
+}
+
+@Composable
+private fun SearchResult(
+    modifier: Modifier = Modifier,
+    result: List<Book>,
+    onBookClick: (String) -> Unit
+) {
+    LazyColumn(modifier = modifier) {
+        result.forEachIndexed { index, book ->
+            item(key = book.isbn13) {
+                BookItem(
+                    book = book,
+                    onItemClick = { onBookClick(book.isbn13) }
+                )
+                if (index != result.lastIndex) {
+                    HorizontalDivider(color = Gray40)
+                }
+            }
+        }
     }
 }
 
