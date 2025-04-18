@@ -54,8 +54,7 @@ class SearchLibraryViewModel @Inject constructor(
         .map { id ->
             getLibrariesByRegionUseCase(LibrarySearchParam(districtId = id))
         }.combine(favoriteLibraryIds) { libraries, favoriteSet ->
-            val searchResult = libraries.map { it.copy(isFavorite = it.id in favoriteSet) }
-            SearchLibraryUiState.Result(list = searchResult)
+            SearchLibraryUiState.Result(list = libraries, favoriteIds = favoriteSet)
         }
         .catch {
             _eventChannel.send(SearchLibraryUiEvent.Error("도서관을 불러오는데 실패했습니다."))
@@ -82,7 +81,8 @@ class SearchLibraryViewModel @Inject constructor(
 sealed class SearchLibraryUiState {
     data object Loading : SearchLibraryUiState()
     data class Result(
-        val list: List<Library>
+        val list: List<Library>,
+        val favoriteIds: Set<String>,
     ) : SearchLibraryUiState()
 }
 

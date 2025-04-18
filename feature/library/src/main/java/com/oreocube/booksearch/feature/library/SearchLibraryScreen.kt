@@ -13,7 +13,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -92,6 +91,7 @@ fun SearchLibraryScreen(
                             LibraryItem(
                                 modifier = Modifier.fillMaxWidth(),
                                 library = library,
+                                isFavorite = library.id in uiState.favoriteIds,
                                 onStarClick = onStarClick,
                             )
                         }
@@ -115,12 +115,11 @@ fun SearchLibraryScreen(
 private fun LibraryItem(
     modifier: Modifier = Modifier,
     library: Library,
+    isFavorite: Boolean,
     onStarClick: (Library) -> Unit,
 ) {
-    val iconRes = remember(library.isFavorite) {
-        if (library.isFavorite) R.drawable.ic_bookmark_filled_24
-        else R.drawable.ic_bookmark_border_24
-    }
+    val iconRes = if (isFavorite) R.drawable.ic_bookmark_filled_24
+    else R.drawable.ic_bookmark_border_24
 
     Row(
         modifier = modifier
@@ -169,6 +168,7 @@ private fun LibraryItemPreview() {
             operatingTime = "평일 09:00~22:00",
             bookCount = 11000,
         ),
+        isFavorite = false,
         onStarClick = {},
     )
 }
