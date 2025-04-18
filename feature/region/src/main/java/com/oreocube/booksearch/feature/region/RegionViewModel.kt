@@ -86,12 +86,13 @@ class RegionViewModel @Inject constructor(
         }
     }
 
-    fun onSearchButtonClicked(id: Int) {
+    fun onSearchButtonClicked() {
+        val cachedState = uiState.value as? RegionUiState.Table ?: return
         viewModelScope.launch {
-            if (id == -1) {
+            if (cachedState.selectedDistrictId == UNSELECTED) {
                 _eventChannel.send(RegionUiEvent.Error("지역을 선택해주세요."))
             } else {
-                _eventChannel.send(RegionUiEvent.NavigateToSearchBook(id))
+                _eventChannel.send(RegionUiEvent.NavigateToSearchBook(cachedState.selectedDistrictId))
             }
         }
     }
