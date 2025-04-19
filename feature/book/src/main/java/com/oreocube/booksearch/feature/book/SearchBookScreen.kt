@@ -32,7 +32,9 @@ import com.oreocube.booksearch.core.ui.component.BookSearchTextField
 import com.oreocube.booksearch.core.ui.theme.Gray10
 import com.oreocube.booksearch.core.ui.theme.Gray20
 import com.oreocube.booksearch.core.ui.theme.Gray40
-import com.oreocube.booksearch.domain.model.Book
+import com.oreocube.booksearch.feature.book.model.BookUiState
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 fun SearchBookRoute(
@@ -85,19 +87,11 @@ fun SearchBookScreen(
                 focusManager.clearFocus()
             },
         )
-        LazyColumn(modifier = Modifier.weight(1f)) {
-            uiState.result.forEachIndexed { index, book ->
-                item(key = book.isbn13) {
-                    BookItem(
-                        book = book,
-                        onItemClick = { onBookClick(book.isbn13) }
-                    )
-                    if (index != uiState.result.lastIndex) {
-                        HorizontalDivider(color = Gray40)
-                    }
-                }
-            }
-        }
+        SearchResult(
+            modifier = Modifier.weight(1f),
+            result = uiState.result,
+            onBookClick = onBookClick,
+        )
     }
 
     LaunchedEffect(Unit) {
@@ -106,9 +100,30 @@ fun SearchBookScreen(
 }
 
 @Composable
+private fun SearchResult(
+    modifier: Modifier = Modifier,
+    result: ImmutableList<BookUiState>,
+    onBookClick: (String) -> Unit
+) {
+    LazyColumn(modifier = modifier) {
+        result.forEachIndexed { index, book ->
+            item(key = book.isbn13) {
+                BookItem(
+                    book = book,
+                    onItemClick = { onBookClick(book.isbn13) }
+                )
+                if (index != result.lastIndex) {
+                    HorizontalDivider(color = Gray40)
+                }
+            }
+        }
+    }
+}
+
+@Composable
 private fun BookItem(
     modifier: Modifier = Modifier,
-    book: Book,
+    book: BookUiState,
     onItemClick: () -> Unit
 ) {
     Row(
@@ -151,7 +166,7 @@ private fun BookItem(
 @Preview(showBackground = true)
 private fun BookItemPreview() {
     BookItem(
-        book = Book(
+        book = BookUiState(
             title = "실용주의 프로그래머 :20주년 기념판 ",
             authors = "데이비드 토머스,정지용 옮김",
             publisher = "인사이트",
@@ -184,7 +199,7 @@ private fun SearchBookScreenPreview2() {
         uiState = SearchBookUiState(
             query = "실용주의",
             result = listOf(
-                Book(
+                BookUiState(
                     title = "실용주의 프로그래머 :20주년 기념판 ",
                     authors = "데이비드 토머스,정지용 옮김",
                     publisher = "인사이트",
@@ -195,7 +210,7 @@ private fun SearchBookScreenPreview2() {
                     detailUrl = "https://data4library.kr/bookV?seq=6404790",
                     loanCount = 695
                 ),
-            )
+            ).toImmutableList()
         ),
         onInputChanged = {},
         onClearClicked = {},

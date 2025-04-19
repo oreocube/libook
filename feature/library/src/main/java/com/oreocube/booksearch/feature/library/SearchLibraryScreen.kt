@@ -13,7 +13,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,7 +29,7 @@ import com.oreocube.booksearch.core.ui.component.BookSearchTopBar
 import com.oreocube.booksearch.core.ui.theme.Brown20
 import com.oreocube.booksearch.core.ui.theme.Gray10
 import com.oreocube.booksearch.core.ui.theme.Gray20
-import com.oreocube.booksearch.domain.model.Library
+import com.oreocube.booksearch.feature.library.model.LibraryUiState
 
 @Composable
 fun SearchLibraryRoute(
@@ -63,7 +62,7 @@ fun SearchLibraryRoute(
 fun SearchLibraryScreen(
     uiState: SearchLibraryUiState,
     onBackClick: () -> Unit,
-    onStarClick: (Library) -> Unit,
+    onStarClick: (LibraryUiState) -> Unit,
     onCompleteClick: () -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
@@ -92,6 +91,7 @@ fun SearchLibraryScreen(
                             LibraryItem(
                                 modifier = Modifier.fillMaxWidth(),
                                 library = library,
+                                isFavorite = library.id in uiState.favoriteIds,
                                 onStarClick = onStarClick,
                             )
                         }
@@ -114,13 +114,12 @@ fun SearchLibraryScreen(
 @Composable
 private fun LibraryItem(
     modifier: Modifier = Modifier,
-    library: Library,
-    onStarClick: (Library) -> Unit,
+    library: LibraryUiState,
+    isFavorite: Boolean,
+    onStarClick: (LibraryUiState) -> Unit,
 ) {
-    val iconRes = remember(library.isFavorite) {
-        if (library.isFavorite) R.drawable.ic_bookmark_filled_24
-        else R.drawable.ic_bookmark_border_24
-    }
+    val iconRes = if (isFavorite) R.drawable.ic_bookmark_filled_24
+    else R.drawable.ic_bookmark_border_24
 
     Row(
         modifier = modifier
@@ -156,7 +155,7 @@ private fun LibraryItem(
 @Preview(showBackground = true)
 private fun LibraryItemPreview() {
     LibraryItem(
-        library = Library(
+        library = LibraryUiState(
             id = "11111",
             name = "도서관이름",
             address = "서울특별시 광진구",
@@ -169,6 +168,7 @@ private fun LibraryItemPreview() {
             operatingTime = "평일 09:00~22:00",
             bookCount = 11000,
         ),
+        isFavorite = false,
         onStarClick = {},
     )
 }

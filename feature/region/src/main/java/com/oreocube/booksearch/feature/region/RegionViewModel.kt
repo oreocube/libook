@@ -7,7 +7,13 @@ import com.oreocube.booksearch.domain.model.District
 import com.oreocube.booksearch.domain.model.param.DistrictSearchParam
 import com.oreocube.booksearch.domain.usecase.GetCitiesUseCase
 import com.oreocube.booksearch.domain.usecase.GetDistrictsUseCase
+import com.oreocube.booksearch.feature.region.model.CityUiState
+import com.oreocube.booksearch.feature.region.model.DistrictUiState
+import com.oreocube.booksearch.feature.region.model.toUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -42,7 +48,9 @@ class RegionViewModel @Inject constructor(
 
                 _uiState.value = RegionUiState.Table(
                     selectedCityId = selectedCityId,
-                    cities = cities,
+                    cities = cities
+                        .map(City::toUiState)
+                        .toImmutableList(),
                 )
 
                 if (selectedCityId != UNSELECTED) {
@@ -64,7 +72,9 @@ class RegionViewModel @Inject constructor(
                         state.copy(
                             selectedCityId = id,
                             selectedDistrictId = UNSELECTED,
-                            districts = districts,
+                            districts = districts
+                                .map(District::toUiState)
+                                .toImmutableList(),
                         )
                     } else {
                         state
@@ -86,12 +96,13 @@ class RegionViewModel @Inject constructor(
         }
     }
 
-    fun onSearchButtonClicked(id: Int) {
+    fun onSearchButtonClicked() {
+        val cachedState = uiState.value as? RegionUiState.Table ?: return
         viewModelScope.launch {
-            if (id == -1) {
+            if (cachedState.selectedDistrictId == UNSELECTED) {
                 _eventChannel.send(RegionUiEvent.Error("지역을 선택해주세요."))
             } else {
-                _eventChannel.send(RegionUiEvent.NavigateToSearchBook(id))
+                _eventChannel.send(RegionUiEvent.NavigateToSearchBook(cachedState.selectedDistrictId))
             }
         }
     }
@@ -106,8 +117,8 @@ sealed class RegionUiState {
     data class Table(
         val selectedCityId: Int,
         val selectedDistrictId: Int = -1,
-        val cities: List<City>,
-        val districts: List<District> = emptyList(),
+        val cities: ImmutableList<CityUiState>,
+        val districts: ImmutableList<DistrictUiState> = persistentListOf(),
     ) : RegionUiState()
 }
 

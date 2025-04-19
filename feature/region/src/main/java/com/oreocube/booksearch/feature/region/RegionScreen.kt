@@ -30,8 +30,10 @@ import com.oreocube.booksearch.core.ui.component.BookSearchTopBar
 import com.oreocube.booksearch.core.ui.theme.Brown10
 import com.oreocube.booksearch.core.ui.theme.Brown60
 import com.oreocube.booksearch.core.ui.theme.Gray80
-import com.oreocube.booksearch.domain.model.City
-import com.oreocube.booksearch.domain.model.District
+import com.oreocube.booksearch.feature.region.model.CityUiState
+import com.oreocube.booksearch.feature.region.model.DistrictUiState
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -74,7 +76,7 @@ fun RegionScreen(
     onBackClick: () -> Unit = {},
     onCityClick: (Int) -> Unit = {},
     onDistrictClick: (Int) -> Unit = {},
-    onSearchButtonClick: (Int) -> Unit = {},
+    onSearchButtonClick: () -> Unit = {},
 ) {
     when (uiState) {
         is RegionUiState.Table -> {
@@ -112,7 +114,7 @@ fun RegionScreen(
                         .fillMaxWidth()
                         .padding(16.dp),
                     text = stringResource(R.string.menu_search_library),
-                    onClick = { onSearchButtonClick(uiState.selectedDistrictId) }
+                    onClick = onSearchButtonClick,
                 )
             }
         }
@@ -144,8 +146,8 @@ private fun RegionTable(
     modifier: Modifier = Modifier,
     selectedCityId: Int,
     selectedDistrictId: Int,
-    cities: List<City>,
-    districts: List<District>,
+    cities: ImmutableList<CityUiState>,
+    districts: ImmutableList<DistrictUiState>,
     onCityClick: (Int) -> Unit,
     onDistrictClick: (Int) -> Unit,
 ) {
@@ -225,13 +227,13 @@ private fun RegionScreenPreview() {
             selectedCityId = 11,
             selectedDistrictId = 11002,
             cities = listOf(
-                City(id = 11, name = "서울"),
-                City(id = 21, name = "대구"),
-            ),
+                CityUiState(id = 11, name = "서울"),
+                CityUiState(id = 21, name = "대구"),
+            ).toImmutableList(),
             districts = listOf(
-                District(id = 11001, cityId = 11, name = "강남구"),
-                District(id = 11002, cityId = 11, name = "강동구"),
-            )
+                DistrictUiState(id = 11001, cityId = 11, name = "강남구"),
+                DistrictUiState(id = 11002, cityId = 11, name = "강동구"),
+            ).toImmutableList(),
         )
     )
 }
