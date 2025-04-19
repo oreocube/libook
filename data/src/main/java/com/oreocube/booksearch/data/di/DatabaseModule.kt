@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.oreocube.booksearch.data.database.BookSearchDatabase
 import com.oreocube.booksearch.data.database.FavoriteDao
+import com.oreocube.booksearch.data.database.RecentBookHistoryDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -29,4 +30,10 @@ class DatabaseModule {
     fun providesFavoriteDao(
         database: BookSearchDatabase,
     ): FavoriteDao = database.favoriteDao()
+
+    @Provides
+    @Singleton
+    fun providesHistoryDao(
+        database: BookSearchDatabase,
+    ): RecentBookHistoryDao = database.recentBookHistoryDao()
 }
