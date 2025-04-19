@@ -48,7 +48,7 @@ fun SearchBookRoute(
         uiState = uiState,
         onInputChanged = viewModel::onInputChanged,
         onClearClicked = viewModel::onInputChanged,
-        onBookClick = onBookClick,
+        onBookClick = viewModel::onBookClicked,
     )
 
     LaunchedEffect(Unit) {
@@ -56,6 +56,10 @@ fun SearchBookRoute(
             when (event) {
                 is SearchBookUiEvent.Error -> {
                     onShowSnackbar(event.message)
+                }
+
+                is SearchBookUiEvent.NavigateToBookDetail -> {
+                    onBookClick(event.isbn)
                 }
             }
         }
@@ -67,7 +71,7 @@ fun SearchBookScreen(
     uiState: SearchBookUiState,
     onInputChanged: (String) -> Unit,
     onClearClicked: () -> Unit,
-    onBookClick: (String) -> Unit,
+    onBookClick: (BookUiState) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
@@ -103,14 +107,14 @@ fun SearchBookScreen(
 private fun SearchResult(
     modifier: Modifier = Modifier,
     result: ImmutableList<BookUiState>,
-    onBookClick: (String) -> Unit
+    onBookClick: (BookUiState) -> Unit,
 ) {
     LazyColumn(modifier = modifier) {
         result.forEachIndexed { index, book ->
             item(key = book.isbn13) {
                 BookItem(
                     book = book,
-                    onItemClick = { onBookClick(book.isbn13) }
+                    onItemClick = { onBookClick(book) }
                 )
                 if (index != result.lastIndex) {
                     HorizontalDivider(color = Gray40)

@@ -1,8 +1,11 @@
 package com.oreocube.booksearch.feature.book
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.oreocube.booksearch.domain.model.Book
+import com.oreocube.booksearch.domain.model.RecentBookHistory
+import com.oreocube.booksearch.domain.usecase.AddHistoryUseCase
 import com.oreocube.booksearch.domain.usecase.SearchBooksUseCase
 import com.oreocube.booksearch.feature.book.model.BookUiState
 import com.oreocube.booksearch.feature.book.model.toUiState
@@ -19,11 +22,13 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class SearchBookViewModel @Inject constructor(
     private val searchBooksUseCase: SearchBooksUseCase,
+    private val addHistoryUseCase: AddHistoryUseCase,
 ) : ViewModel() {
     private val _eventChannel = Channel<SearchBookUiEvent>(Channel.BUFFERED)
     val eventFlow = _eventChannel.receiveAsFlow()
@@ -62,6 +67,24 @@ class SearchBookViewModel @Inject constructor(
             emptyList()
         }
     }
+
+    fun onBookClicked(book: BookUiState) {
+        viewModelScope.launch {
+            val history = RecentBookHistory(
+                isbn = book.isbn13,
+                title = book.title,
+                searchedAt = System.currentTimeMillis(),
+            )
+            runCatching {
+                addHistoryUseCase(item = history)
+            }.onSuccess {
+                Log.d("TAG", "onBookClicked: 성공")
+            }.onFailure {
+                Log.d("TAG", "onBookClicked: 실패")
+            }
+            _eventChannel.send(SearchBookUiEvent.NavigateToBookDetail(isbn = book.isbn13))
+        }
+    }
 }
 
 data class SearchBookUiState(
@@ -71,4 +94,5 @@ data class SearchBookUiState(
 
 sealed class SearchBookUiEvent {
     data class Error(val message: String) : SearchBookUiEvent()
+    data class NavigateToBookDetail(val isbn: String) : SearchBookUiEvent()
 }
