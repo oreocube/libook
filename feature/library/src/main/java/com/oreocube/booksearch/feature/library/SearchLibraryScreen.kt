@@ -29,7 +29,7 @@ import com.oreocube.booksearch.core.ui.component.BookSearchTopBar
 import com.oreocube.booksearch.core.ui.theme.Brown20
 import com.oreocube.booksearch.core.ui.theme.Gray10
 import com.oreocube.booksearch.core.ui.theme.Gray20
-import com.oreocube.booksearch.domain.model.Library
+import com.oreocube.booksearch.feature.library.model.LibraryUiState
 
 @Composable
 fun SearchLibraryRoute(
@@ -62,7 +62,7 @@ fun SearchLibraryRoute(
 fun SearchLibraryScreen(
     uiState: SearchLibraryUiState,
     onBackClick: () -> Unit,
-    onStarClick: (Library) -> Unit,
+    onStarClick: (LibraryUiState) -> Unit,
     onCompleteClick: () -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
@@ -114,9 +114,9 @@ fun SearchLibraryScreen(
 @Composable
 private fun LibraryItem(
     modifier: Modifier = Modifier,
-    library: Library,
+    library: LibraryUiState,
     isFavorite: Boolean,
-    onStarClick: (Library) -> Unit,
+    onStarClick: (LibraryUiState) -> Unit,
 ) {
     val iconRes = if (isFavorite) R.drawable.ic_bookmark_filled_24
     else R.drawable.ic_bookmark_border_24
@@ -155,7 +155,7 @@ private fun LibraryItem(
 @Preview(showBackground = true)
 private fun LibraryItemPreview() {
     LibraryItem(
-        library = Library(
+        library = LibraryUiState(
             id = "11111",
             name = "도서관이름",
             address = "서울특별시 광진구",

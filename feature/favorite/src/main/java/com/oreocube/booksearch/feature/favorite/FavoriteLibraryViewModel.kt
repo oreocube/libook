@@ -5,7 +5,11 @@ import androidx.lifecycle.viewModelScope
 import com.oreocube.booksearch.domain.model.LibraryShort
 import com.oreocube.booksearch.domain.usecase.DeleteFavoriteLibraryUseCase
 import com.oreocube.booksearch.domain.usecase.GetFavoriteLibrariesUseCase
+import com.oreocube.booksearch.feature.favorite.model.LibraryShortUiState
+import com.oreocube.booksearch.feature.favorite.model.toUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -21,10 +25,11 @@ class FavoriteLibraryViewModel @Inject constructor(
     val uiState: StateFlow<FavoriteLibraryUiState> = getFavoriteLibrariesUseCase()
         .map { libraries ->
             FavoriteLibraryUiState.Data(
-                libraries = libraries,
+                libraries = libraries
+                    .map(LibraryShort::toUiState)
+                    .toImmutableList(),
             )
-        }
-        .stateIn(
+        }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(500),
             initialValue = FavoriteLibraryUiState.Loading,
@@ -40,6 +45,6 @@ class FavoriteLibraryViewModel @Inject constructor(
 sealed class FavoriteLibraryUiState {
     data object Loading : FavoriteLibraryUiState()
     data class Data(
-        val libraries: List<LibraryShort>,
+        val libraries: ImmutableList<LibraryShortUiState>,
     ) : FavoriteLibraryUiState()
 }

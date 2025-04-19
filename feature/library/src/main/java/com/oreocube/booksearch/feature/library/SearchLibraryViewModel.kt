@@ -10,7 +10,14 @@ import com.oreocube.booksearch.domain.usecase.AddFavoriteLibraryUseCase
 import com.oreocube.booksearch.domain.usecase.DeleteFavoriteLibraryUseCase
 import com.oreocube.booksearch.domain.usecase.GetFavoriteLibrariesUseCase
 import com.oreocube.booksearch.domain.usecase.GetLibrariesByRegionUseCase
+import com.oreocube.booksearch.feature.library.model.LibraryUiState
+import com.oreocube.booksearch.feature.library.model.toUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.PersistentSet
+import kotlinx.collections.immutable.persistentSetOf
+import kotlinx.collections.immutable.toPersistentList
+import kotlinx.collections.immutable.toPersistentSet
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -42,30 +49,30 @@ class SearchLibraryViewModel @Inject constructor(
     private val _eventChannel = Channel<SearchLibraryUiEvent>(Channel.BUFFERED)
     val eventFlow = _eventChannel.receiveAsFlow()
 
-    private val favoriteLibraryIds: StateFlow<Set<String>> = getFavoriteLibrariesUseCase()
-        .map { list -> list.map { it.id }.toSet() }
+    private val favoriteLibraryIds: StateFlow<PersistentSet<String>> = getFavoriteLibrariesUseCase()
+        .map { list -> list.map { it.id }.toPersistentSet() }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(500),
-            initialValue = emptySet(),
+            initialValue = persistentSetOf(),
         )
 
     val uiState: StateFlow<SearchLibraryUiState> = districtId
         .map { id ->
             getLibrariesByRegionUseCase(LibrarySearchParam(districtId = id))
+                .map(Library::toUiState)
+                .toPersistentList()
         }.combine(favoriteLibraryIds) { libraries, favoriteSet ->
             SearchLibraryUiState.Result(list = libraries, favoriteIds = favoriteSet)
-        }
-        .catch {
+        }.catch {
             _eventChannel.send(SearchLibraryUiEvent.Error("도서관을 불러오는데 실패했습니다."))
-        }
-        .stateIn(
+        }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(500),
             initialValue = SearchLibraryUiState.Loading,
         )
 
-    fun toggleLibraryStar(library: Library) {
+    fun toggleLibraryStar(library: LibraryUiState) {
         viewModelScope.launch {
             favoriteLibraryIds.first().let { idSet ->
                 if (library.id in idSet) {
@@ -81,8 +88,8 @@ class SearchLibraryViewModel @Inject constructor(
 sealed class SearchLibraryUiState {
     data object Loading : SearchLibraryUiState()
     data class Result(
-        val list: List<Library>,
-        val favoriteIds: Set<String>,
+        val list: ImmutableList<LibraryUiState>,
+        val favoriteIds: PersistentSet<String>,
     ) : SearchLibraryUiState()
 }
 

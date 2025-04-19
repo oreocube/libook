@@ -32,7 +32,10 @@ import com.oreocube.booksearch.core.ui.R
 import com.oreocube.booksearch.core.ui.component.BookSearchTopBar
 import com.oreocube.booksearch.core.ui.theme.Brown20
 import com.oreocube.booksearch.core.ui.theme.Gray20
-import com.oreocube.booksearch.domain.model.LibraryShort
+import com.oreocube.booksearch.feature.favorite.model.LibraryShortUiState
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 fun FavoriteLibraryRoute(
@@ -128,7 +131,7 @@ private fun EmptyFavoriteLibraryContent(
 @Composable
 private fun FavoriteLibraryList(
     modifier: Modifier = Modifier,
-    libraries: List<LibraryShort>,
+    libraries: ImmutableList<LibraryShortUiState>,
     onStarClick: (String) -> Unit,
 ) {
     LazyColumn(modifier = modifier) {
@@ -147,8 +150,8 @@ private fun FavoriteLibraryList(
 @Composable
 private fun FavoriteLibraryItem(
     modifier: Modifier = Modifier,
-    library: LibraryShort,
-    onStarClick: (LibraryShort) -> Unit,
+    library: LibraryShortUiState,
+    onStarClick: (LibraryShortUiState) -> Unit,
 ) {
     Row(
         modifier = modifier
@@ -180,9 +183,9 @@ private fun FavoriteLibraryScreenPreview1() {
     FavoriteLibraryScreen(
         uiState = FavoriteLibraryUiState.Data(
             libraries = listOf(
-                LibraryShort(id = "11", name = "자바도서관"),
-                LibraryShort(id = "12", name = "코틀린도서관"),
-            )
+                LibraryShortUiState(id = "11", name = "자바도서관"),
+                LibraryShortUiState(id = "12", name = "코틀린도서관"),
+            ).toImmutableList(),
         ),
         onSearchClick = {},
         onStarClick = {},
@@ -194,7 +197,7 @@ private fun FavoriteLibraryScreenPreview1() {
 private fun FavoriteLibraryScreenPreview2() {
     FavoriteLibraryScreen(
         uiState = FavoriteLibraryUiState.Data(
-            libraries = emptyList()
+            libraries = persistentListOf()
         ),
         onSearchClick = {},
         onStarClick = {},

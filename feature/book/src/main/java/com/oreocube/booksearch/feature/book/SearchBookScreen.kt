@@ -32,7 +32,9 @@ import com.oreocube.booksearch.core.ui.component.BookSearchTextField
 import com.oreocube.booksearch.core.ui.theme.Gray10
 import com.oreocube.booksearch.core.ui.theme.Gray20
 import com.oreocube.booksearch.core.ui.theme.Gray40
-import com.oreocube.booksearch.domain.model.Book
+import com.oreocube.booksearch.feature.book.model.BookUiState
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 fun SearchBookRoute(
@@ -100,7 +102,7 @@ fun SearchBookScreen(
 @Composable
 private fun SearchResult(
     modifier: Modifier = Modifier,
-    result: List<Book>,
+    result: ImmutableList<BookUiState>,
     onBookClick: (String) -> Unit
 ) {
     LazyColumn(modifier = modifier) {
@@ -121,7 +123,7 @@ private fun SearchResult(
 @Composable
 private fun BookItem(
     modifier: Modifier = Modifier,
-    book: Book,
+    book: BookUiState,
     onItemClick: () -> Unit
 ) {
     Row(
@@ -164,7 +166,7 @@ private fun BookItem(
 @Preview(showBackground = true)
 private fun BookItemPreview() {
     BookItem(
-        book = Book(
+        book = BookUiState(
             title = "실용주의 프로그래머 :20주년 기념판 ",
             authors = "데이비드 토머스,정지용 옮김",
             publisher = "인사이트",
@@ -197,7 +199,7 @@ private fun SearchBookScreenPreview2() {
         uiState = SearchBookUiState(
             query = "실용주의",
             result = listOf(
-                Book(
+                BookUiState(
                     title = "실용주의 프로그래머 :20주년 기념판 ",
                     authors = "데이비드 토머스,정지용 옮김",
                     publisher = "인사이트",
@@ -208,7 +210,7 @@ private fun SearchBookScreenPreview2() {
                     detailUrl = "https://data4library.kr/bookV?seq=6404790",
                     loanCount = 695
                 ),
-            )
+            ).toImmutableList()
         ),
         onInputChanged = {},
         onClearClicked = {},

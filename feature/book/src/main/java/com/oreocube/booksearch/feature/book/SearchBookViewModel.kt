@@ -4,7 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.oreocube.booksearch.domain.model.Book
 import com.oreocube.booksearch.domain.usecase.SearchBooksUseCase
+import com.oreocube.booksearch.feature.book.model.BookUiState
+import com.oreocube.booksearch.feature.book.model.toUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -35,7 +40,10 @@ class SearchBookViewModel @Inject constructor(
         )
 
     val uiState: StateFlow<SearchBookUiState> = combine(_query, _searchResult) { query, result ->
-        SearchBookUiState(query = query, result = result)
+        SearchBookUiState(
+            query = query,
+            result = result.toImmutableList(),
+        )
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(500),
@@ -46,9 +54,9 @@ class SearchBookViewModel @Inject constructor(
         _query.value = input
     }
 
-    private suspend fun searchBookSafely(query: String): List<Book> {
+    private suspend fun searchBookSafely(query: String): List<BookUiState> {
         return runCatching {
-            searchBooksUseCase(query)
+            searchBooksUseCase(query).map(Book::toUiState)
         }.getOrElse {
             _eventChannel.send(SearchBookUiEvent.Error("도서 검색에 실패했습니다."))
             emptyList()
@@ -58,7 +66,7 @@ class SearchBookViewModel @Inject constructor(
 
 data class SearchBookUiState(
     val query: String = "",
-    val result: List<Book> = emptyList(),
+    val result: ImmutableList<BookUiState> = persistentListOf(),
 )
 
 sealed class SearchBookUiEvent {
