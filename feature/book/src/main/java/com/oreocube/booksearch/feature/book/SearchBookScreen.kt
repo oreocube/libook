@@ -56,12 +56,7 @@ fun SearchBookRoute(
 
     SearchBookScreen(
         uiState = uiState,
-        onInputChanged = viewModel::onInputChanged,
-        onClearClicked = viewModel::onInputChanged,
-        onBookClick = viewModel::onBookClicked,
-        onClearHistoryClick = viewModel::onClearHistoryClick,
-        onHistoryItemClick = viewModel::onHistoryItemClick,
-        onDeleteHistoryClick = viewModel::onDeleteHistoryClick,
+        onAction = viewModel::onAction,
     )
 
     LaunchedEffect(Unit) {
@@ -82,12 +77,7 @@ fun SearchBookRoute(
 @Composable
 fun SearchBookScreen(
     uiState: SearchBookUiState,
-    onInputChanged: (String) -> Unit,
-    onClearClicked: () -> Unit,
-    onBookClick: (BookUiState) -> Unit,
-    onClearHistoryClick: () -> Unit,
-    onHistoryItemClick: (RecentHistoryUiState) -> Unit,
-    onDeleteHistoryClick: (RecentHistoryUiState) -> Unit,
+    onAction: (SearchBookUiAction) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
@@ -100,8 +90,8 @@ fun SearchBookScreen(
                 .focusRequester(focusRequester),
             input = uiState.query,
             placeholder = stringResource(R.string.search_book_hint),
-            onInputChanged = onInputChanged,
-            onClearClicked = onClearClicked,
+            onInputChanged = { onAction(SearchBookUiAction.InputChanged(it)) },
+            onClearClicked = { onAction(SearchBookUiAction.InputChanged()) },
             onQuerySubmitted = {
                 keyboardController?.hide()
                 focusManager.clearFocus()
@@ -111,15 +101,13 @@ fun SearchBookScreen(
             RecentHistoryContainer(
                 modifier = Modifier.weight(1f),
                 histories = uiState.recentHistory,
-                onClearHistoryClick = onClearHistoryClick,
-                onHistoryItemClick = onHistoryItemClick,
-                onDeleteHistoryClick = onDeleteHistoryClick,
+                onAction = onAction,
             )
         } else {
             SearchResult(
                 modifier = Modifier.weight(1f),
                 result = uiState.result,
-                onBookClick = onBookClick,
+                onAction = onAction,
             )
         }
     }
@@ -133,9 +121,7 @@ fun SearchBookScreen(
 private fun RecentHistoryContainer(
     modifier: Modifier = Modifier,
     histories: ImmutableList<RecentHistoryUiState>,
-    onClearHistoryClick: () -> Unit,
-    onHistoryItemClick: (RecentHistoryUiState) -> Unit,
-    onDeleteHistoryClick: (RecentHistoryUiState) -> Unit,
+    onAction: (SearchBookUiAction) -> Unit,
 ) {
     LazyColumn(modifier = modifier) {
         item {
@@ -153,7 +139,7 @@ private fun RecentHistoryContainer(
                     color = Gray10,
                 )
                 Text(
-                    modifier = Modifier.clickable { onClearHistoryClick() },
+                    modifier = Modifier.clickable { onAction(SearchBookUiAction.ClearHistoryClick) },
                     text = "전체 삭제",
                     fontSize = 14.sp,
                     color = Gray20,
@@ -168,7 +154,7 @@ private fun RecentHistoryContainer(
                 modifier = Modifier
                     .fillParentMaxWidth()
                     .height(48.dp)
-                    .clickable { onHistoryItemClick(history) },
+                    .clickable { onAction(SearchBookUiAction.HistoryItemClick(history)) },
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
@@ -190,7 +176,7 @@ private fun RecentHistoryContainer(
                 )
                 IconButton(
                     modifier = Modifier.padding(end = 4.dp),
-                    onClick = { onDeleteHistoryClick(history) }
+                    onClick = { onAction(SearchBookUiAction.DeleteHistoryClick(history)) }
                 ) {
                     Icon(
                         imageVector = ImageVector.vectorResource(R.drawable.ic_clear_24),
@@ -207,14 +193,14 @@ private fun RecentHistoryContainer(
 private fun SearchResult(
     modifier: Modifier = Modifier,
     result: ImmutableList<BookUiState>,
-    onBookClick: (BookUiState) -> Unit,
+    onAction: (SearchBookUiAction) -> Unit,
 ) {
     LazyColumn(modifier = modifier) {
         result.forEachIndexed { index, book ->
             item(key = book.isbn13) {
                 BookItem(
                     book = book,
-                    onItemClick = { onBookClick(book) }
+                    onItemClick = { onAction(SearchBookUiAction.BookClicked(book)) }
                 )
                 if (index != result.lastIndex) {
                     HorizontalDivider(color = Gray40)
@@ -302,9 +288,7 @@ private fun RecentHistoryPreview() {
                 searchedAt = "04.19",
             ),
         ).toImmutableList(),
-        onClearHistoryClick = {},
-        onHistoryItemClick = {},
-        onDeleteHistoryClick = {},
+        onAction = {},
     )
 }
 
@@ -313,12 +297,7 @@ private fun RecentHistoryPreview() {
 private fun SearchBookScreenPreview1() {
     SearchBookScreen(
         uiState = SearchBookUiState(),
-        onInputChanged = {},
-        onClearClicked = {},
-        onBookClick = {},
-        onClearHistoryClick = {},
-        onDeleteHistoryClick = {},
-        onHistoryItemClick = {},
+        onAction = {},
     )
 }
 
@@ -342,11 +321,6 @@ private fun SearchBookScreenPreview2() {
                 ),
             ).toImmutableList()
         ),
-        onInputChanged = {},
-        onClearClicked = {},
-        onBookClick = {},
-        onClearHistoryClick = {},
-        onDeleteHistoryClick = {},
-        onHistoryItemClick = {},
+        onAction = {},
     )
 }

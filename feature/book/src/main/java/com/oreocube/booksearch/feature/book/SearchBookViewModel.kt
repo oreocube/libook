@@ -71,7 +71,7 @@ class SearchBookViewModel @Inject constructor(
         initialValue = SearchBookUiState()
     )
 
-    fun onInputChanged(input: String = "") {
+    private fun onInputChanged(input: String = "") {
         _query.value = input
     }
 
@@ -107,21 +107,21 @@ class SearchBookViewModel @Inject constructor(
         }
     }
 
-    fun onBookClicked(book: BookUiState) {
+    private fun onBookClicked(book: BookUiState) {
         viewModelScope.launch {
             addHistory(title = book.title, isbn = book.isbn13)
             _eventChannel.send(SearchBookUiEvent.NavigateToBookDetail(isbn = book.isbn13))
         }
     }
 
-    fun onHistoryItemClick(history: RecentHistoryUiState) {
+    private fun onHistoryItemClick(history: RecentHistoryUiState) {
         viewModelScope.launch {
             addHistory(title = history.title, isbn = history.isbn)
             _eventChannel.send(SearchBookUiEvent.NavigateToBookDetail(isbn = history.isbn))
         }
     }
 
-    fun onDeleteHistoryClick(history: RecentHistoryUiState) {
+    private fun onDeleteHistoryClick(history: RecentHistoryUiState) {
         viewModelScope.launch {
             runCatching {
                 deleteHistoryUseCase(history.isbn)
@@ -130,12 +130,22 @@ class SearchBookViewModel @Inject constructor(
         }
     }
 
-    fun onClearHistoryClick() {
+    private fun onClearHistoryClick() {
         viewModelScope.launch {
             runCatching {
                 clearHistoryUseCase()
                 _recentHistories.value = emptyList()
             }
+        }
+    }
+
+    fun onAction(action: SearchBookUiAction) {
+        when (action) {
+            is SearchBookUiAction.InputChanged -> onInputChanged(action.input)
+            is SearchBookUiAction.BookClicked -> onBookClicked(action.book)
+            is SearchBookUiAction.HistoryItemClick -> onHistoryItemClick(action.history)
+            is SearchBookUiAction.DeleteHistoryClick -> onDeleteHistoryClick(action.history)
+            is SearchBookUiAction.ClearHistoryClick -> onClearHistoryClick()
         }
     }
 }
@@ -149,4 +159,12 @@ data class SearchBookUiState(
 sealed class SearchBookUiEvent {
     data class Error(val message: String) : SearchBookUiEvent()
     data class NavigateToBookDetail(val isbn: String) : SearchBookUiEvent()
+}
+
+sealed class SearchBookUiAction {
+    data class InputChanged(val input: String = "") : SearchBookUiAction()
+    data class BookClicked(val book: BookUiState) : SearchBookUiAction()
+    data class HistoryItemClick(val history: RecentHistoryUiState) : SearchBookUiAction()
+    data class DeleteHistoryClick(val history: RecentHistoryUiState) : SearchBookUiAction()
+    data object ClearHistoryClick : SearchBookUiAction()
 }
