@@ -1,26 +1,35 @@
 package com.oreocube.booksearch.feature.book
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -33,6 +42,7 @@ import com.oreocube.booksearch.core.ui.theme.Gray10
 import com.oreocube.booksearch.core.ui.theme.Gray20
 import com.oreocube.booksearch.core.ui.theme.Gray40
 import com.oreocube.booksearch.feature.book.model.BookUiState
+import com.oreocube.booksearch.feature.book.model.RecentHistoryUiState
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 
@@ -46,9 +56,7 @@ fun SearchBookRoute(
 
     SearchBookScreen(
         uiState = uiState,
-        onInputChanged = viewModel::onInputChanged,
-        onClearClicked = viewModel::onInputChanged,
-        onBookClick = onBookClick,
+        onAction = viewModel::onAction,
     )
 
     LaunchedEffect(Unit) {
@@ -56,6 +64,10 @@ fun SearchBookRoute(
             when (event) {
                 is SearchBookUiEvent.Error -> {
                     onShowSnackbar(event.message)
+                }
+
+                is SearchBookUiEvent.NavigateToBookDetail -> {
+                    onBookClick(event.isbn)
                 }
             }
         }
@@ -65,9 +77,7 @@ fun SearchBookRoute(
 @Composable
 fun SearchBookScreen(
     uiState: SearchBookUiState,
-    onInputChanged: (String) -> Unit,
-    onClearClicked: () -> Unit,
-    onBookClick: (String) -> Unit,
+    onAction: (SearchBookUiAction) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
@@ -80,18 +90,26 @@ fun SearchBookScreen(
                 .focusRequester(focusRequester),
             input = uiState.query,
             placeholder = stringResource(R.string.search_book_hint),
-            onInputChanged = onInputChanged,
-            onClearClicked = onClearClicked,
+            onInputChanged = { onAction(SearchBookUiAction.InputChanged(it)) },
+            onClearClicked = { onAction(SearchBookUiAction.InputChanged()) },
             onQuerySubmitted = {
                 keyboardController?.hide()
                 focusManager.clearFocus()
             },
         )
-        SearchResult(
-            modifier = Modifier.weight(1f),
-            result = uiState.result,
-            onBookClick = onBookClick,
-        )
+        if (uiState.query.isBlank() && uiState.recentHistory.isNotEmpty()) {
+            RecentHistoryContainer(
+                modifier = Modifier.weight(1f),
+                histories = uiState.recentHistory,
+                onAction = onAction,
+            )
+        } else {
+            SearchResult(
+                modifier = Modifier.weight(1f),
+                result = uiState.result,
+                onAction = onAction,
+            )
+        }
     }
 
     LaunchedEffect(Unit) {
@@ -100,17 +118,89 @@ fun SearchBookScreen(
 }
 
 @Composable
+private fun RecentHistoryContainer(
+    modifier: Modifier = Modifier,
+    histories: ImmutableList<RecentHistoryUiState>,
+    onAction: (SearchBookUiAction) -> Unit,
+) {
+    LazyColumn(modifier = modifier) {
+        item {
+            Row(
+                modifier = Modifier
+                    .fillParentMaxWidth()
+                    .padding(top = 16.dp, start = 16.dp, end = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = "최근 검색 기록",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Gray10,
+                )
+                Text(
+                    modifier = Modifier.clickable { onAction(SearchBookUiAction.ClearHistoryClick) },
+                    text = "전체 삭제",
+                    fontSize = 14.sp,
+                    color = Gray20,
+                )
+            }
+        }
+        items(
+            items = histories,
+            key = { history -> history.isbn }
+        ) { history ->
+            Row(
+                modifier = Modifier
+                    .fillParentMaxWidth()
+                    .height(48.dp)
+                    .clickable { onAction(SearchBookUiAction.HistoryItemClick(history)) },
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 16.dp),
+                    text = history.title,
+                    fontSize = 14.sp,
+                    color = Gray10,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Text(
+                    text = history.searchedAt,
+                    fontSize = 14.sp,
+                    color = Gray20,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                IconButton(
+                    modifier = Modifier.padding(end = 4.dp),
+                    onClick = { onAction(SearchBookUiAction.DeleteHistoryClick(history)) }
+                ) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(R.drawable.ic_clear_24),
+                        contentDescription = null,
+                        tint = Gray20
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
 private fun SearchResult(
     modifier: Modifier = Modifier,
     result: ImmutableList<BookUiState>,
-    onBookClick: (String) -> Unit
+    onAction: (SearchBookUiAction) -> Unit,
 ) {
     LazyColumn(modifier = modifier) {
         result.forEachIndexed { index, book ->
             item(key = book.isbn13) {
                 BookItem(
                     book = book,
-                    onItemClick = { onBookClick(book.isbn13) }
+                    onItemClick = { onAction(SearchBookUiAction.BookClicked(book)) }
                 )
                 if (index != result.lastIndex) {
                     HorizontalDivider(color = Gray40)
@@ -183,12 +273,31 @@ private fun BookItemPreview() {
 
 @Composable
 @Preview(showBackground = true)
+private fun RecentHistoryPreview() {
+    RecentHistoryContainer(
+        modifier = Modifier.fillMaxWidth(),
+        histories = listOf(
+            RecentHistoryUiState(
+                isbn = "1",
+                title = "가나다라마바사아자차카타파하",
+                searchedAt = "04.19",
+            ),
+            RecentHistoryUiState(
+                isbn = "2",
+                title = "가나다라마바사아자차카타파하",
+                searchedAt = "04.19",
+            ),
+        ).toImmutableList(),
+        onAction = {},
+    )
+}
+
+@Composable
+@Preview(showBackground = true)
 private fun SearchBookScreenPreview1() {
     SearchBookScreen(
         uiState = SearchBookUiState(),
-        onInputChanged = {},
-        onClearClicked = {},
-        onBookClick = {},
+        onAction = {},
     )
 }
 
@@ -212,8 +321,6 @@ private fun SearchBookScreenPreview2() {
                 ),
             ).toImmutableList()
         ),
-        onInputChanged = {},
-        onClearClicked = {},
-        onBookClick = {},
+        onAction = {},
     )
 }

@@ -1,9 +1,11 @@
 package com.oreocube.booksearch.data.di
 
 import com.oreocube.booksearch.data.repository.FavoriteRepositoryImpl
+import com.oreocube.booksearch.data.repository.HistoryRepositoryImpl
 import com.oreocube.booksearch.data.repository.LibraryRepositoryImpl
 import com.oreocube.booksearch.data.repository.RegionRepositoryImpl
 import com.oreocube.booksearch.domain.repository.FavoriteRepository
+import com.oreocube.booksearch.domain.repository.HistoryRepository
 import com.oreocube.booksearch.domain.repository.LibraryRepository
 import com.oreocube.booksearch.domain.repository.RegionRepository
 import dagger.Binds
@@ -22,4 +24,7 @@ interface RepositoryModule {
 
     @Binds
     fun bindsFavoriteRepository(repositoryImpl: FavoriteRepositoryImpl): FavoriteRepository
+
+    @Binds
+    fun bindsHistoryRepository(repositoryImpl: HistoryRepositoryImpl): HistoryRepository
 }
