@@ -10,6 +10,7 @@ class BookPagingSource @Inject constructor(
     private val query: String,
     private val service: LibraryService,
 ) : PagingSource<Int, Book>() {
+    private val emittedIsbns = mutableSetOf<String>()
 
     override fun getRefreshKey(state: PagingState<Int, Book>): Int? {
         return state.anchorPosition?.let { anchorPosition ->
@@ -29,8 +30,10 @@ class BookPagingSource @Inject constructor(
                 it.doc.toModel()
             }
 
+            val filtered = books.filter { emittedIsbns.add(it.isbn13) }
+
             LoadResult.Page(
-                data = books,
+                data = filtered,
                 prevKey = if (currentPage == 1) null else currentPage - 1,
                 nextKey = if (books.size < params.loadSize) null else currentPage + 1,
             )
