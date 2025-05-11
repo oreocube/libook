@@ -46,9 +46,6 @@ class SearchBookViewModel @Inject constructor(
     private val _recentHistories = MutableStateFlow<List<RecentBookHistory>>(emptyList())
 
     private val _searchResult = _query
-        .onEach { query ->
-            if (query.isBlank()) refreshHistory()
-        }
         .debounce(700)
         .map { query ->
             if (query.length > 1) searchBooksUseCase(query)
@@ -72,6 +69,7 @@ class SearchBookViewModel @Inject constructor(
     )
 
     private fun onInputChanged(input: String = "") {
+        if (input.isBlank()) refreshHistory()
         _query.value = input
     }
 
