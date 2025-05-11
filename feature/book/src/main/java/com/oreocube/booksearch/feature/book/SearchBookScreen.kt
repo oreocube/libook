@@ -35,6 +35,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemKey
 import coil3.compose.AsyncImage
 import com.oreocube.booksearch.core.ui.R
 import com.oreocube.booksearch.core.ui.component.BookSearchTextField
@@ -45,6 +49,7 @@ import com.oreocube.booksearch.feature.book.model.BookUiState
 import com.oreocube.booksearch.feature.book.model.RecentHistoryUiState
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.flow.flowOf
 
 @Composable
 fun SearchBookRoute(
@@ -82,6 +87,7 @@ fun SearchBookScreen(
     val focusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
+    val pagingData = uiState.result.collectAsLazyPagingItems()
 
     Column(modifier = Modifier.fillMaxSize()) {
         BookSearchTextField(
@@ -106,7 +112,7 @@ fun SearchBookScreen(
         } else {
             SearchResult(
                 modifier = Modifier.weight(1f),
-                result = uiState.result,
+                result = pagingData,
                 onAction = onAction,
             )
         }
@@ -192,19 +198,21 @@ private fun RecentHistoryContainer(
 @Composable
 private fun SearchResult(
     modifier: Modifier = Modifier,
-    result: ImmutableList<BookUiState>,
+    result: LazyPagingItems<BookUiState>,
     onAction: (SearchBookUiAction) -> Unit,
 ) {
     LazyColumn(modifier = modifier) {
-        result.forEachIndexed { index, book ->
-            item(key = book.isbn13) {
-                BookItem(
-                    book = book,
-                    onItemClick = { onAction(SearchBookUiAction.BookClicked(book)) }
-                )
-                if (index != result.lastIndex) {
-                    HorizontalDivider(color = Gray40)
-                }
+        items(
+            count = result.itemCount,
+            key = result.itemKey { it.isbn13 },
+        ) { index ->
+            val book = result[index] ?: return@items
+            BookItem(
+                book = book,
+                onItemClick = { onAction(SearchBookUiAction.BookClicked(book)) }
+            )
+            if (index < result.itemCount) {
+                HorizontalDivider(color = Gray40)
             }
         }
     }
@@ -304,22 +312,24 @@ private fun SearchBookScreenPreview1() {
 @Composable
 @Preview(showBackground = true)
 private fun SearchBookScreenPreview2() {
+    val fakeData = listOf(
+        BookUiState(
+            title = "실용주의 프로그래머 :20주년 기념판 ",
+            authors = "데이비드 토머스,정지용 옮김",
+            publisher = "인사이트",
+            publicationYear = "2022",
+            isbn13 = "9788966263363",
+            vol = "",
+            imageUrl = "https://image.aladin.co.kr/product/28878/64/cover/8966263364_1.jpg",
+            detailUrl = "https://data4library.kr/bookV?seq=6404790",
+            loanCount = 695
+        )
+    )
+
     SearchBookScreen(
         uiState = SearchBookUiState(
             query = "실용주의",
-            result = listOf(
-                BookUiState(
-                    title = "실용주의 프로그래머 :20주년 기념판 ",
-                    authors = "데이비드 토머스,정지용 옮김",
-                    publisher = "인사이트",
-                    publicationYear = "2022",
-                    isbn13 = "9788966263363",
-                    vol = "",
-                    imageUrl = "https://image.aladin.co.kr/product/28878/64/cover/8966263364_1.jpg",
-                    detailUrl = "https://data4library.kr/bookV?seq=6404790",
-                    loanCount = 695
-                ),
-            ).toImmutableList()
+            result = flowOf(PagingData.from(fakeData)),
         ),
         onAction = {},
     )

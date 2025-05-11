@@ -1,13 +1,16 @@
 package com.oreocube.booksearch.feature.book
 
+import androidx.paging.PagingData
 import com.oreocube.booksearch.feature.book.model.BookUiState
 import com.oreocube.booksearch.feature.book.model.RecentHistoryUiState
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 
 data class SearchBookUiState(
     val query: String = "",
-    val result: ImmutableList<BookUiState> = persistentListOf(),
+    val result: Flow<PagingData<BookUiState>> = emptyFlow(),
     val recentHistory: ImmutableList<RecentHistoryUiState> = persistentListOf(),
 )
 
