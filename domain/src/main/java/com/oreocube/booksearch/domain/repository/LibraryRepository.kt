@@ -5,6 +5,7 @@ import com.oreocube.booksearch.domain.model.Book
 import com.oreocube.booksearch.domain.model.BookAvailability
 import com.oreocube.booksearch.domain.model.BookDetail
 import com.oreocube.booksearch.domain.model.Library
+import com.oreocube.booksearch.domain.model.RecommendedBook
 import com.oreocube.booksearch.domain.model.param.BookAvailabilityCheckParam
 import com.oreocube.booksearch.domain.model.param.BookDetailParam
 import com.oreocube.booksearch.domain.model.param.BookSearchParam
@@ -16,4 +17,5 @@ interface LibraryRepository {
     suspend fun searchBooks(param: BookSearchParam): Flow<PagingData<Book>>
     suspend fun checkBookAvailability(param: BookAvailabilityCheckParam): BookAvailability
     suspend fun getBookDetail(param: BookDetailParam): BookDetail
+    suspend fun getRecommendedBooks(isbn: String): List<RecommendedBook>
 }

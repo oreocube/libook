@@ -12,6 +12,7 @@ import com.oreocube.booksearch.domain.model.Book
 import com.oreocube.booksearch.domain.model.BookAvailability
 import com.oreocube.booksearch.domain.model.BookDetail
 import com.oreocube.booksearch.domain.model.Library
+import com.oreocube.booksearch.domain.model.RecommendedBook
 import com.oreocube.booksearch.domain.model.param.BookAvailabilityCheckParam
 import com.oreocube.booksearch.domain.model.param.BookDetailParam
 import com.oreocube.booksearch.domain.model.param.BookSearchParam
@@ -52,5 +53,9 @@ class LibraryRepositoryImpl @Inject constructor(
         return libraryService.getBookDetail(
             isbn = param.isbn,
         ).response.detail.first().book.run(BookDetailDTO::toModel)
+    }
+
+    override suspend fun getRecommendedBooks(isbn: String): List<RecommendedBook> {
+        return libraryService.getRecommendedBooks(isbn = isbn).response.docs.map { it.book.toModel() }
     }
 }
