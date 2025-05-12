@@ -7,9 +7,13 @@ import androidx.navigation.toRoute
 import com.oreocube.booksearch.domain.model.BookAvailability
 import com.oreocube.booksearch.domain.model.BookDetail
 import com.oreocube.booksearch.domain.model.LibraryShort
+import com.oreocube.booksearch.domain.model.RecommendedBook
 import com.oreocube.booksearch.domain.model.param.BookDetailParam
 import com.oreocube.booksearch.domain.usecase.CheckBookAvailabilityUseCase
 import com.oreocube.booksearch.domain.usecase.GetBookDetailUseCase
+import com.oreocube.booksearch.domain.usecase.GetRecommendedBooksWithTargetBookUseCase
+import com.oreocube.booksearch.feature.book.model.RecommendedBookUiState
+import com.oreocube.booksearch.feature.book.model.toUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted
@@ -26,6 +30,7 @@ class BookDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     getBookDetailUseCase: GetBookDetailUseCase,
     checkBookAvailabilityUseCase: CheckBookAvailabilityUseCase,
+    getRecommendedBooksUseCase: GetRecommendedBooksWithTargetBookUseCase,
 ) : ViewModel() {
     private val isbnKey = "isbnKey"
 
@@ -39,11 +44,18 @@ class BookDetailViewModel @Inject constructor(
     val eventFlow = _eventChannel.receiveAsFlow()
 
     val uiState: StateFlow<BookDetailUiState> = isbn13.flatMapLatest { isbn ->
+        // TODO: 추천도서 개별 업데이트
         combine(
             getBookDetailUseCase(BookDetailParam(isbn)),
             checkBookAvailabilityUseCase(isbn),
-            BookDetailUiState::Data,
-        )
+            getRecommendedBooksUseCase(isbn),
+        ) { bookDetail, availability, recommendedBooks ->
+            BookDetailUiState.Data(
+                book = bookDetail,
+                status = availability,
+                recommendBooks = recommendedBooks.map(RecommendedBook::toUiState)
+            )
+        }
     }.catch {
         _eventChannel.send(BookDetailUiEvent.Error("도서 정보를 불러오는데 실패했습니다."))
     }.stateIn(
@@ -57,7 +69,8 @@ sealed class BookDetailUiState {
     data object Loading : BookDetailUiState()
     data class Data(
         val book: BookDetail,
-        val status: List<Pair<LibraryShort, BookAvailability>>
+        val status: List<Pair<LibraryShort, BookAvailability>>,
+        val recommendBooks: List<RecommendedBookUiState> = emptyList(),
     ) : BookDetailUiState()
 }
 

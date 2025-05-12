@@ -5,11 +5,16 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -45,6 +50,7 @@ import com.oreocube.booksearch.core.ui.theme.Red30
 import com.oreocube.booksearch.domain.model.BookAvailability
 import com.oreocube.booksearch.domain.model.BookDetail
 import com.oreocube.booksearch.domain.model.LibraryShort
+import com.oreocube.booksearch.feature.book.model.RecommendedBookUiState
 
 @Composable
 fun BookDetailRoute(
@@ -98,6 +104,12 @@ fun BookDetailScreen(
                         status = uiState.status,
                         onAddLibraryClick = onAddLibraryClick,
                     )
+                    if (uiState.recommendBooks.isNotEmpty()) {
+                        HorizontalDivider()
+                        RecommendedBookSection(
+                            books = uiState.recommendBooks,
+                        )
+                    }
                 }
             }
         }
@@ -265,6 +277,52 @@ private fun StatusLabel(
 }
 
 @Composable
+private fun RecommendedBookSection(
+    books: List<RecommendedBookUiState>,
+) {
+    Column {
+        Text(
+            modifier = Modifier.padding(top = 16.dp, start = 16.dp),
+            text = "같이 볼만한 도서",
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold
+        )
+        LazyRow(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            contentPadding = PaddingValues(horizontal = 16.dp)
+        ) {
+            items(
+                items = books,
+                key = { book -> book.isbn13 }
+            ) { book ->
+                RecommendedBookItem(book = book)
+            }
+        }
+    }
+}
+
+@Composable
+private fun RecommendedBookItem(
+    book: RecommendedBookUiState,
+) {
+    Column(modifier = Modifier.width(120.dp)) {
+        AsyncImage(
+            modifier = Modifier.size(width = 120.dp, height = 150.dp),
+            model = book.imageUrl,
+            contentDescription = "recommended book image",
+        )
+        Text(
+            modifier = Modifier.padding(top = 8.dp),
+            text = book.title,
+            fontSize = 14.sp,
+        )
+    }
+}
+
+@Composable
 @Preview(showBackground = true)
 private fun LibraryStatusForBookPreview1() {
     LibraryStatusForBook(
@@ -313,7 +371,17 @@ private fun BookDetailScreenPreview() {
                     hasBook = true,
                     loanAvailable = true
                 ),
-            )
+            ),
+            recommendBooks = listOf(
+                RecommendedBookUiState(
+                    title = "실용주의 프로그래머 :20주년 기념판 ",
+                    authors = "데이비드 토머스,정지용 옮김",
+                    publisher = "인사이트",
+                    publicationYear = "2022",
+                    isbn13 = "978",
+                    imageUrl = "https://image.aladin.co.kr/product/28878/64/cover/8966263364_1.jpg",
+                ),
+            ),
         ),
         onBackClick = {},
         onAddLibraryClick = {},
