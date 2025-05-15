@@ -2,6 +2,8 @@ package com.oreocube.booksearch.feature.book
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.cachedIn
+import androidx.paging.map
 import com.oreocube.booksearch.domain.model.Book
 import com.oreocube.booksearch.domain.model.RecentBookHistory
 import com.oreocube.booksearch.domain.usecase.AddHistoryUseCase
@@ -16,14 +18,15 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -39,47 +42,44 @@ class SearchBookViewModel @Inject constructor(
     private val _eventChannel = Channel<SearchBookUiEvent>(Channel.BUFFERED)
     val eventFlow = _eventChannel.receiveAsFlow()
 
-    private val _query = MutableStateFlow("")
-    private val _recentHistories = MutableStateFlow<List<RecentBookHistory>>(emptyList())
+    private val _uiState = MutableStateFlow(SearchBookUiState())
+    val uiState: StateFlow<SearchBookUiState> = _uiState.asStateFlow()
 
-    private val _searchResult = _query
-        .onEach { query ->
-            if (query.isBlank()) refreshHistory()
-        }
-        .debounce(700)
-        .map { query ->
-            if (query.length > 1) searchBookSafely(query) else emptyList()
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(500),
-            initialValue = emptyList()
-        )
-
-    val uiState: StateFlow<SearchBookUiState> = combine(
-        _query, _searchResult, _recentHistories
-    ) { query, result, history ->
-        SearchBookUiState(
-            query = query,
-            result = result.toImmutableList(),
-            recentHistory = history.map(RecentBookHistory::toUiState).toImmutableList(),
-        )
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(500),
-        initialValue = SearchBookUiState()
-    )
-
-    private fun onInputChanged(input: String = "") {
-        _query.value = input
+    init {
+        observeQuery()
+        refreshHistory()
     }
 
-    private suspend fun searchBookSafely(query: String): List<BookUiState> {
-        return runCatching {
-            searchBooksUseCase(query).map(Book::toUiState)
-        }.getOrElse {
-            _eventChannel.send(SearchBookUiEvent.Error("도서 검색에 실패했습니다."))
-            emptyList()
+    fun onAction(action: SearchBookUiAction) {
+        when (action) {
+            is SearchBookUiAction.InputChanged -> onInputChanged(action.input)
+            is SearchBookUiAction.BookClicked -> onBookClicked(action.book)
+            is SearchBookUiAction.HistoryItemClick -> onHistoryItemClick(action.history)
+            is SearchBookUiAction.DeleteHistoryClick -> onDeleteHistoryClick(action.history)
+            is SearchBookUiAction.ClearHistoryClick -> onClearHistoryClick()
         }
+    }
+
+    private fun observeQuery() {
+        uiState.map { it.query }
+            .debounce(700)
+            .distinctUntilChanged()
+            .onEach { query -> updateSearchResult(query) }
+            .launchIn(viewModelScope)
+    }
+
+    private suspend fun updateSearchResult(query: String) {
+        val result = if (query.length > 1) searchBooksUseCase(query)
+            .map { pagingData -> pagingData.map(Book::toUiState) }
+            .cachedIn(viewModelScope)
+        else emptyFlow()
+
+        _uiState.update { state -> state.copy(result = result) }
+    }
+
+    private fun onInputChanged(input: String = "") {
+        if (input.isBlank()) refreshHistory()
+        _uiState.update { state -> state.copy(query = input) }
     }
 
     private fun refreshHistory() {
@@ -87,7 +87,7 @@ class SearchBookViewModel @Inject constructor(
             runCatching {
                 getAllHistoriesUseCase()
             }.onSuccess { history ->
-                _recentHistories.value = history
+                updateRecentHistory(history.map(RecentBookHistory::toUiState))
             }
         }
     }
@@ -123,7 +123,9 @@ class SearchBookViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 deleteHistoryUseCase(history.isbn)
-                _recentHistories.update { it.filterNot { h -> h.isbn == history.isbn } }
+                val newHistory = uiState.value.recentHistory
+                    .filterNot { h -> h.isbn == history.isbn }
+                updateRecentHistory(newHistory)
             }
         }
     }
@@ -132,18 +134,14 @@ class SearchBookViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 clearHistoryUseCase()
-                _recentHistories.value = emptyList()
+                updateRecentHistory(emptyList())
             }
         }
     }
 
-    fun onAction(action: SearchBookUiAction) {
-        when (action) {
-            is SearchBookUiAction.InputChanged -> onInputChanged(action.input)
-            is SearchBookUiAction.BookClicked -> onBookClicked(action.book)
-            is SearchBookUiAction.HistoryItemClick -> onHistoryItemClick(action.history)
-            is SearchBookUiAction.DeleteHistoryClick -> onDeleteHistoryClick(action.history)
-            is SearchBookUiAction.ClearHistoryClick -> onClearHistoryClick()
+    private fun updateRecentHistory(history: List<RecentHistoryUiState>) {
+        _uiState.update { state ->
+            state.copy(recentHistory = history.toImmutableList())
         }
     }
 }

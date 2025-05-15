@@ -8,27 +8,16 @@ import com.oreocube.booksearch.domain.repository.LibraryRepository
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 class CheckBookAvailabilityUseCase @Inject constructor(
     private val libraryRepository: LibraryRepository,
     private val favoriteRepository: FavoriteRepository,
 ) {
-    operator fun invoke(isbn: String): Flow<List<Pair<LibraryShort, BookAvailability>>> {
-        return favoriteRepository.getFavoriteLibraries()
-            .flatMapLatest { favoriteLibraries ->
-                getBookAvailabilityForLibraries(isbn, favoriteLibraries)
-            }
-    }
-
-    private fun getBookAvailabilityForLibraries(
-        isbn: String,
-        libraries: List<LibraryShort>
-    ): Flow<List<Pair<LibraryShort, BookAvailability>>> = flow {
-        val results = coroutineScope {
+    suspend operator fun invoke(isbn: String): List<Pair<LibraryShort, BookAvailability>> {
+        val libraries = favoriteRepository.getFavoriteLibraries().first()
+        return coroutineScope {
             libraries.map { library ->
                 async {
                     val availability = libraryRepository.checkBookAvailability(
@@ -38,6 +27,5 @@ class CheckBookAvailabilityUseCase @Inject constructor(
                 }
             }.awaitAll()
         }
-        emit(results)
     }
 }

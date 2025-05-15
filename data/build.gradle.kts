@@ -49,6 +49,7 @@ dependencies {
     implementation(libs.retrofit.kotlin.serialization)
     implementation(libs.retrofit)
     implementation(libs.okhttp.logging)
+    implementation(libs.androidx.paging.runtime)
     ksp(libs.room.compiler)
     implementation(libs.room.ktx)
     implementation(libs.room.runtime)

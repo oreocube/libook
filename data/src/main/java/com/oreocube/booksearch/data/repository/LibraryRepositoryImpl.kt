@@ -1,5 +1,10 @@
 package com.oreocube.booksearch.data.repository
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import com.oreocube.booksearch.data.datasource.BookPagingConfig
+import com.oreocube.booksearch.data.datasource.BookPagingSource
 import com.oreocube.booksearch.data.response.BookAvailabilityDTO
 import com.oreocube.booksearch.data.response.BookDetailDTO
 import com.oreocube.booksearch.data.service.LibraryService
@@ -7,11 +12,13 @@ import com.oreocube.booksearch.domain.model.Book
 import com.oreocube.booksearch.domain.model.BookAvailability
 import com.oreocube.booksearch.domain.model.BookDetail
 import com.oreocube.booksearch.domain.model.Library
+import com.oreocube.booksearch.domain.model.RecommendedBook
 import com.oreocube.booksearch.domain.model.param.BookAvailabilityCheckParam
 import com.oreocube.booksearch.domain.model.param.BookDetailParam
 import com.oreocube.booksearch.domain.model.param.BookSearchParam
 import com.oreocube.booksearch.domain.model.param.LibrarySearchParam
 import com.oreocube.booksearch.domain.repository.LibraryRepository
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class LibraryRepositoryImpl @Inject constructor(
@@ -23,10 +30,16 @@ class LibraryRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun searchBooks(param: BookSearchParam): List<Book> {
-        return libraryService.searchBooks(title = param.title).response.docs.map {
-            it.doc.toModel()
-        }
+    override suspend fun searchBooks(param: BookSearchParam): Flow<PagingData<Book>> {
+        return Pager(
+            config = PagingConfig(pageSize = BookPagingConfig.PAGE_SIZE),
+            pagingSourceFactory = {
+                BookPagingSource(
+                    query = param.title,
+                    service = libraryService,
+                )
+            }
+        ).flow
     }
 
     override suspend fun checkBookAvailability(param: BookAvailabilityCheckParam): BookAvailability {
@@ -40,5 +53,9 @@ class LibraryRepositoryImpl @Inject constructor(
         return libraryService.getBookDetail(
             isbn = param.isbn,
         ).response.detail.first().book.run(BookDetailDTO::toModel)
+    }
+
+    override suspend fun getRecommendedBooks(isbn: String): List<RecommendedBook> {
+        return libraryService.getRecommendedBooks(isbn = isbn).response.docs.map { it.book.toModel() }
     }
 }
