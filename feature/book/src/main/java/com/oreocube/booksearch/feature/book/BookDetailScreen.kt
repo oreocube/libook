@@ -57,6 +57,7 @@ import com.oreocube.booksearch.feature.book.model.RecommendedBookUiState
 fun BookDetailRoute(
     onBackClick: () -> Unit,
     onAddLibraryClick: () -> Unit,
+    onBookItemClick: (String) -> Unit,
     onShowSnackbar: (String) -> Unit,
     viewModel: BookDetailViewModel = hiltViewModel()
 ) {
@@ -67,6 +68,7 @@ fun BookDetailRoute(
         uiState = uiState,
         onBackClick = onBackClick,
         onAddLibraryClick = onAddLibraryClick,
+        onBookItemClick = onBookItemClick,
     )
 
     LaunchedEffect(Unit) {
@@ -86,6 +88,7 @@ fun BookDetailScreen(
     uiState: BookDetailUiState,
     onBackClick: () -> Unit,
     onAddLibraryClick: () -> Unit,
+    onBookItemClick: (String) -> Unit,
 ) {
     Column(modifier = modifier) {
         BookSearchTopBar(onNavigationIconClick = onBackClick)
@@ -120,6 +123,7 @@ fun BookDetailScreen(
                         HorizontalDivider()
                         RecommendedBookSection(
                             books = uiState.recommendBooks,
+                            onBookItemClick = onBookItemClick,
                         )
                     }
                 }
@@ -291,6 +295,7 @@ private fun StatusLabel(
 @Composable
 private fun RecommendedBookSection(
     books: List<RecommendedBookUiState>,
+    onBookItemClick: (String) -> Unit,
 ) {
     Column {
         Text(
@@ -310,7 +315,7 @@ private fun RecommendedBookSection(
                 items = books,
                 key = { book -> book.isbn13 }
             ) { book ->
-                RecommendedBookItem(book = book)
+                RecommendedBookItem(book = book, onClick = onBookItemClick)
             }
         }
     }
@@ -319,8 +324,13 @@ private fun RecommendedBookSection(
 @Composable
 private fun RecommendedBookItem(
     book: RecommendedBookUiState,
+    onClick: (String) -> Unit,
 ) {
-    Column(modifier = Modifier.width(120.dp)) {
+    Column(
+        modifier = Modifier
+            .width(120.dp)
+            .clickable { onClick(book.isbn13) }
+    ) {
         AsyncImage(
             modifier = Modifier.size(width = 120.dp, height = 150.dp),
             model = book.imageUrl,
@@ -398,5 +408,6 @@ private fun BookDetailScreenPreview() {
         ),
         onBackClick = {},
         onAddLibraryClick = {},
+        onBookItemClick = {},
     )
 }

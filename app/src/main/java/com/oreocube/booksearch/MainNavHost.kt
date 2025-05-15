@@ -50,6 +50,7 @@ fun MainNavHost(
         bookDetailScreen(
             onBackClick = navController::popBackStack,
             onAddLibraryClick = navController::navigateToRegion,
+            onBookItemClick = navController::navigateToBookDetail,
             onShowSnackbar = onShowSnackbar,
         )
         favoriteLibraryScreen(
