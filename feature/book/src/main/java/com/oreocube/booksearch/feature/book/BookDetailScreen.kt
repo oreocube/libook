@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -88,9 +89,20 @@ fun BookDetailScreen(
 ) {
     Column(modifier = modifier) {
         BookSearchTopBar(onNavigationIconClick = onBackClick)
-        when (uiState) {
-            is BookDetailUiState.Loading -> {}
-            is BookDetailUiState.Data -> {
+        when {
+            uiState.isLoading -> {
+                Box(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.Center),
+                    )
+                }
+            }
+
+            uiState.book != null -> {
                 val scrollState = rememberScrollState()
 
                 Column(modifier = modifier.verticalScroll(scrollState)) {
@@ -348,7 +360,8 @@ private fun LibraryStatusForBookPreview2() {
 @Preview(showBackground = true)
 private fun BookDetailScreenPreview() {
     BookDetailScreen(
-        uiState = BookDetailUiState.Data(
+        uiState = BookDetailUiState(
+            isLoading = false,
             book = BookDetail(
                 title = "실용주의 프로그래머 :20주년 기념판 ",
                 authors = "데이비드 토머스,정지용 옮김",

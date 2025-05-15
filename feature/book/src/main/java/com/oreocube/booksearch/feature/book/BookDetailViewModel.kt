@@ -16,21 +16,20 @@ import com.oreocube.booksearch.feature.book.model.RecommendedBookUiState
 import com.oreocube.booksearch.feature.book.model.toUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class BookDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    getBookDetailUseCase: GetBookDetailUseCase,
-    checkBookAvailabilityUseCase: CheckBookAvailabilityUseCase,
-    getRecommendedBooksUseCase: GetRecommendedBooksWithTargetBookUseCase,
+    val getBookDetailUseCase: GetBookDetailUseCase,
+    val checkBookAvailabilityUseCase: CheckBookAvailabilityUseCase,
+    val getRecommendedBooksUseCase: GetRecommendedBooksWithTargetBookUseCase,
 ) : ViewModel() {
     private val isbnKey = "isbnKey"
 
@@ -40,38 +39,79 @@ class BookDetailViewModel @Inject constructor(
         initialValue = bookDetailRoute.isbn,
     )
 
+    private val _uiState = MutableStateFlow(BookDetailUiState.initialState)
+    val uiState: StateFlow<BookDetailUiState> = _uiState.asStateFlow()
+
+    init {
+        getBookDetail(isbn13.value)
+        getBookAvailability(isbn13.value)
+        getRecommendedBooks(isbn13.value)
+    }
+
     private val _eventChannel = Channel<BookDetailUiEvent>(Channel.BUFFERED)
     val eventFlow = _eventChannel.receiveAsFlow()
 
-    val uiState: StateFlow<BookDetailUiState> = isbn13.flatMapLatest { isbn ->
-        // TODO: 추천도서 개별 업데이트
-        combine(
-            getBookDetailUseCase(BookDetailParam(isbn)),
-            checkBookAvailabilityUseCase(isbn),
-            getRecommendedBooksUseCase(isbn),
-        ) { bookDetail, availability, recommendedBooks ->
-            BookDetailUiState.Data(
-                book = bookDetail,
-                status = availability,
-                recommendBooks = recommendedBooks.map(RecommendedBook::toUiState)
-            )
+    private fun getBookDetail(isbn: String) {
+        viewModelScope.launch {
+            runCatching {
+                getBookDetailUseCase(BookDetailParam(isbn))
+            }.onSuccess { bookDetail ->
+                _uiState.update { state ->
+                    state.copy(
+                        isLoading = false,
+                        book = bookDetail,
+                    )
+                }
+            }.onFailure {
+                _eventChannel.send(BookDetailUiEvent.Error("도서 정보를 불러오는데 실패했습니다."))
+            }
         }
-    }.catch {
-        _eventChannel.send(BookDetailUiEvent.Error("도서 정보를 불러오는데 실패했습니다."))
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(500),
-        initialValue = BookDetailUiState.Loading
-    )
+    }
+
+    private fun getBookAvailability(isbn: String) {
+        viewModelScope.launch {
+            runCatching {
+                checkBookAvailabilityUseCase(isbn)
+            }.onSuccess { availability ->
+                _uiState.update { state ->
+                    state.copy(
+                        status = availability,
+                    )
+                }
+            }
+        }
+    }
+
+    private fun getRecommendedBooks(isbn: String) {
+        viewModelScope.launch {
+            runCatching {
+                getRecommendedBooksUseCase(isbn)
+            }.onSuccess { books ->
+                val recommendedBooks = books.map(RecommendedBook::toUiState)
+                _uiState.update { state ->
+                    state.copy(
+                        recommendBooks = recommendedBooks,
+                    )
+                }
+            }
+        }
+    }
 }
 
-sealed class BookDetailUiState {
-    data object Loading : BookDetailUiState()
-    data class Data(
-        val book: BookDetail,
-        val status: List<Pair<LibraryShort, BookAvailability>>,
-        val recommendBooks: List<RecommendedBookUiState> = emptyList(),
-    ) : BookDetailUiState()
+data class BookDetailUiState(
+    val isLoading: Boolean,
+    val book: BookDetail?,
+    val status: List<Pair<LibraryShort, BookAvailability>>,
+    val recommendBooks: List<RecommendedBookUiState> = emptyList(),
+) {
+    companion object {
+        val initialState = BookDetailUiState(
+            isLoading = true,
+            book = null,
+            status = emptyList(),
+            recommendBooks = emptyList(),
+        )
+    }
 }
 
 sealed class BookDetailUiEvent {
