@@ -23,7 +23,10 @@ val Gray30 = Color(0xFF999999)
 val Gray40 = Color(0xFFCCCCCC)
 val Gray50 = Color(0xFFC9C9BC)
 val Gray80 = Color(0xFFEFEEEA)
+val Gray90 = Color(0xFFF9F9F7)
 
-val Green30 = Color(0xFF009944)
+val Green30 = Color(0xFF40C057)
+val Green80 = Color(0xFFE6F7EC)
 
-val Red30 = Color(0xFFdc2f02)
+val Red30 = Color(0xFFFD7E14)
+val Red80 = Color(0xFFFFF4E6)
