@@ -43,12 +43,7 @@ fun BookSearchTopBar(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (navigationIcon != null) {
-            Box(
-                modifier = Modifier
-                    .padding(start = topAppBarItemSpacing)
-            ) {
-                navigationIcon()
-            }
+            navigationIcon()
         }
         Column(
             modifier = Modifier

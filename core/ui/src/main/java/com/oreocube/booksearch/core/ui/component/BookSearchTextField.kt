@@ -30,7 +30,7 @@ fun BookSearchTextField(
     onQuerySubmitted: () -> Unit,
 ) {
     TextField(
-        modifier = modifier,
+        modifier = modifier.height(72.dp),
         value = input,
         onValueChange = onInputChanged,
         placeholder = { Text(text = placeholder) },
