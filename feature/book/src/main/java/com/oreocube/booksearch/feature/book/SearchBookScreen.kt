@@ -26,6 +26,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
@@ -42,6 +43,7 @@ import androidx.paging.compose.itemKey
 import coil3.compose.AsyncImage
 import com.oreocube.booksearch.core.ui.R
 import com.oreocube.booksearch.core.ui.component.BookSearchTextField
+import com.oreocube.booksearch.core.ui.theme.Brown30
 import com.oreocube.booksearch.core.ui.theme.Gray10
 import com.oreocube.booksearch.core.ui.theme.Gray20
 import com.oreocube.booksearch.core.ui.theme.Gray40
@@ -53,6 +55,7 @@ import kotlinx.coroutines.flow.flowOf
 
 @Composable
 fun SearchBookRoute(
+    onBackClick: () -> Unit,
     onBookClick: (String) -> Unit,
     onShowSnackbar: (String) -> Unit,
     viewModel: SearchBookViewModel = hiltViewModel()
@@ -62,6 +65,7 @@ fun SearchBookRoute(
     SearchBookScreen(
         uiState = uiState,
         onAction = viewModel::onAction,
+        onBackClick = onBackClick,
     )
 
     LaunchedEffect(Unit) {
@@ -83,6 +87,7 @@ fun SearchBookRoute(
 fun SearchBookScreen(
     uiState: SearchBookUiState,
     onAction: (SearchBookUiAction) -> Unit,
+    onBackClick: () -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
@@ -96,6 +101,18 @@ fun SearchBookScreen(
                 .focusRequester(focusRequester),
             input = uiState.query,
             placeholder = stringResource(R.string.search_book_hint),
+            leadingIcon = {
+                IconButton(
+                    modifier = Modifier.padding(start = 8.dp),
+                    onClick = onBackClick
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_arrow_back_24),
+                        contentDescription = null,
+                        tint = Brown30,
+                    )
+                }
+            },
             onInputChanged = { onAction(SearchBookUiAction.InputChanged(it)) },
             onClearClicked = { onAction(SearchBookUiAction.InputChanged()) },
             onQuerySubmitted = {
@@ -305,6 +322,7 @@ private fun RecentHistoryPreview() {
 private fun SearchBookScreenPreview1() {
     SearchBookScreen(
         uiState = SearchBookUiState(),
+        onBackClick = {},
         onAction = {},
     )
 }
@@ -331,6 +349,7 @@ private fun SearchBookScreenPreview2() {
             query = "실용주의",
             result = flowOf(PagingData.from(fakeData)),
         ),
+        onBackClick = {},
         onAction = {},
     )
 }

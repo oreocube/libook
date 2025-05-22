@@ -1,5 +1,6 @@
 package com.oreocube.booksearch.core.ui.component
 
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.TextSelectionColors
@@ -13,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.unit.dp
 import com.oreocube.booksearch.core.ui.R
 import com.oreocube.booksearch.core.ui.theme.Brown30
 import com.oreocube.booksearch.core.ui.theme.Gray30
@@ -22,6 +24,7 @@ fun BookSearchTextField(
     modifier: Modifier = Modifier,
     input: String,
     placeholder: String,
+    leadingIcon: @Composable (() -> Unit)? = null,
     onInputChanged: (String) -> Unit,
     onClearClicked: () -> Unit,
     onQuerySubmitted: () -> Unit,
@@ -31,6 +34,7 @@ fun BookSearchTextField(
         value = input,
         onValueChange = onInputChanged,
         placeholder = { Text(text = placeholder) },
+        leadingIcon = leadingIcon,
         trailingIcon = {
             if (input.isNotBlank())
                 IconButton(onClick = onClearClicked) {

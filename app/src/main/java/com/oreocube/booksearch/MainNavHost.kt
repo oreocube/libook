@@ -44,6 +44,7 @@ fun MainNavHost(
             },
         )
         searchBookScreen(
+            onBackClick = navController::popBackStack,
             onBookClick = navController::navigateToBookDetail,
             onShowSnackbar = onShowSnackbar,
         )
