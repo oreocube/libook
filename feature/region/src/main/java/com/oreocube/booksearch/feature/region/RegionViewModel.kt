@@ -29,7 +29,7 @@ class RegionViewModel @Inject constructor(
     private val getDistrictsUseCase: GetDistrictsUseCase,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<RegionUiState>(RegionUiState.Loading)
+    private val _uiState = MutableStateFlow(RegionUiState.initialState)
     val uiState: StateFlow<RegionUiState> = _uiState.asStateFlow()
 
     private val _eventChannel = Channel<RegionUiEvent>(Channel.BUFFERED)
@@ -46,12 +46,15 @@ class RegionViewModel @Inject constructor(
             }.onSuccess { cities ->
                 val selectedCityId = cities.firstOrNull()?.id ?: UNSELECTED
 
-                _uiState.value = RegionUiState.Table(
-                    selectedCityId = selectedCityId,
-                    cities = cities
-                        .map(City::toUiState)
-                        .toImmutableList(),
-                )
+                _uiState.update { state ->
+                    state.copy(
+                        isLoading = false,
+                        selectedCityId = selectedCityId,
+                        cities = cities
+                            .map(City::toUiState)
+                            .toImmutableList(),
+                    )
+                }
 
                 if (selectedCityId != UNSELECTED) {
                     onCitySelected(selectedCityId)
@@ -68,17 +71,13 @@ class RegionViewModel @Inject constructor(
                 getDistrictsUseCase(DistrictSearchParam(cityId = id))
             }.onSuccess { districts ->
                 _uiState.update { state ->
-                    if (state is RegionUiState.Table) {
-                        state.copy(
-                            selectedCityId = id,
-                            selectedDistrictId = UNSELECTED,
-                            districts = districts
-                                .map(District::toUiState)
-                                .toImmutableList(),
-                        )
-                    } else {
-                        state
-                    }
+                    state.copy(
+                        selectedCityId = id,
+                        selectedDistrictId = UNSELECTED,
+                        districts = districts
+                            .map(District::toUiState)
+                            .toImmutableList(),
+                    )
                 }
             }.onFailure {
                 _eventChannel.send(RegionUiEvent.Error("데이터를 불러오지 못했습니다."))
@@ -88,16 +87,12 @@ class RegionViewModel @Inject constructor(
 
     fun onDistrictSelected(id: Int) {
         _uiState.update { state ->
-            if (state is RegionUiState.Table) {
-                state.copy(selectedDistrictId = id)
-            } else {
-                state
-            }
+            state.copy(selectedDistrictId = id)
         }
     }
 
     fun onSearchButtonClicked() {
-        val cachedState = uiState.value as? RegionUiState.Table ?: return
+        val cachedState = uiState.value
         viewModelScope.launch {
             if (cachedState.selectedDistrictId == UNSELECTED) {
                 _eventChannel.send(RegionUiEvent.Error("지역을 선택해주세요."))
@@ -106,20 +101,28 @@ class RegionViewModel @Inject constructor(
             }
         }
     }
-    
+
     companion object {
         private const val UNSELECTED = -1
     }
 }
 
-sealed class RegionUiState {
-    data object Loading : RegionUiState()
-    data class Table(
-        val selectedCityId: Int,
-        val selectedDistrictId: Int = -1,
-        val cities: ImmutableList<CityUiState>,
-        val districts: ImmutableList<DistrictUiState> = persistentListOf(),
-    ) : RegionUiState()
+data class RegionUiState(
+    val isLoading: Boolean,
+    val selectedCityId: Int,
+    val selectedDistrictId: Int = -1,
+    val cities: ImmutableList<CityUiState>,
+    val districts: ImmutableList<DistrictUiState> = persistentListOf(),
+) {
+    companion object {
+        val initialState = RegionUiState(
+            isLoading = true,
+            selectedCityId = -1,
+            selectedDistrictId = -1,
+            cities = persistentListOf(),
+            districts = persistentListOf(),
+        )
+    }
 }
 
 sealed class RegionUiEvent {
