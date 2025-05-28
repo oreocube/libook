@@ -2,6 +2,7 @@ package com.oreocube.booksearch.feature.book
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,12 +12,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -36,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -120,7 +124,7 @@ fun SearchBookScreen(
                 focusManager.clearFocus()
             },
         )
-        if (uiState.query.isBlank() && uiState.recentHistory.isNotEmpty()) {
+        if (uiState.query.length < 2 && uiState.recentHistory.isNotEmpty()) {
             RecentHistoryContainer(
                 modifier = Modifier.weight(1f),
                 histories = uiState.recentHistory,
@@ -218,6 +222,17 @@ private fun SearchResult(
     result: LazyPagingItems<BookUiState>,
     onAction: (SearchBookUiAction) -> Unit,
 ) {
+    val loadState = result.loadState
+    val hasError by remember(loadState) {
+        derivedStateOf {
+            listOf(
+                loadState.refresh,
+                loadState.append,
+                loadState.prepend,
+            ).any { it is LoadState.Error }
+        }
+    }
+
     LazyColumn(modifier = modifier) {
         items(
             count = result.itemCount,
@@ -228,8 +243,38 @@ private fun SearchResult(
                 book = book,
                 onItemClick = { onAction(SearchBookUiAction.BookClicked(book)) }
             )
-            if (index < result.itemCount) {
+            if (index < result.itemCount - 1) {
                 HorizontalDivider(color = Gray40)
+            }
+        }
+
+        if (hasError) {
+            item {
+                Text(
+                    text = "오류가 발생했습니다",
+                )
+            }
+        }
+    }
+
+    when {
+        loadState.refresh is LoadState.Loading || loadState.append is LoadState.Loading -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center,
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+
+        loadState.refresh is LoadState.NotLoading && result.itemCount == 0 -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = "검색 결과가 없습니다",
+                )
             }
         }
     }
@@ -248,7 +293,7 @@ private fun BookItem(
             .padding(8.dp)
     ) {
         AsyncImage(
-            modifier = Modifier.size(80.dp),
+            modifier = Modifier.size(100.dp),
             model = book.imageUrl,
             contentDescription = "book image",
         )
