@@ -2,7 +2,6 @@ package com.oreocube.booksearch.feature.book
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -47,6 +45,8 @@ import androidx.paging.compose.itemKey
 import coil3.compose.AsyncImage
 import com.oreocube.booksearch.core.ui.R
 import com.oreocube.booksearch.core.ui.component.BookSearchTextField
+import com.oreocube.booksearch.core.ui.component.LiBookEmptyView
+import com.oreocube.booksearch.core.ui.component.LiBookLoadingIndicator
 import com.oreocube.booksearch.core.ui.theme.Brown30
 import com.oreocube.booksearch.core.ui.theme.Gray10
 import com.oreocube.booksearch.core.ui.theme.Gray20
@@ -259,23 +259,16 @@ private fun SearchResult(
 
     when {
         loadState.refresh is LoadState.Loading || loadState.append is LoadState.Loading -> {
-            Box(
+            LiBookLoadingIndicator(
                 modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center,
-            ) {
-                CircularProgressIndicator()
-            }
+            )
         }
 
         loadState.refresh is LoadState.NotLoading && result.itemCount == 0 -> {
-            Box(
+            LiBookEmptyView(
                 modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center,
-            ) {
-                Text(
-                    text = "검색 결과가 없습니다",
-                )
-            }
+                message = "검색 결과가 없습니다",
+            )
         }
     }
 }
