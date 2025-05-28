@@ -25,8 +25,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.oreocube.booksearch.core.ui.R
-import com.oreocube.booksearch.core.ui.component.BookSearchButton
-import com.oreocube.booksearch.core.ui.component.BookSearchTopBar
+import com.oreocube.booksearch.core.ui.component.LiBookLargeButton
+import com.oreocube.booksearch.core.ui.component.LiBookTopBar
 import com.oreocube.booksearch.core.ui.theme.Brown10
 import com.oreocube.booksearch.core.ui.theme.Brown60
 import com.oreocube.booksearch.core.ui.theme.Gray80
@@ -81,7 +81,7 @@ fun RegionScreen(
     when (uiState) {
         is RegionUiState.Table -> {
             Column(modifier = modifier) {
-                BookSearchTopBar(
+                LiBookTopBar(
                     title = stringResource(R.string.menu_search_library),
                     description = stringResource(R.string.menu_description_search_library),
                     onNavigationIconClick = onBackClick,
@@ -109,7 +109,7 @@ fun RegionScreen(
                     onCityClick = onCityClick,
                     onDistrictClick = onDistrictClick,
                 )
-                BookSearchButton(
+                LiBookLargeButton(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp),

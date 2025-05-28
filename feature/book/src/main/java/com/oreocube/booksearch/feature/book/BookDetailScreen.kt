@@ -42,7 +42,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.oreocube.booksearch.core.ui.R
-import com.oreocube.booksearch.core.ui.component.BookSearchTopBar
+import com.oreocube.booksearch.core.ui.component.LiBookTopBar
 import com.oreocube.booksearch.core.ui.theme.Brown20
 import com.oreocube.booksearch.core.ui.theme.Gray10
 import com.oreocube.booksearch.core.ui.theme.Gray20
@@ -90,7 +90,7 @@ fun BookDetailScreen(
     onBookItemClick: (String) -> Unit,
 ) {
     Column(modifier = modifier) {
-        BookSearchTopBar(onNavigationIconClick = onBackClick)
+        LiBookTopBar(onNavigationIconClick = onBackClick)
         when {
             uiState.isLoading -> {
                 Box(

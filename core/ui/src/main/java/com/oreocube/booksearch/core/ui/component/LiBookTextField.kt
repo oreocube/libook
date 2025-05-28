@@ -20,7 +20,7 @@ import com.oreocube.booksearch.core.ui.theme.Brown30
 import com.oreocube.booksearch.core.ui.theme.Gray30
 
 @Composable
-fun BookSearchTextField(
+fun LiBookTextField(
     modifier: Modifier = Modifier,
     input: String,
     placeholder: String,
@@ -52,28 +52,28 @@ fun BookSearchTextField(
             onDone = { onQuerySubmitted() }
         ),
         colors = TextFieldDefaults.colors(
-            focusedContainerColor = BookSearchTextFieldDefaults.containerColor,
-            errorContainerColor = BookSearchTextFieldDefaults.containerColor,
-            disabledContainerColor = BookSearchTextFieldDefaults.containerColor,
-            unfocusedContainerColor = BookSearchTextFieldDefaults.containerColor,
-            focusedTextColor = BookSearchTextFieldDefaults.textColor,
-            errorTextColor = BookSearchTextFieldDefaults.textColor,
-            disabledTextColor = BookSearchTextFieldDefaults.textColor,
-            unfocusedTextColor = BookSearchTextFieldDefaults.textColor,
-            focusedPlaceholderColor = BookSearchTextFieldDefaults.placeholderColor,
-            errorPlaceholderColor = BookSearchTextFieldDefaults.placeholderColor,
-            disabledPlaceholderColor = BookSearchTextFieldDefaults.placeholderColor,
-            unfocusedPlaceholderColor = BookSearchTextFieldDefaults.placeholderColor,
-            focusedIndicatorColor = BookSearchTextFieldDefaults.indicatorColor,
-            errorIndicatorColor = BookSearchTextFieldDefaults.indicatorColor,
-            disabledIndicatorColor = BookSearchTextFieldDefaults.indicatorColor,
-            unfocusedIndicatorColor = BookSearchTextFieldDefaults.indicatorColor,
-            cursorColor = BookSearchTextFieldDefaults.cursorColor,
-            errorCursorColor = BookSearchTextFieldDefaults.cursorColor,
-            focusedTrailingIconColor = BookSearchTextFieldDefaults.trailingIconColor,
-            errorTrailingIconColor = BookSearchTextFieldDefaults.trailingIconColor,
-            disabledTrailingIconColor = BookSearchTextFieldDefaults.trailingIconColor,
-            unfocusedTrailingIconColor = BookSearchTextFieldDefaults.trailingIconColor,
+            focusedContainerColor = LiBookTextFieldDefaults.containerColor,
+            errorContainerColor = LiBookTextFieldDefaults.containerColor,
+            disabledContainerColor = LiBookTextFieldDefaults.containerColor,
+            unfocusedContainerColor = LiBookTextFieldDefaults.containerColor,
+            focusedTextColor = LiBookTextFieldDefaults.textColor,
+            errorTextColor = LiBookTextFieldDefaults.textColor,
+            disabledTextColor = LiBookTextFieldDefaults.textColor,
+            unfocusedTextColor = LiBookTextFieldDefaults.textColor,
+            focusedPlaceholderColor = LiBookTextFieldDefaults.placeholderColor,
+            errorPlaceholderColor = LiBookTextFieldDefaults.placeholderColor,
+            disabledPlaceholderColor = LiBookTextFieldDefaults.placeholderColor,
+            unfocusedPlaceholderColor = LiBookTextFieldDefaults.placeholderColor,
+            focusedIndicatorColor = LiBookTextFieldDefaults.indicatorColor,
+            errorIndicatorColor = LiBookTextFieldDefaults.indicatorColor,
+            disabledIndicatorColor = LiBookTextFieldDefaults.indicatorColor,
+            unfocusedIndicatorColor = LiBookTextFieldDefaults.indicatorColor,
+            cursorColor = LiBookTextFieldDefaults.cursorColor,
+            errorCursorColor = LiBookTextFieldDefaults.cursorColor,
+            focusedTrailingIconColor = LiBookTextFieldDefaults.trailingIconColor,
+            errorTrailingIconColor = LiBookTextFieldDefaults.trailingIconColor,
+            disabledTrailingIconColor = LiBookTextFieldDefaults.trailingIconColor,
+            unfocusedTrailingIconColor = LiBookTextFieldDefaults.trailingIconColor,
             selectionColors = TextSelectionColors(
                 handleColor = Brown30,
                 backgroundColor = Brown30.copy(alpha = 0.4f)
@@ -82,7 +82,7 @@ fun BookSearchTextField(
     )
 }
 
-object BookSearchTextFieldDefaults {
+object LiBookTextFieldDefaults {
     val containerColor = Color.White
     val textColor = Color.Black
     val trailingIconColor = Brown30

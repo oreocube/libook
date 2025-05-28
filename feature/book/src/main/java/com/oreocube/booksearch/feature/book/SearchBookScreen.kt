@@ -44,7 +44,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import coil3.compose.AsyncImage
 import com.oreocube.booksearch.core.ui.R
-import com.oreocube.booksearch.core.ui.component.BookSearchTextField
+import com.oreocube.booksearch.core.ui.component.LiBookTextField
 import com.oreocube.booksearch.core.ui.component.LiBookEmptyView
 import com.oreocube.booksearch.core.ui.component.LiBookLoadingIndicator
 import com.oreocube.booksearch.core.ui.theme.Brown30
@@ -99,7 +99,7 @@ fun SearchBookScreen(
     val pagingData = uiState.result.collectAsLazyPagingItems()
 
     Column(modifier = Modifier.fillMaxSize()) {
-        BookSearchTextField(
+        LiBookTextField(
             modifier = Modifier
                 .fillMaxWidth()
                 .focusRequester(focusRequester),

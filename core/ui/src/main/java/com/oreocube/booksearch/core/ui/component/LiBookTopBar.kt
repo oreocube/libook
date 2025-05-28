@@ -27,7 +27,7 @@ private val topAppBarHeight = 72.dp
 private val topAppBarItemSpacing = 8.dp
 
 @Composable
-fun BookSearchTopBar(
+fun LiBookTopBar(
     modifier: Modifier = Modifier,
     title: String = "",
     description: String = "",
@@ -77,13 +77,13 @@ fun BookSearchTopBar(
 }
 
 @Composable
-fun BookSearchTopBar(
+fun LiBookTopBar(
     modifier: Modifier = Modifier,
     title: String = "",
     description: String = "",
     onNavigationIconClick: () -> Unit,
 ) {
-    BookSearchTopBar(
+    LiBookTopBar(
         modifier = modifier,
         title = title,
         description = description,
@@ -100,16 +100,16 @@ fun BookSearchTopBar(
 
 @Composable
 @Preview
-private fun BookSearchTopBarPreview1() {
-    BookSearchTopBar(
+private fun LiBookTopBarPreview1() {
+    LiBookTopBar(
         title = "도서 검색",
     )
 }
 
 @Composable
 @Preview
-private fun BookSearchTopBarPreview2() {
-    BookSearchTopBar(
+private fun LiBookTopBarPreview2() {
+    LiBookTopBar(
         title = "관심 도서관",
         description = "자주 가는 도서관을 저장할 수 있어요",
         menuIcon = {
@@ -127,8 +127,8 @@ private fun BookSearchTopBarPreview2() {
 
 @Composable
 @Preview
-private fun BookSearchTopBarPreview3() {
-    BookSearchTopBar(
+private fun LiBookTopBarPreview3() {
+    LiBookTopBar(
         title = "관심 도서관",
         description = "자주 가는 도서관을 저장할 수 있어요",
         onNavigationIconClick = {},
