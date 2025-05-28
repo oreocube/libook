@@ -15,6 +15,7 @@ import com.oreocube.booksearch.feature.library.model.toUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.PersistentSet
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.collections.immutable.toPersistentSet
@@ -63,13 +64,17 @@ class SearchLibraryViewModel @Inject constructor(
                 .map(Library::toUiState)
                 .toPersistentList()
         }.combine(favoriteLibraryIds) { libraries, favoriteSet ->
-            SearchLibraryUiState.Result(list = libraries, favoriteIds = favoriteSet)
+            SearchLibraryUiState(
+                isLoading = false,
+                list = libraries,
+                favoriteIds = favoriteSet,
+            )
         }.catch {
             _eventChannel.send(SearchLibraryUiEvent.Error("도서관을 불러오는데 실패했습니다."))
         }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(500),
-            initialValue = SearchLibraryUiState.Loading,
+            initialValue = SearchLibraryUiState.initialState,
         )
 
     fun toggleLibraryStar(library: LibraryUiState) {
@@ -85,12 +90,18 @@ class SearchLibraryViewModel @Inject constructor(
     }
 }
 
-sealed class SearchLibraryUiState {
-    data object Loading : SearchLibraryUiState()
-    data class Result(
-        val list: ImmutableList<LibraryUiState>,
-        val favoriteIds: PersistentSet<String>,
-    ) : SearchLibraryUiState()
+data class SearchLibraryUiState(
+    val isLoading: Boolean,
+    val list: ImmutableList<LibraryUiState>,
+    val favoriteIds: PersistentSet<String>,
+) {
+    companion object {
+        val initialState = SearchLibraryUiState(
+            isLoading = true,
+            list = persistentListOf(),
+            favoriteIds = persistentSetOf(),
+        )
+    }
 }
 
 sealed class SearchLibraryUiEvent {

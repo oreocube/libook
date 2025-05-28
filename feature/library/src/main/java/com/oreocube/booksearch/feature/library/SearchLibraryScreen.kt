@@ -25,6 +25,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.oreocube.booksearch.core.ui.R
 import com.oreocube.booksearch.core.ui.component.LiBookLargeButton
+import com.oreocube.booksearch.core.ui.component.LiBookLoadingIndicator
 import com.oreocube.booksearch.core.ui.component.LiBookTopBar
 import com.oreocube.booksearch.core.ui.theme.Brown20
 import com.oreocube.booksearch.core.ui.theme.Gray10
@@ -72,41 +73,45 @@ fun SearchLibraryScreen(
             onNavigationIconClick = onBackClick,
         )
 
-        when (uiState) {
-            is SearchLibraryUiState.Result -> {
-                if (uiState.list.isEmpty()) {
-                    Text(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp),
-                        text = stringResource(R.string.no_result),
-                        color = Gray20,
-                    )
-                } else {
-                    LazyColumn(modifier = Modifier.weight(1f)) {
-                        items(
-                            items = uiState.list,
-                            key = { library -> library.id }
-                        ) { library ->
-                            LibraryItem(
-                                modifier = Modifier.fillMaxWidth(),
-                                library = library,
-                                isFavorite = library.id in uiState.favoriteIds,
-                                onStarClick = onStarClick,
-                            )
-                        }
-                    }
-                    LiBookLargeButton(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        text = "완료",
-                        onClick = onCompleteClick,
-                    )
-                }
+        when {
+            uiState.isLoading -> {
+                LiBookLoadingIndicator(
+                    modifier = Modifier.fillMaxSize()
+                )
             }
 
-            else -> {}
+            uiState.list.isEmpty() -> {
+                Text(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    text = stringResource(R.string.no_result),
+                    color = Gray20,
+                )
+            }
+
+            else -> {
+                LazyColumn(modifier = Modifier.weight(1f)) {
+                    items(
+                        items = uiState.list,
+                        key = { library -> library.id }
+                    ) { library ->
+                        LibraryItem(
+                            modifier = Modifier.fillMaxWidth(),
+                            library = library,
+                            isFavorite = library.id in uiState.favoriteIds,
+                            onStarClick = onStarClick,
+                        )
+                    }
+                }
+                LiBookLargeButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    text = "완료",
+                    onClick = onCompleteClick,
+                )
+            }
         }
     }
 }
