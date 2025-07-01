@@ -13,12 +13,15 @@ import com.oreocube.booksearch.domain.model.BookAvailability
 import com.oreocube.booksearch.domain.model.BookDetail
 import com.oreocube.booksearch.domain.model.Library
 import com.oreocube.booksearch.domain.model.RecommendedBook
+import com.oreocube.booksearch.domain.model.TrendingBook
 import com.oreocube.booksearch.domain.model.param.BookAvailabilityCheckParam
 import com.oreocube.booksearch.domain.model.param.BookDetailParam
 import com.oreocube.booksearch.domain.model.param.BookSearchParam
 import com.oreocube.booksearch.domain.model.param.LibrarySearchParam
 import com.oreocube.booksearch.domain.repository.LibraryRepository
 import kotlinx.coroutines.flow.Flow
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 class LibraryRepositoryImpl @Inject constructor(
@@ -57,5 +60,15 @@ class LibraryRepositoryImpl @Inject constructor(
 
     override suspend fun getRecommendedBooks(isbn: String): List<RecommendedBook> {
         return libraryService.getRecommendedBooks(isbn = isbn).response.docs.map { it.book.toModel() }
+    }
+
+    override suspend fun getTrendingBooks(searchDate: LocalDate): List<TrendingBook> {
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val response = libraryService.getTrendingBooks(
+            searchDate = searchDate.format(formatter),
+        ).response
+        val latest = response.results
+            .maxByOrNull { LocalDate.parse(it.result.date, formatter) } ?: return emptyList()
+        return latest.result.docs.map { it.doc.toModel() }
     }
 }

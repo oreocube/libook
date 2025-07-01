@@ -7,6 +7,7 @@ import com.oreocube.booksearch.data.response.BookSearchResponse
 import com.oreocube.booksearch.data.response.LibraryApiResponse
 import com.oreocube.booksearch.data.response.LibrarySearchResponse
 import com.oreocube.booksearch.data.response.RecommendedBookResponse
+import com.oreocube.booksearch.data.response.TrendingBookResponse
 import retrofit2.http.GET
 import retrofit2.http.Query
 
@@ -51,6 +52,13 @@ interface LibraryService {
         @Query("authKey") authKey: String = BuildConfig.LIBRARY_API_AUTH_KEY,
         @Query("format") format: String = JSON_FORMAT,
     ): LibraryApiResponse<RecommendedBookResponse>
+
+    @GET("hotTrend")
+    suspend fun getTrendingBooks(
+        @Query("searchDt") searchDate: String,
+        @Query("authKey") authKey: String = BuildConfig.LIBRARY_API_AUTH_KEY,
+        @Query("format") format: String = JSON_FORMAT,
+    ): LibraryApiResponse<TrendingBookResponse>
 
     companion object {
         private const val JSON_FORMAT = "json"
