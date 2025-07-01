@@ -15,10 +15,12 @@ fun NavController.navigateToHome(navOptions: NavOptions? = null) {
 
 fun NavGraphBuilder.homeScreen(
     onSearchBarClick: () -> Unit,
+    onBookItemClick: (String) -> Unit,
 ) {
     composable<HomeRoute> {
         HomeRoute(
             onSearchBarClick = onSearchBarClick,
+            onBookItemClick = onBookItemClick,
         )
     }
 }

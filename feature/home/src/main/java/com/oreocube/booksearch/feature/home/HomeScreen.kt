@@ -37,6 +37,7 @@ import com.oreocube.booksearch.core.ui.theme.Gray20
 @Composable
 fun HomeRoute(
     onSearchBarClick: () -> Unit,
+    onBookItemClick: (String) -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -44,6 +45,7 @@ fun HomeRoute(
     HomeScreen(
         uiState = uiState,
         onSearchBarClick = onSearchBarClick,
+        onBookItemClick = onBookItemClick,
     )
 }
 
@@ -51,6 +53,7 @@ fun HomeRoute(
 fun HomeScreen(
     uiState: HomeUiState,
     onSearchBarClick: () -> Unit,
+    onBookItemClick: (String) -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -81,6 +84,7 @@ fun HomeScreen(
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
             books = uiState.trendingBooks,
+            onBookItemClick = onBookItemClick,
         )
     }
 }
@@ -125,5 +129,6 @@ private fun HomeScreenPreview() {
     HomeScreen(
         uiState = HomeUiState(),
         onSearchBarClick = {},
+        onBookItemClick = {},
     )
 }

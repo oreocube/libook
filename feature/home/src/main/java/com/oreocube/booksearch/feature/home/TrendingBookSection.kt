@@ -52,6 +52,7 @@ import com.oreocube.booksearch.domain.model.TrendingBook
 internal fun TrendingBooksSection(
     modifier: Modifier = Modifier,
     books: List<TrendingBook>,
+    onBookItemClick: (String) -> Unit,
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -104,7 +105,8 @@ internal fun TrendingBooksSection(
                 key(book.no) {
                     TrendingBookItem(
                         modifier = Modifier.fillMaxWidth(),
-                        book = book
+                        book = book,
+                        onBookItemClick = onBookItemClick,
                     )
                 }
                 if (book != books.last()) {
@@ -121,12 +123,13 @@ internal fun TrendingBooksSection(
 private fun TrendingBookItem(
     modifier: Modifier = Modifier,
     book: TrendingBook,
+    onBookItemClick: (String) -> Unit,
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clickable { }
-            .padding(horizontal = 16.dp, vertical = 10.dp),
+            .clickable { onBookItemClick(book.isbn13) }
+            .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -285,6 +288,7 @@ private fun TrendingBooksSectionPreview() {
                 isbn13 = "9788966263363",
                 imageUrl = "",
             )
-        )
+        ),
+        onBookItemClick = {},
     )
 }
