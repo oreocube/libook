@@ -44,9 +44,9 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import coil3.compose.AsyncImage
 import com.oreocube.booksearch.core.ui.R
-import com.oreocube.booksearch.core.ui.component.LiBookTextField
 import com.oreocube.booksearch.core.ui.component.LiBookEmptyView
 import com.oreocube.booksearch.core.ui.component.LiBookLoadingIndicator
+import com.oreocube.booksearch.core.ui.component.LiBookTextField
 import com.oreocube.booksearch.core.ui.theme.Brown30
 import com.oreocube.booksearch.core.ui.theme.Gray10
 import com.oreocube.booksearch.core.ui.theme.Gray20
@@ -124,18 +124,22 @@ fun SearchBookScreen(
                 focusManager.clearFocus()
             },
         )
-        if (uiState.query.length < 2 && uiState.recentHistory.isNotEmpty()) {
-            RecentHistoryContainer(
-                modifier = Modifier.weight(1f),
-                histories = uiState.recentHistory,
-                onAction = onAction,
-            )
-        } else {
-            SearchResult(
-                modifier = Modifier.weight(1f),
-                result = pagingData,
-                onAction = onAction,
-            )
+        when {
+            uiState.query.length >= 2 -> {
+                SearchResult(
+                    modifier = Modifier.weight(1f),
+                    result = pagingData,
+                    onAction = onAction,
+                )
+            }
+
+            uiState.recentHistory.isNotEmpty() -> {
+                RecentHistoryContainer(
+                    modifier = Modifier.weight(1f),
+                    histories = uiState.recentHistory,
+                    onAction = onAction,
+                )
+            }
         }
     }
 
