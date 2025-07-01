@@ -17,6 +17,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,6 +27,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.oreocube.booksearch.core.ui.R
 import com.oreocube.booksearch.core.ui.theme.Brown20
 import com.oreocube.booksearch.core.ui.theme.Gray20
@@ -33,14 +36,19 @@ import com.oreocube.booksearch.core.ui.theme.Gray20
 @Composable
 fun HomeRoute(
     onSearchBarClick: () -> Unit,
+    viewModel: HomeViewModel = hiltViewModel(),
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     HomeScreen(
+        uiState = uiState,
         onSearchBarClick = onSearchBarClick,
     )
 }
 
 @Composable
 fun HomeScreen(
+    uiState: HomeUiState,
     onSearchBarClick: () -> Unit,
 ) {
     Column(
@@ -66,6 +74,15 @@ fun HomeScreen(
         LiBookSearchBar(
             onSearchBarClick = onSearchBarClick,
         )
+        if (uiState.trendingBooks.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(24.dp))
+            TrendingBooksSection(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp),
+                books = uiState.trendingBooks,
+            )
+        }
     }
 }
 
@@ -106,5 +123,8 @@ private fun LiBookSearchBar(
 @Composable
 @Preview(showBackground = true)
 private fun HomeScreenPreview() {
-    HomeScreen(onSearchBarClick = {})
+    HomeScreen(
+        uiState = HomeUiState(),
+        onSearchBarClick = {},
+    )
 }
