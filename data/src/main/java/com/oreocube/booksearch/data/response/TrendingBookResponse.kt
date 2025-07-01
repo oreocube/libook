@@ -60,5 +60,6 @@ data class TrendingBookDTO(
         publisher = publisher,
         publicationYear = publicationYear.orEmpty(),
         isbn13 = isbn13,
+        imageUrl = imageUrl,
     )
 }

@@ -8,4 +8,5 @@ data class TrendingBook(
     val publisher: String,
     val publicationYear: String,
     val isbn13: String,
+    val imageUrl: String, // 책표지 URL
 )

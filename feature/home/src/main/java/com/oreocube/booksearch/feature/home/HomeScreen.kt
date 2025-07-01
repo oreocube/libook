@@ -3,7 +3,6 @@ package com.oreocube.booksearch.feature.home
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -12,7 +11,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -54,10 +55,10 @@ fun HomeScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(bottom = 80.dp),
-        verticalArrangement = Arrangement.Center,
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        Spacer(modifier = Modifier.height(48.dp))
         Text(
             text = stringResource(R.string.display_app_name),
             style = MaterialTheme.typography.headlineLarge,
@@ -74,15 +75,13 @@ fun HomeScreen(
         LiBookSearchBar(
             onSearchBarClick = onSearchBarClick,
         )
-        if (uiState.trendingBooks.isNotEmpty()) {
-            Spacer(modifier = Modifier.height(24.dp))
-            TrendingBooksSection(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp),
-                books = uiState.trendingBooks,
-            )
-        }
+        Spacer(modifier = Modifier.height(48.dp))
+        TrendingBooksSection(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            books = uiState.trendingBooks,
+        )
     }
 }
 
