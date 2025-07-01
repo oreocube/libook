@@ -86,6 +86,7 @@ fun HomeScreen(
             books = uiState.trendingBooks,
             onBookItemClick = onBookItemClick,
         )
+        Spacer(modifier = Modifier.height(48.dp))
     }
 }
 

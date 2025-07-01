@@ -59,43 +59,7 @@ internal fun TrendingBooksSection(
         border = BorderStroke(1.dp, Color(0xFFF3F4F6))
     ) {
         Column {
-            // Header
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        brush = Brush.horizontalGradient(
-                            colors = listOf(
-                                Color(0xFFFEF2F2),
-                                Color(0xFFFFF7ED)
-                            )
-                        )
-                    )
-                    .padding(16.dp)
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Text(
-                        text = "🔥",
-                        fontSize = 18.sp
-                    )
-                    Text(
-                        text = "인기 급상승 도서",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF374151)
-                    )
-                    Icon(
-                        imageVector = LiBookIcons.Default.TrendingUp,
-                        contentDescription = "상승",
-                        tint = Color(0xFFEF4444),
-                        modifier = Modifier.size(12.dp)
-                    )
-                }
-            }
+            TrendingBooksHeader()
 
             books.forEach { book ->
                 key(book.no) {
@@ -116,6 +80,46 @@ internal fun TrendingBooksSection(
 }
 
 @Composable
+private fun TrendingBooksHeader() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                brush = Brush.horizontalGradient(
+                    colors = listOf(
+                        Color(0xFFFEF2F2),
+                        Color(0xFFFFF7ED)
+                    )
+                )
+            )
+            .padding(16.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                text = "🔥",
+                fontSize = 18.sp
+            )
+            Text(
+                text = "대출 급상승 도서",
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF374151)
+            )
+            Icon(
+                imageVector = LiBookIcons.Default.TrendingUp,
+                contentDescription = "상승",
+                tint = Color(0xFFEF4444),
+                modifier = Modifier.size(12.dp)
+            )
+        }
+    }
+}
+
+@Composable
 private fun TrendingBookItem(
     modifier: Modifier = Modifier,
     book: TrendingBook,
@@ -129,63 +133,7 @@ private fun TrendingBookItem(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Rank
-        Column(
-            modifier = Modifier.heightIn(min = 64.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(32.dp)
-                    .background(
-                        color = when (book.no) {
-                            1 -> Color(0xFFFEF3C7)
-                            2 -> Color(0xFFF3F4F6)
-                            3 -> Color(0xFFFED7AA)
-                            else -> Color(0xFFDDEAFE)
-                        },
-                        shape = CircleShape
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = book.no.toString(),
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 14.sp,
-                    color = when (book.no) {
-                        1 -> Color(0xFFB45309)
-                        2 -> Color(0xFF6B7280)
-                        3 -> Color(0xFFEA580C)
-                        else -> Color(0xFF2563EB)
-                    }
-                )
-            }
-
-            Text(
-                text = buildAnnotatedString {
-                    withStyle(
-                        style = SpanStyle(
-                            color = Color(0xFFEF4444),
-                            fontSize = 12.sp
-                        )
-                    ) {
-                        append("▲")
-                    }
-                    withStyle(
-                        style = SpanStyle(
-                            color = Color(0xFF6B7280),
-                            fontSize = 12.sp,
-                        )
-                    ) {
-                        append("${book.difference}")
-                    }
-                },
-                fontSize = 12.sp,
-                color = Color(0xFF6B7280),
-                fontWeight = FontWeight.Medium
-            )
-        }
+        TrendingBookRank(book)
 
         // Book Cover
         AsyncImage(
@@ -205,33 +153,103 @@ private fun TrendingBookItem(
             contentDescription = "cover",
         )
 
-        // Book Info
-        Column(
-            modifier = Modifier.weight(1f)
-        ) {
-            Text(
-                text = book.title,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 14.sp,
-                color = Color(0xFF1F2937),
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis
-            )
-            Spacer(modifier = Modifier.height(2.dp))
-            Text(
-                text = book.authors,
-                fontSize = 12.sp,
-                color = Color(0xFF6B7280)
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-
-        }
+        TrendingBookInfo(
+            modifier = Modifier.weight(1f),
+            book = book,
+        )
 
         Icon(
             imageVector = Icons.Filled.KeyboardArrowRight,
             contentDescription = "더보기",
             tint = Color(0xFFD1D5DB),
             modifier = Modifier.size(20.dp)
+        )
+    }
+}
+
+@Composable
+private fun TrendingBookInfo(
+    modifier: Modifier = Modifier,
+    book: TrendingBook,
+) {
+    Column(modifier = modifier) {
+        Text(
+            text = book.title,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 14.sp,
+            color = Color(0xFF1F2937),
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis
+        )
+        Spacer(modifier = Modifier.height(2.dp))
+        Text(
+            text = book.authors,
+            fontSize = 12.sp,
+            color = Color(0xFF6B7280)
+        )
+    }
+}
+
+private fun getRankColor(rank: Int): Color = when (rank) {
+    1 -> Color(0xFFFEF3C7)
+    2 -> Color(0xFFF3F4F6)
+    3 -> Color(0xFFFED7AA)
+    else -> Color(0xFFDDEAFE)
+}
+
+private fun getRankTextColor(rank: Int): Color = when (rank) {
+    1 -> Color(0xFFB45309)
+    2 -> Color(0xFF6B7280)
+    3 -> Color(0xFFEA580C)
+    else -> Color(0xFF2563EB)
+}
+
+@Composable
+private fun TrendingBookRank(book: TrendingBook) {
+    Column(
+        modifier = Modifier.heightIn(min = 64.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Box(
+            modifier = Modifier
+                .size(32.dp)
+                .background(
+                    color = getRankColor(book.no),
+                    shape = CircleShape,
+                ),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                text = book.no.toString(),
+                fontWeight = FontWeight.Bold,
+                fontSize = 14.sp,
+                color = getRankTextColor(book.no),
+            )
+        }
+
+        Text(
+            text = buildAnnotatedString {
+                withStyle(
+                    style = SpanStyle(
+                        color = Color(0xFFEF4444),
+                        fontSize = 12.sp,
+                    )
+                ) {
+                    append("▲")
+                }
+                withStyle(
+                    style = SpanStyle(
+                        color = Color(0xFF6B7280),
+                        fontSize = 12.sp,
+                    )
+                ) {
+                    append(book.difference.toString())
+                }
+            },
+            fontSize = 12.sp,
+            color = Color(0xFF6B7280),
+            fontWeight = FontWeight.Medium,
         )
     }
 }
