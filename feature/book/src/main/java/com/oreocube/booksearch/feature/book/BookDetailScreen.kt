@@ -182,12 +182,20 @@ private fun BookDetailContent(
             fontWeight = FontWeight.Bold,
         )
 
-        Text(
-            modifier = Modifier.padding(top = 8.dp),
-            text = book.description,
-            fontSize = 16.sp,
-            color = Gray10
-        )
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp)
+                .clip(RoundedCornerShape(16.dp))
+                .background(color = Gray90)
+                .padding(16.dp),
+        ) {
+            Text(
+                text = book.description,
+                fontSize = 16.sp,
+                color = Gray10
+            )
+        }
     }
 }
 
