@@ -42,12 +42,13 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.oreocube.booksearch.core.ui.component.icon.LiBookIcons
 import com.oreocube.booksearch.core.ui.component.icon.TrendingUp
+import com.oreocube.booksearch.core.ui.theme.Gray80
 import com.oreocube.booksearch.domain.model.TrendingBook
 
 @Composable
 internal fun TrendingBooksSection(
     modifier: Modifier = Modifier,
-    books: List<TrendingBook>,
+    books: List<TrendingBook>?,
     onBookItemClick: (String) -> Unit,
 ) {
     Card(
@@ -61,18 +62,24 @@ internal fun TrendingBooksSection(
         Column {
             TrendingBooksHeader()
 
-            books.forEach { book ->
-                key(book.no) {
-                    TrendingBookItem(
-                        modifier = Modifier.fillMaxWidth(),
-                        book = book,
-                        onBookItemClick = onBookItemClick,
-                    )
+            if (books == null) {
+                repeat(2) {
+                    TrendingBookSkeleton()
                 }
-                if (book != books.last()) {
-                    HorizontalDivider(
-                        color = Color(0xFFF3F4F6)
-                    )
+            } else {
+                books.forEach { book ->
+                    key(book.no) {
+                        TrendingBookItem(
+                            modifier = Modifier.fillMaxWidth(),
+                            book = book,
+                            onBookItemClick = onBookItemClick,
+                        )
+                    }
+                    if (book != books.last()) {
+                        HorizontalDivider(
+                            color = Color(0xFFF3F4F6)
+                        )
+                    }
                 }
             }
         }
@@ -114,6 +121,62 @@ private fun TrendingBooksHeader() {
                 contentDescription = "상승",
                 tint = Color(0xFFEF4444),
                 modifier = Modifier.size(12.dp)
+            )
+        }
+    }
+}
+
+val SkeletonLightGray = Gray80
+
+@Composable
+private fun TrendingBookSkeleton() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+
+        Box(
+            modifier = Modifier
+                .size(32.dp)
+                .background(
+                    color = SkeletonLightGray,
+                    shape = CircleShape,
+                ),
+        )
+
+        Box(
+            modifier = Modifier
+                .size(width = 48.dp, height = 64.dp)
+                .background(
+                    color = SkeletonLightGray,
+                    shape = RoundedCornerShape(8.dp),
+                ),
+        )
+
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.9f)
+                    .height(16.dp)
+                    .background(
+                        color = SkeletonLightGray,
+                        shape = RoundedCornerShape(4.dp),
+                    ),
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.6f)
+                    .height(16.dp)
+                    .background(
+                        color = SkeletonLightGray,
+                        shape = RoundedCornerShape(4.dp),
+                    ),
             )
         }
     }
@@ -252,6 +315,15 @@ private fun TrendingBookRank(book: TrendingBook) {
             fontWeight = FontWeight.Medium,
         )
     }
+}
+
+@Composable
+@Preview(showBackground = true)
+private fun TrendingBookSkeletonPreview() {
+    TrendingBooksSection(
+        books = null,
+        onBookItemClick = {},
+    )
 }
 
 @Composable

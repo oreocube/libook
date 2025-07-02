@@ -36,5 +36,5 @@ class HomeViewModel @Inject constructor(
 }
 
 data class HomeUiState(
-    val trendingBooks: List<TrendingBook> = emptyList(),
+    val trendingBooks: List<TrendingBook>? = null,
 )
