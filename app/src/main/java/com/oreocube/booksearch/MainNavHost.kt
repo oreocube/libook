@@ -28,7 +28,8 @@ fun MainNavHost(
         startDestination = HomeRoute,
     ) {
         homeScreen(
-            onSearchBarClick = navController::navigateToSearchBook
+            onSearchBarClick = navController::navigateToSearchBook,
+            onBookItemClick = navController::navigateToBookDetail,
         )
         regionScreen(
             onBackClick = navController::popBackStack,
@@ -44,6 +45,7 @@ fun MainNavHost(
             },
         )
         searchBookScreen(
+            onBackClick = navController::popBackStack,
             onBookClick = navController::navigateToBookDetail,
             onShowSnackbar = onShowSnackbar,
         )

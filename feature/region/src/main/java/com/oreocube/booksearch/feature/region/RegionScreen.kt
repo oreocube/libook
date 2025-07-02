@@ -25,8 +25,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.oreocube.booksearch.core.ui.R
-import com.oreocube.booksearch.core.ui.component.BookSearchButton
-import com.oreocube.booksearch.core.ui.component.BookSearchTopBar
+import com.oreocube.booksearch.core.ui.component.LiBookLargeButton
+import com.oreocube.booksearch.core.ui.component.LiBookLoadingIndicator
+import com.oreocube.booksearch.core.ui.component.LiBookTopBar
 import com.oreocube.booksearch.core.ui.theme.Brown10
 import com.oreocube.booksearch.core.ui.theme.Brown60
 import com.oreocube.booksearch.core.ui.theme.Gray80
@@ -78,48 +79,46 @@ fun RegionScreen(
     onDistrictClick: (Int) -> Unit = {},
     onSearchButtonClick: () -> Unit = {},
 ) {
-    when (uiState) {
-        is RegionUiState.Table -> {
-            Column(modifier = modifier) {
-                BookSearchTopBar(
-                    title = stringResource(R.string.menu_search_library),
-                    description = stringResource(R.string.menu_description_search_library),
-                    onNavigationIconClick = onBackClick,
-                )
-                Row(modifier = Modifier.fillMaxWidth()) {
-                    TableTitleItem(
-                        modifier = Modifier.weight(1f),
-                        text = "시·도",
-                    )
-                    VerticalDivider(
-                        modifier = Modifier.height(IntrinsicSize.Min),
-                    )
-                    TableTitleItem(
-                        modifier = Modifier.weight(1f),
-                        text = "시·군·구",
-                    )
-                }
-
-                RegionTable(
-                    modifier = Modifier.weight(1f),
-                    selectedCityId = uiState.selectedCityId,
-                    selectedDistrictId = uiState.selectedDistrictId,
-                    cities = uiState.cities,
-                    districts = uiState.districts,
-                    onCityClick = onCityClick,
-                    onDistrictClick = onDistrictClick,
-                )
-                BookSearchButton(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    text = stringResource(R.string.menu_search_library),
-                    onClick = onSearchButtonClick,
-                )
-            }
+    Column(modifier = modifier) {
+        LiBookTopBar(
+            title = stringResource(R.string.menu_search_library),
+            description = stringResource(R.string.menu_description_search_library),
+            onNavigationIconClick = onBackClick,
+        )
+        Row(modifier = Modifier.fillMaxWidth()) {
+            TableTitleItem(
+                modifier = Modifier.weight(1f),
+                text = "시·도",
+            )
+            VerticalDivider(
+                modifier = Modifier.height(IntrinsicSize.Min),
+            )
+            TableTitleItem(
+                modifier = Modifier.weight(1f),
+                text = "시·군·구",
+            )
         }
 
-        else -> {}
+        RegionTable(
+            modifier = Modifier.weight(1f),
+            selectedCityId = uiState.selectedCityId,
+            selectedDistrictId = uiState.selectedDistrictId,
+            cities = uiState.cities,
+            districts = uiState.districts,
+            onCityClick = onCityClick,
+            onDistrictClick = onDistrictClick,
+        )
+        LiBookLargeButton(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            text = stringResource(R.string.menu_search_library),
+            onClick = onSearchButtonClick,
+        )
+    }
+
+    if (uiState.isLoading) {
+        LiBookLoadingIndicator(modifier = Modifier.fillMaxSize())
     }
 }
 
@@ -223,7 +222,8 @@ private fun RegionTableItem(
 @Preview(showBackground = true)
 private fun RegionScreenPreview() {
     RegionScreen(
-        uiState = RegionUiState.Table(
+        uiState = RegionUiState(
+            isLoading = false,
             selectedCityId = 11,
             selectedDistrictId = 11002,
             cities = listOf(

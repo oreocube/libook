@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.oreocube.booksearch.core.ui.R
-import com.oreocube.booksearch.core.ui.component.BookSearchTopBar
+import com.oreocube.booksearch.core.ui.component.LiBookTopBar
 import com.oreocube.booksearch.core.ui.theme.Brown20
 import com.oreocube.booksearch.core.ui.theme.Gray20
 import com.oreocube.booksearch.feature.favorite.model.LibraryShortUiState
@@ -58,7 +58,7 @@ private fun FavoriteLibraryScreen(
     onStarClick: (String) -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
-        BookSearchTopBar(
+        LiBookTopBar(
             title = stringResource(R.string.menu_favorite_library),
             description = stringResource(R.string.menu_description_favorite_library),
             menuIcon = {

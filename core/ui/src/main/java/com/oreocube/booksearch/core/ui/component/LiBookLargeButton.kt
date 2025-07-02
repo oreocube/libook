@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import com.oreocube.booksearch.core.ui.theme.Brown10
 
 @Composable
-fun BookSearchButton(
+fun LiBookLargeButton(
     modifier: Modifier = Modifier,
     text: String,
     onClick: () -> Unit,
@@ -50,8 +50,8 @@ fun BookSearchButton(
 
 @Composable
 @Preview
-private fun BookSearchButtonPreview() {
-    BookSearchButton(
+private fun LiBookLargeButtonPreview() {
+    LiBookLargeButton(
         text = "도서관 찾기",
         onClick = {},
     )

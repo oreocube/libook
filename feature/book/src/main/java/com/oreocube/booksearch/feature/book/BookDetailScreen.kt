@@ -34,6 +34,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -41,16 +42,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.oreocube.booksearch.core.ui.R
-import com.oreocube.booksearch.core.ui.component.BookSearchTopBar
+import com.oreocube.booksearch.core.ui.component.LiBookTopBar
 import com.oreocube.booksearch.core.ui.theme.Brown20
 import com.oreocube.booksearch.core.ui.theme.Gray10
 import com.oreocube.booksearch.core.ui.theme.Gray20
-import com.oreocube.booksearch.core.ui.theme.Gray30
-import com.oreocube.booksearch.core.ui.theme.Green30
-import com.oreocube.booksearch.core.ui.theme.Red30
-import com.oreocube.booksearch.domain.model.BookAvailability
+import com.oreocube.booksearch.core.ui.theme.Gray90
 import com.oreocube.booksearch.domain.model.BookDetail
 import com.oreocube.booksearch.domain.model.LibraryShort
+import com.oreocube.booksearch.feature.book.model.BookStatusUiState
 import com.oreocube.booksearch.feature.book.model.RecommendedBookUiState
 
 @Composable
@@ -91,7 +90,7 @@ fun BookDetailScreen(
     onBookItemClick: (String) -> Unit,
 ) {
     Column(modifier = modifier) {
-        BookSearchTopBar(onNavigationIconClick = onBackClick)
+        LiBookTopBar(onNavigationIconClick = onBackClick)
         when {
             uiState.isLoading -> {
                 Box(
@@ -108,7 +107,11 @@ fun BookDetailScreen(
             uiState.book != null -> {
                 val scrollState = rememberScrollState()
 
-                Column(modifier = modifier.verticalScroll(scrollState)) {
+                Column(
+                    modifier = modifier
+                        .verticalScroll(scrollState)
+                        .background(color = Color.White)
+                ) {
                     BookDetailContent(
                         modifier = Modifier.fillMaxWidth(),
                         book = uiState.book,
@@ -172,20 +175,34 @@ private fun BookDetailContent(
                 )
             }
         }
-
         Text(
             modifier = Modifier.padding(top = 16.dp),
-            text = book.description,
-            fontSize = 16.sp,
-            color = Gray10
+            text = "책 소개",
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
         )
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp)
+                .clip(RoundedCornerShape(16.dp))
+                .background(color = Gray90)
+                .padding(16.dp),
+        ) {
+            Text(
+                text = book.description,
+                fontSize = 16.sp,
+                color = Gray10
+            )
+        }
     }
 }
 
 @Composable
 private fun LibraryStatusForBook(
     modifier: Modifier = Modifier,
-    status: List<Pair<LibraryShort, BookAvailability>>,
+    status: List<Pair<LibraryShort, BookStatusUiState>>,
     onAddLibraryClick: () -> Unit,
 ) {
     Column(
@@ -194,7 +211,7 @@ private fun LibraryStatusForBook(
             .padding(all = 16.dp)
     ) {
         Text(
-            text = "소장 도서관",
+            text = "관심 도서관 비치 현황",
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
         )
@@ -207,23 +224,25 @@ private fun LibraryStatusForBook(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 8.dp),
+                        .padding(top = 8.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(color = Gray90)
+                        .padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
-                    Text(text = library.name, fontSize = 16.sp)
+                    Text(
+                        modifier = Modifier.weight(1f),
+                        text = library.name, fontSize = 16.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
                     StatusLabel(
                         modifier = Modifier.padding(start = 8.dp),
-                        text = if (availability.hasBook) "보유" else "미보유",
-                        containerColor = if (availability.hasBook) Brown20 else Gray30
+                        text = availability.text,
+                        textColor = availability.textColor,
+                        containerColor = availability.containerColor,
                     )
-
-                    if (availability.hasBook) {
-                        StatusLabel(
-                            modifier = Modifier.padding(start = 8.dp),
-                            text = if (availability.loanAvailable) "대출가능" else "대출중",
-                            containerColor = if (availability.loanAvailable) Green30 else Red30
-                        )
-                    }
                 }
             }
         }
@@ -276,6 +295,7 @@ private fun EmptyFavoriteLibraryContent(
 private fun StatusLabel(
     modifier: Modifier = Modifier,
     text: String,
+    textColor: Color,
     containerColor: Color,
 ) {
     Box(
@@ -286,8 +306,8 @@ private fun StatusLabel(
     ) {
         Text(
             text = text,
-            color = Color.White,
-            fontSize = 12.sp
+            color = textColor,
+            fontSize = 12.sp,
         )
     }
 }
@@ -349,9 +369,9 @@ private fun RecommendedBookItem(
 private fun LibraryStatusForBookPreview1() {
     LibraryStatusForBook(
         status = listOf(
-            LibraryShort("1", "도서관1") to BookAvailability(hasBook = true, loanAvailable = false),
-            LibraryShort("1", "도서관2") to BookAvailability(hasBook = false, loanAvailable = false),
-            LibraryShort("1", "도서관3") to BookAvailability(hasBook = true, loanAvailable = true),
+            LibraryShort("1", "도서관1") to BookStatusUiState.ON_LOAN,
+            LibraryShort("1", "도서관2") to BookStatusUiState.NOT_AVAILABLE,
+            LibraryShort("1", "도서관3") to BookStatusUiState.AVAILABLE,
         ),
         onAddLibraryClick = {},
     )
@@ -382,18 +402,9 @@ private fun BookDetailScreenPreview() {
                 description = "실용주의 프로그래머 20주년 기념판. 데이비드 토마스와 앤드류 헌트는 소프트웨어 산업에 큰 영향을 미친 이 책의 1판을 1999년에 썼다. 고객들이 더 나은 소프트웨어를 만들고 코딩의 기쁨을 재발견하도록 돕기 위해서였다."
             ),
             status = listOf(
-                LibraryShort("1", "도서관1") to BookAvailability(
-                    hasBook = true,
-                    loanAvailable = false
-                ),
-                LibraryShort("1", "도서관2") to BookAvailability(
-                    hasBook = false,
-                    loanAvailable = false
-                ),
-                LibraryShort("1", "도서관3") to BookAvailability(
-                    hasBook = true,
-                    loanAvailable = true
-                ),
+                LibraryShort("1", "도서관1") to BookStatusUiState.ON_LOAN,
+                LibraryShort("1", "도서관2") to BookStatusUiState.NOT_AVAILABLE,
+                LibraryShort("1", "도서관3") to BookStatusUiState.AVAILABLE,
             ),
             recommendBooks = listOf(
                 RecommendedBookUiState(

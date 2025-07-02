@@ -17,6 +17,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -26,6 +27,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
@@ -35,13 +37,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import coil3.compose.AsyncImage
 import com.oreocube.booksearch.core.ui.R
-import com.oreocube.booksearch.core.ui.component.BookSearchTextField
+import com.oreocube.booksearch.core.ui.component.LiBookEmptyView
+import com.oreocube.booksearch.core.ui.component.LiBookLoadingIndicator
+import com.oreocube.booksearch.core.ui.component.LiBookTextField
+import com.oreocube.booksearch.core.ui.theme.Brown30
 import com.oreocube.booksearch.core.ui.theme.Gray10
 import com.oreocube.booksearch.core.ui.theme.Gray20
 import com.oreocube.booksearch.core.ui.theme.Gray40
@@ -53,6 +59,7 @@ import kotlinx.coroutines.flow.flowOf
 
 @Composable
 fun SearchBookRoute(
+    onBackClick: () -> Unit,
     onBookClick: (String) -> Unit,
     onShowSnackbar: (String) -> Unit,
     viewModel: SearchBookViewModel = hiltViewModel()
@@ -62,6 +69,7 @@ fun SearchBookRoute(
     SearchBookScreen(
         uiState = uiState,
         onAction = viewModel::onAction,
+        onBackClick = onBackClick,
     )
 
     LaunchedEffect(Unit) {
@@ -83,6 +91,7 @@ fun SearchBookRoute(
 fun SearchBookScreen(
     uiState: SearchBookUiState,
     onAction: (SearchBookUiAction) -> Unit,
+    onBackClick: () -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
@@ -90,12 +99,24 @@ fun SearchBookScreen(
     val pagingData = uiState.result.collectAsLazyPagingItems()
 
     Column(modifier = Modifier.fillMaxSize()) {
-        BookSearchTextField(
+        LiBookTextField(
             modifier = Modifier
                 .fillMaxWidth()
                 .focusRequester(focusRequester),
             input = uiState.query,
             placeholder = stringResource(R.string.search_book_hint),
+            leadingIcon = {
+                IconButton(
+                    modifier = Modifier.padding(start = 8.dp),
+                    onClick = onBackClick
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_arrow_back_24),
+                        contentDescription = null,
+                        tint = Brown30,
+                    )
+                }
+            },
             onInputChanged = { onAction(SearchBookUiAction.InputChanged(it)) },
             onClearClicked = { onAction(SearchBookUiAction.InputChanged()) },
             onQuerySubmitted = {
@@ -103,18 +124,22 @@ fun SearchBookScreen(
                 focusManager.clearFocus()
             },
         )
-        if (uiState.query.isBlank() && uiState.recentHistory.isNotEmpty()) {
-            RecentHistoryContainer(
-                modifier = Modifier.weight(1f),
-                histories = uiState.recentHistory,
-                onAction = onAction,
-            )
-        } else {
-            SearchResult(
-                modifier = Modifier.weight(1f),
-                result = pagingData,
-                onAction = onAction,
-            )
+        when {
+            uiState.query.length >= 2 -> {
+                SearchResult(
+                    modifier = Modifier.weight(1f),
+                    result = pagingData,
+                    onAction = onAction,
+                )
+            }
+
+            uiState.recentHistory.isNotEmpty() -> {
+                RecentHistoryContainer(
+                    modifier = Modifier.weight(1f),
+                    histories = uiState.recentHistory,
+                    onAction = onAction,
+                )
+            }
         }
     }
 
@@ -201,6 +226,17 @@ private fun SearchResult(
     result: LazyPagingItems<BookUiState>,
     onAction: (SearchBookUiAction) -> Unit,
 ) {
+    val loadState = result.loadState
+    val hasError by remember(loadState) {
+        derivedStateOf {
+            listOf(
+                loadState.refresh,
+                loadState.append,
+                loadState.prepend,
+            ).any { it is LoadState.Error }
+        }
+    }
+
     LazyColumn(modifier = modifier) {
         items(
             count = result.itemCount,
@@ -211,9 +247,32 @@ private fun SearchResult(
                 book = book,
                 onItemClick = { onAction(SearchBookUiAction.BookClicked(book)) }
             )
-            if (index < result.itemCount) {
+            if (index < result.itemCount - 1) {
                 HorizontalDivider(color = Gray40)
             }
+        }
+
+        if (hasError) {
+            item {
+                Text(
+                    text = "오류가 발생했습니다",
+                )
+            }
+        }
+    }
+
+    when {
+        loadState.refresh is LoadState.Loading || loadState.append is LoadState.Loading -> {
+            LiBookLoadingIndicator(
+                modifier = Modifier.fillMaxSize(),
+            )
+        }
+
+        loadState.refresh is LoadState.NotLoading && result.itemCount == 0 -> {
+            LiBookEmptyView(
+                modifier = Modifier.fillMaxSize(),
+                message = "검색 결과가 없습니다",
+            )
         }
     }
 }
@@ -231,7 +290,7 @@ private fun BookItem(
             .padding(8.dp)
     ) {
         AsyncImage(
-            modifier = Modifier.size(80.dp),
+            modifier = Modifier.size(100.dp),
             model = book.imageUrl,
             contentDescription = "book image",
         )
@@ -305,6 +364,7 @@ private fun RecentHistoryPreview() {
 private fun SearchBookScreenPreview1() {
     SearchBookScreen(
         uiState = SearchBookUiState(),
+        onBackClick = {},
         onAction = {},
     )
 }
@@ -331,6 +391,7 @@ private fun SearchBookScreenPreview2() {
             query = "실용주의",
             result = flowOf(PagingData.from(fakeData)),
         ),
+        onBackClick = {},
         onAction = {},
     )
 }

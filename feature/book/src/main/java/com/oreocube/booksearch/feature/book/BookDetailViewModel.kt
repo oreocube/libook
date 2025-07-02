@@ -4,7 +4,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.oreocube.booksearch.domain.model.BookAvailability
 import com.oreocube.booksearch.domain.model.BookDetail
 import com.oreocube.booksearch.domain.model.LibraryShort
 import com.oreocube.booksearch.domain.model.RecommendedBook
@@ -12,6 +11,7 @@ import com.oreocube.booksearch.domain.model.param.BookDetailParam
 import com.oreocube.booksearch.domain.usecase.CheckBookAvailabilityUseCase
 import com.oreocube.booksearch.domain.usecase.GetBookDetailUseCase
 import com.oreocube.booksearch.domain.usecase.GetRecommendedBooksWithTargetBookUseCase
+import com.oreocube.booksearch.feature.book.model.BookStatusUiState
 import com.oreocube.booksearch.feature.book.model.RecommendedBookUiState
 import com.oreocube.booksearch.feature.book.model.toUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -75,7 +75,7 @@ class BookDetailViewModel @Inject constructor(
             }.onSuccess { availability ->
                 _uiState.update { state ->
                     state.copy(
-                        status = availability,
+                        status = availability.map { it.toUiState() },
                     )
                 }
             }
@@ -101,7 +101,7 @@ class BookDetailViewModel @Inject constructor(
 data class BookDetailUiState(
     val isLoading: Boolean,
     val book: BookDetail?,
-    val status: List<Pair<LibraryShort, BookAvailability>>,
+    val status: List<Pair<LibraryShort, BookStatusUiState>>,
     val recommendBooks: List<RecommendedBookUiState> = emptyList(),
 ) {
     companion object {
