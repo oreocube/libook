@@ -18,18 +18,28 @@ class CheckBookAvailabilityUseCase @Inject constructor(
     ): List<LibraryWithAvailability> {
         return supervisorScope {
             libraries.map { library ->
-                async {
-                    val availability = runCatching {
-                        libraryRepository.checkBookAvailability(
-                            BookAvailabilityCheckParam(isbn = isbn, libraryCode = library.id)
-                        )
-                    }
-                    LibraryWithAvailability(
-                        library = library,
-                        availability = availability
-                    )
-                }
+                async { checkAvailabilitySafely(isbn, library) }
             }.awaitAll()
         }
+    }
+
+    suspend operator fun invoke(
+        isbn: String,
+        library: LibraryShort,
+    ): LibraryWithAvailability = checkAvailabilitySafely(isbn, library)
+
+    private suspend fun checkAvailabilitySafely(
+        isbn: String,
+        library: LibraryShort,
+    ): LibraryWithAvailability {
+        val availability = runCatching {
+            libraryRepository.checkBookAvailability(
+                BookAvailabilityCheckParam(isbn = isbn, libraryCode = library.id)
+            )
+        }
+        return LibraryWithAvailability(
+            library = library,
+            availability = availability
+        )
     }
 }

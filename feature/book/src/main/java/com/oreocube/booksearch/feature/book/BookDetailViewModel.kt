@@ -86,6 +86,26 @@ class BookDetailViewModel @Inject constructor(
         }
     }
 
+    fun refreshBookAvailability(library: LibraryShort) {
+        viewModelScope.launch {
+            runCatching {
+                checkBookAvailabilityUseCase(isbn13.value, library)
+            }.onSuccess { availability ->
+                _uiState.update { state ->
+                    state.copy(
+                        status = state.status.map { origin ->
+                            if (origin.first.id == library.id) {
+                                availability.toUiState()
+                            } else {
+                                origin
+                            }
+                        }
+                    )
+                }
+            }
+        }
+    }
+
     private fun getRecommendedBooks(isbn: String) {
         viewModelScope.launch {
             runCatching {
