@@ -105,7 +105,7 @@ class BookDetailViewModel @Inject constructor(
 data class BookDetailUiState(
     val isLoading: Boolean,
     val book: BookDetail?,
-    val status: List<Pair<LibraryShort, BookStatusUiState>>,
+    val status: List<Pair<LibraryShort, BookStatusUiState?>>,
     val recommendBooks: List<RecommendedBookUiState> = emptyList(),
 ) {
     companion object {

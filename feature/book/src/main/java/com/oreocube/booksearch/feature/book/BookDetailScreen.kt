@@ -202,7 +202,7 @@ private fun BookDetailContent(
 @Composable
 private fun LibraryStatusForBook(
     modifier: Modifier = Modifier,
-    status: List<Pair<LibraryShort, BookStatusUiState>>,
+    status: List<Pair<LibraryShort, BookStatusUiState?>>,
     onAddLibraryClick: () -> Unit,
 ) {
     Column(
@@ -237,12 +237,16 @@ private fun LibraryStatusForBook(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
-                    StatusLabel(
-                        modifier = Modifier.padding(start = 8.dp),
-                        text = availability.text,
-                        textColor = availability.textColor,
-                        containerColor = availability.containerColor,
-                    )
+                    if (availability == null) {
+                        CircularProgressIndicator()
+                    } else {
+                        StatusLabel(
+                            modifier = Modifier.padding(start = 8.dp),
+                            text = availability.text,
+                            textColor = availability.textColor,
+                            containerColor = availability.containerColor,
+                        )
+                    }
                 }
             }
         }
