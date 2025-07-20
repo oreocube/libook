@@ -10,6 +10,7 @@ import com.oreocube.booksearch.domain.model.RecommendedBook
 import com.oreocube.booksearch.domain.model.param.BookDetailParam
 import com.oreocube.booksearch.domain.usecase.CheckBookAvailabilityUseCase
 import com.oreocube.booksearch.domain.usecase.GetBookDetailUseCase
+import com.oreocube.booksearch.domain.usecase.GetFavoriteLibrariesUseCase
 import com.oreocube.booksearch.domain.usecase.GetRecommendedBooksWithTargetBookUseCase
 import com.oreocube.booksearch.feature.book.model.BookStatusUiState
 import com.oreocube.booksearch.feature.book.model.RecommendedBookUiState
@@ -19,6 +20,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -28,6 +30,7 @@ import javax.inject.Inject
 class BookDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     val getBookDetailUseCase: GetBookDetailUseCase,
+    val getFavoriteLibrariesUseCase: GetFavoriteLibrariesUseCase,
     val checkBookAvailabilityUseCase: CheckBookAvailabilityUseCase,
     val getRecommendedBooksUseCase: GetRecommendedBooksWithTargetBookUseCase,
 ) : ViewModel() {
@@ -71,7 +74,8 @@ class BookDetailViewModel @Inject constructor(
     private fun getBookAvailability(isbn: String) {
         viewModelScope.launch {
             runCatching {
-                checkBookAvailabilityUseCase(isbn)
+                val libraries = getFavoriteLibrariesUseCase().first()
+                checkBookAvailabilityUseCase(isbn, libraries)
             }.onSuccess { availability ->
                 _uiState.update { state ->
                     state.copy(
