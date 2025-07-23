@@ -9,6 +9,7 @@ import com.oreocube.booksearch.core.ui.theme.Red30
 import com.oreocube.booksearch.core.ui.theme.Red80
 import com.oreocube.booksearch.domain.model.BookAvailability
 import com.oreocube.booksearch.domain.model.LibraryShort
+import com.oreocube.booksearch.domain.model.LibraryWithAvailability
 
 enum class BookStatusUiState(
     val text: String,
@@ -30,6 +31,11 @@ enum class BookStatusUiState(
         textColor = Green30,
         containerColor = Green80,
     ),
+    ERROR(
+        text = "오류",
+        textColor = Gray20,
+        containerColor = Gray80,
+    )
 }
 
 fun BookAvailability.toUiState(): BookStatusUiState {
@@ -40,7 +46,9 @@ fun BookAvailability.toUiState(): BookStatusUiState {
     }
 }
 
-fun Pair<LibraryShort, BookAvailability>.toUiState(): Pair<LibraryShort, BookStatusUiState> {
-    val (library, availability) = this
-    return library to availability.toUiState()
+fun LibraryWithAvailability.toUiState(): Pair<LibraryShort, BookStatusUiState> {
+    return when {
+        availability.isSuccess -> library to availability.getOrThrow().toUiState()
+        else -> library to BookStatusUiState.ERROR
+    }
 }

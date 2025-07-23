@@ -18,9 +18,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -66,6 +69,7 @@ fun BookDetailRoute(
         modifier = Modifier.fillMaxSize(),
         uiState = uiState,
         onBackClick = onBackClick,
+        onRetryClick = viewModel::refreshBookAvailability,
         onAddLibraryClick = onAddLibraryClick,
         onBookItemClick = onBookItemClick,
     )
@@ -86,6 +90,7 @@ fun BookDetailScreen(
     modifier: Modifier = Modifier,
     uiState: BookDetailUiState,
     onBackClick: () -> Unit,
+    onRetryClick: (LibraryShort) -> Unit,
     onAddLibraryClick: () -> Unit,
     onBookItemClick: (String) -> Unit,
 ) {
@@ -120,6 +125,7 @@ fun BookDetailScreen(
                     LibraryStatusForBook(
                         modifier = Modifier.fillMaxWidth(),
                         status = uiState.status,
+                        onRetryClick = onRetryClick,
                         onAddLibraryClick = onAddLibraryClick,
                     )
                     if (uiState.recommendBooks.isNotEmpty()) {
@@ -202,7 +208,8 @@ private fun BookDetailContent(
 @Composable
 private fun LibraryStatusForBook(
     modifier: Modifier = Modifier,
-    status: List<Pair<LibraryShort, BookStatusUiState>>,
+    status: List<Pair<LibraryShort, BookStatusUiState?>>,
+    onRetryClick: (LibraryShort) -> Unit,
     onAddLibraryClick: () -> Unit,
 ) {
     Column(
@@ -237,12 +244,32 @@ private fun LibraryStatusForBook(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
-                    StatusLabel(
+                    Row(
                         modifier = Modifier.padding(start = 8.dp),
-                        text = availability.text,
-                        textColor = availability.textColor,
-                        containerColor = availability.containerColor,
-                    )
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        if (availability == null) {
+                            CircularProgressIndicator()
+                        } else {
+                            StatusLabel(
+                                text = availability.text,
+                                textColor = availability.textColor,
+                                containerColor = availability.containerColor,
+                            )
+                        }
+                        if (availability == BookStatusUiState.ERROR) {
+                            IconButton(
+                                modifier = Modifier.size(20.dp),
+                                onClick = { onRetryClick(library) }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Refresh,
+                                    contentDescription = "refresh",
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -372,7 +399,9 @@ private fun LibraryStatusForBookPreview1() {
             LibraryShort("1", "도서관1") to BookStatusUiState.ON_LOAN,
             LibraryShort("1", "도서관2") to BookStatusUiState.NOT_AVAILABLE,
             LibraryShort("1", "도서관3") to BookStatusUiState.AVAILABLE,
+            LibraryShort("1", "도서관4") to BookStatusUiState.ERROR,
         ),
+        onRetryClick = {},
         onAddLibraryClick = {},
     )
 }
@@ -382,6 +411,7 @@ private fun LibraryStatusForBookPreview1() {
 private fun LibraryStatusForBookPreview2() {
     LibraryStatusForBook(
         status = emptyList(),
+        onRetryClick = {},
         onAddLibraryClick = {},
     )
 }
@@ -418,6 +448,7 @@ private fun BookDetailScreenPreview() {
             ),
         ),
         onBackClick = {},
+        onRetryClick = {},
         onAddLibraryClick = {},
         onBookItemClick = {},
     )
