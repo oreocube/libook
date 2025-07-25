@@ -1,5 +1,7 @@
 package com.oreocube.booksearch.data.di
 
+import com.oreocube.booksearch.data.datasource.NotificationDataSource
+import com.oreocube.booksearch.data.datasource.NotificationDataSourceImpl
 import com.oreocube.booksearch.data.datasource.RegionDataSource
 import com.oreocube.booksearch.data.datasource.RegionDataSourceImpl
 import com.oreocube.booksearch.data.datasource.UserDataSource
@@ -17,4 +19,7 @@ interface DataSourceModule {
 
     @Binds
     fun bindsUserDataSource(dataSource: UserDataSourceImpl): UserDataSource
+
+    @Binds
+    fun bindsNotificationDataSource(dataSource: NotificationDataSourceImpl): NotificationDataSource
 }
