@@ -4,10 +4,12 @@ import com.oreocube.booksearch.data.repository.FavoriteRepositoryImpl
 import com.oreocube.booksearch.data.repository.HistoryRepositoryImpl
 import com.oreocube.booksearch.data.repository.LibraryRepositoryImpl
 import com.oreocube.booksearch.data.repository.RegionRepositoryImpl
+import com.oreocube.booksearch.data.repository.UserRepositoryImpl
 import com.oreocube.booksearch.domain.repository.FavoriteRepository
 import com.oreocube.booksearch.domain.repository.HistoryRepository
 import com.oreocube.booksearch.domain.repository.LibraryRepository
 import com.oreocube.booksearch.domain.repository.RegionRepository
+import com.oreocube.booksearch.domain.repository.UserRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -27,4 +29,7 @@ interface RepositoryModule {
 
     @Binds
     fun bindsHistoryRepository(repositoryImpl: HistoryRepositoryImpl): HistoryRepository
+
+    @Binds
+    fun bindsUserRepository(repositoryImpl: UserRepositoryImpl): UserRepository
 }
