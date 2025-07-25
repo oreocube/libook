@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.secrets)
     alias(libs.plugins.room)
+    alias(libs.plugins.gms)
 }
 
 android {
@@ -55,6 +56,8 @@ dependencies {
     implementation(libs.room.runtime)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.firestore)
+    implementation(libs.firebase.messaging)
+    implementation(libs.firebase.auth)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.room.testing)
     androidTestImplementation(libs.androidx.room.testing.android)
