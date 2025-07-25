@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -70,6 +71,7 @@ fun BookDetailRoute(
         uiState = uiState,
         onBackClick = onBackClick,
         onRetryClick = viewModel::refreshBookAvailability,
+        onAlarmClick = viewModel::registerNotification,
         onAddLibraryClick = onAddLibraryClick,
         onBookItemClick = onBookItemClick,
     )
@@ -91,6 +93,7 @@ fun BookDetailScreen(
     uiState: BookDetailUiState,
     onBackClick: () -> Unit,
     onRetryClick: (LibraryShort) -> Unit,
+    onAlarmClick: (LibraryShort) -> Unit,
     onAddLibraryClick: () -> Unit,
     onBookItemClick: (String) -> Unit,
 ) {
@@ -127,6 +130,7 @@ fun BookDetailScreen(
                         status = uiState.status,
                         onRetryClick = onRetryClick,
                         onAddLibraryClick = onAddLibraryClick,
+                        onAlarmClick = onAlarmClick,
                     )
                     if (uiState.recommendBooks.isNotEmpty()) {
                         HorizontalDivider()
@@ -209,6 +213,7 @@ private fun BookDetailContent(
 private fun LibraryStatusForBook(
     modifier: Modifier = Modifier,
     status: List<Pair<LibraryShort, BookStatusUiState?>>,
+    onAlarmClick: (LibraryShort) -> Unit,
     onRetryClick: (LibraryShort) -> Unit,
     onAddLibraryClick: () -> Unit,
 ) {
@@ -257,6 +262,18 @@ private fun LibraryStatusForBook(
                                 textColor = availability.textColor,
                                 containerColor = availability.containerColor,
                             )
+                        }
+                        if (availability == BookStatusUiState.ON_LOAN) {
+                            IconButton(
+                                modifier = Modifier.size(20.dp),
+                                onClick = { onAlarmClick(library) }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Notifications,
+                                    contentDescription = "notification",
+                                    tint = Color.Black,
+                                )
+                            }
                         }
                         if (availability == BookStatusUiState.ERROR) {
                             IconButton(
@@ -403,6 +420,7 @@ private fun LibraryStatusForBookPreview1() {
         ),
         onRetryClick = {},
         onAddLibraryClick = {},
+        onAlarmClick = {},
     )
 }
 
@@ -413,6 +431,7 @@ private fun LibraryStatusForBookPreview2() {
         status = emptyList(),
         onRetryClick = {},
         onAddLibraryClick = {},
+        onAlarmClick = {},
     )
 }
 
@@ -449,6 +468,7 @@ private fun BookDetailScreenPreview() {
         ),
         onBackClick = {},
         onRetryClick = {},
+        onAlarmClick = {},
         onAddLibraryClick = {},
         onBookItemClick = {},
     )

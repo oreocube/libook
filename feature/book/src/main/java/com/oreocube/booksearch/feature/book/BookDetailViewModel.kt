@@ -8,10 +8,12 @@ import com.oreocube.booksearch.domain.model.BookDetail
 import com.oreocube.booksearch.domain.model.LibraryShort
 import com.oreocube.booksearch.domain.model.RecommendedBook
 import com.oreocube.booksearch.domain.model.param.BookDetailParam
+import com.oreocube.booksearch.domain.model.param.BookNotificationTarget
 import com.oreocube.booksearch.domain.usecase.CheckBookAvailabilityUseCase
 import com.oreocube.booksearch.domain.usecase.GetBookDetailUseCase
 import com.oreocube.booksearch.domain.usecase.GetFavoriteLibrariesUseCase
 import com.oreocube.booksearch.domain.usecase.GetRecommendedBooksWithTargetBookUseCase
+import com.oreocube.booksearch.domain.usecase.RegisterNotificationForBookStatusUseCase
 import com.oreocube.booksearch.feature.book.model.BookStatusUiState
 import com.oreocube.booksearch.feature.book.model.RecommendedBookUiState
 import com.oreocube.booksearch.feature.book.model.toUiState
@@ -29,10 +31,11 @@ import javax.inject.Inject
 @HiltViewModel
 class BookDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    val getBookDetailUseCase: GetBookDetailUseCase,
-    val getFavoriteLibrariesUseCase: GetFavoriteLibrariesUseCase,
-    val checkBookAvailabilityUseCase: CheckBookAvailabilityUseCase,
-    val getRecommendedBooksUseCase: GetRecommendedBooksWithTargetBookUseCase,
+    private val getBookDetailUseCase: GetBookDetailUseCase,
+    private val getFavoriteLibrariesUseCase: GetFavoriteLibrariesUseCase,
+    private val checkBookAvailabilityUseCase: CheckBookAvailabilityUseCase,
+    private val registerNotificationForBookStatusUseCase: RegisterNotificationForBookStatusUseCase,
+    private val getRecommendedBooksUseCase: GetRecommendedBooksWithTargetBookUseCase,
 ) : ViewModel() {
     private val isbnKey = "isbnKey"
 
@@ -103,6 +106,19 @@ class BookDetailViewModel @Inject constructor(
                     )
                 }
             }
+        }
+    }
+
+    fun registerNotification(library: LibraryShort) {
+        val book = uiState.value.book ?: return
+        val target = BookNotificationTarget(
+            libraryId = library.id,
+            libraryName = library.name,
+            isbn = isbn13.value,
+            bookTitle = book.title,
+        )
+        viewModelScope.launch {
+            registerNotificationForBookStatusUseCase(target)
         }
     }
 
