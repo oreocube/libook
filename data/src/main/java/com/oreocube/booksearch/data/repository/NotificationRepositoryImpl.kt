@@ -18,11 +18,11 @@ class NotificationRepositoryImpl @Inject constructor(
         notificationDataSource.registerNotificationForBookStatus(uid, target)
     }
 
-    override suspend fun isNotificationEnabled(
+    override suspend fun isNotificationRegistered(
         uid: String,
         libraryId: String,
         isbn: String
     ): Boolean {
-        return notificationDataSource.isNotificationEnabled(uid, libraryId, isbn)
+        return notificationDataSource.isNotificationRegistered(uid, libraryId, isbn)
     }
 }

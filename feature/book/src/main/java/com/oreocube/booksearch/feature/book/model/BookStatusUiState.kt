@@ -46,9 +46,21 @@ fun BookAvailability.toUiState(): BookStatusUiState {
     }
 }
 
-fun LibraryWithAvailability.toUiState(): Pair<LibraryShort, BookStatusUiState> {
-    return when {
-        availability.isSuccess -> library to availability.getOrThrow().toUiState()
-        else -> library to BookStatusUiState.ERROR
+fun LibraryWithAvailability.toUiState(): LibraryBookStatusUiState {
+    val status = if (availability.isSuccess) {
+        availability.getOrThrow().toUiState()
+    } else {
+        BookStatusUiState.ERROR
     }
+    return LibraryBookStatusUiState(
+        library = library,
+        status = status,
+        isNotificationRegistered = isNotificationRegistered,
+    )
 }
+
+data class LibraryBookStatusUiState(
+    val library: LibraryShort,
+    val status: BookStatusUiState?,
+    val isNotificationRegistered: Boolean,
+)

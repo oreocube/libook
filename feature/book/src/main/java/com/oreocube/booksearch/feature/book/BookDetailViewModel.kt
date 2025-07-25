@@ -14,7 +14,7 @@ import com.oreocube.booksearch.domain.usecase.GetBookDetailUseCase
 import com.oreocube.booksearch.domain.usecase.GetFavoriteLibrariesUseCase
 import com.oreocube.booksearch.domain.usecase.GetRecommendedBooksWithTargetBookUseCase
 import com.oreocube.booksearch.domain.usecase.RegisterNotificationForBookStatusUseCase
-import com.oreocube.booksearch.feature.book.model.BookStatusUiState
+import com.oreocube.booksearch.feature.book.model.LibraryBookStatusUiState
 import com.oreocube.booksearch.feature.book.model.RecommendedBookUiState
 import com.oreocube.booksearch.feature.book.model.toUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -97,7 +97,7 @@ class BookDetailViewModel @Inject constructor(
                 _uiState.update { state ->
                     state.copy(
                         status = state.status.map { origin ->
-                            if (origin.first.id == library.id) {
+                            if (origin.library.id == library.id) {
                                 availability.toUiState()
                             } else {
                                 origin
@@ -141,7 +141,7 @@ class BookDetailViewModel @Inject constructor(
 data class BookDetailUiState(
     val isLoading: Boolean,
     val book: BookDetail?,
-    val status: List<Pair<LibraryShort, BookStatusUiState?>>,
+    val status: List<LibraryBookStatusUiState>,
     val recommendBooks: List<RecommendedBookUiState> = emptyList(),
 ) {
     companion object {

@@ -31,7 +31,7 @@ class NotificationDataSourceImpl @Inject constructor(
             .await()
     }
 
-    override suspend fun isNotificationEnabled(
+    override suspend fun isNotificationRegistered(
         uid: String,
         libraryId: String,
         isbn: String

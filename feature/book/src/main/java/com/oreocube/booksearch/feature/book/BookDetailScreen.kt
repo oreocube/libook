@@ -19,6 +19,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.CircularProgressIndicator
@@ -54,6 +55,7 @@ import com.oreocube.booksearch.core.ui.theme.Gray90
 import com.oreocube.booksearch.domain.model.BookDetail
 import com.oreocube.booksearch.domain.model.LibraryShort
 import com.oreocube.booksearch.feature.book.model.BookStatusUiState
+import com.oreocube.booksearch.feature.book.model.LibraryBookStatusUiState
 import com.oreocube.booksearch.feature.book.model.RecommendedBookUiState
 
 @Composable
@@ -212,7 +214,7 @@ private fun BookDetailContent(
 @Composable
 private fun LibraryStatusForBook(
     modifier: Modifier = Modifier,
-    status: List<Pair<LibraryShort, BookStatusUiState?>>,
+    status: List<LibraryBookStatusUiState>,
     onAlarmClick: (LibraryShort) -> Unit,
     onRetryClick: (LibraryShort) -> Unit,
     onAddLibraryClick: () -> Unit,
@@ -232,7 +234,7 @@ private fun LibraryStatusForBook(
                 onAddLibraryClick = onAddLibraryClick
             )
         } else {
-            status.forEach { (library, availability) ->
+            status.forEach { item ->
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -245,7 +247,7 @@ private fun LibraryStatusForBook(
                 ) {
                     Text(
                         modifier = Modifier.weight(1f),
-                        text = library.name, fontSize = 16.sp,
+                        text = item.library.name, fontSize = 16.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
@@ -254,31 +256,31 @@ private fun LibraryStatusForBook(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        if (availability == null) {
+                        if (item.status == null) {
                             CircularProgressIndicator()
                         } else {
                             StatusLabel(
-                                text = availability.text,
-                                textColor = availability.textColor,
-                                containerColor = availability.containerColor,
+                                text = item.status.text,
+                                textColor = item.status.textColor,
+                                containerColor = item.status.containerColor,
                             )
                         }
-                        if (availability == BookStatusUiState.ON_LOAN) {
+                        if (item.status == BookStatusUiState.ON_LOAN) {
                             IconButton(
                                 modifier = Modifier.size(20.dp),
-                                onClick = { onAlarmClick(library) }
+                                onClick = { onAlarmClick(item.library) }
                             ) {
                                 Icon(
-                                    imageVector = Icons.Outlined.Notifications,
+                                    imageVector = if (item.isNotificationRegistered) Icons.Filled.Notifications else Icons.Outlined.Notifications,
                                     contentDescription = "notification",
                                     tint = Color.Black,
                                 )
                             }
                         }
-                        if (availability == BookStatusUiState.ERROR) {
+                        if (item.status == BookStatusUiState.ERROR) {
                             IconButton(
                                 modifier = Modifier.size(20.dp),
-                                onClick = { onRetryClick(library) }
+                                onClick = { onRetryClick(item.library) }
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Refresh,
@@ -413,10 +415,26 @@ private fun RecommendedBookItem(
 private fun LibraryStatusForBookPreview1() {
     LibraryStatusForBook(
         status = listOf(
-            LibraryShort("1", "도서관1") to BookStatusUiState.ON_LOAN,
-            LibraryShort("1", "도서관2") to BookStatusUiState.NOT_AVAILABLE,
-            LibraryShort("1", "도서관3") to BookStatusUiState.AVAILABLE,
-            LibraryShort("1", "도서관4") to BookStatusUiState.ERROR,
+            LibraryBookStatusUiState(
+                library = LibraryShort("1", "도서관1"),
+                status = BookStatusUiState.ON_LOAN,
+                isNotificationRegistered = true,
+            ),
+            LibraryBookStatusUiState(
+                library = LibraryShort("2", "도서관2"),
+                status = BookStatusUiState.NOT_AVAILABLE,
+                isNotificationRegistered = false,
+            ),
+            LibraryBookStatusUiState(
+                library = LibraryShort("3", "도서관3"),
+                status = BookStatusUiState.AVAILABLE,
+                isNotificationRegistered = false,
+            ),
+            LibraryBookStatusUiState(
+                library = LibraryShort("4", "도서관4"),
+                status = BookStatusUiState.ERROR,
+                isNotificationRegistered = false,
+            ),
         ),
         onRetryClick = {},
         onAddLibraryClick = {},
@@ -451,9 +469,26 @@ private fun BookDetailScreenPreview() {
                 description = "실용주의 프로그래머 20주년 기념판. 데이비드 토마스와 앤드류 헌트는 소프트웨어 산업에 큰 영향을 미친 이 책의 1판을 1999년에 썼다. 고객들이 더 나은 소프트웨어를 만들고 코딩의 기쁨을 재발견하도록 돕기 위해서였다."
             ),
             status = listOf(
-                LibraryShort("1", "도서관1") to BookStatusUiState.ON_LOAN,
-                LibraryShort("1", "도서관2") to BookStatusUiState.NOT_AVAILABLE,
-                LibraryShort("1", "도서관3") to BookStatusUiState.AVAILABLE,
+                LibraryBookStatusUiState(
+                    library = LibraryShort("1", "도서관1"),
+                    status = BookStatusUiState.ON_LOAN,
+                    isNotificationRegistered = true,
+                ),
+                LibraryBookStatusUiState(
+                    library = LibraryShort("2", "도서관2"),
+                    status = BookStatusUiState.NOT_AVAILABLE,
+                    isNotificationRegistered = false,
+                ),
+                LibraryBookStatusUiState(
+                    library = LibraryShort("3", "도서관3"),
+                    status = BookStatusUiState.AVAILABLE,
+                    isNotificationRegistered = false,
+                ),
+                LibraryBookStatusUiState(
+                    library = LibraryShort("4", "도서관4"),
+                    status = BookStatusUiState.ERROR,
+                    isNotificationRegistered = false,
+                ),
             ),
             recommendBooks = listOf(
                 RecommendedBookUiState(
