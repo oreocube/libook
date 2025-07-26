@@ -13,8 +13,8 @@ class UserRepositoryImpl @Inject constructor(
         userDataSource.authenticateAnonymously()
     }
 
-    override suspend fun getUserId(): String? {
-        return userDataSource.getUserId()
+    override suspend fun getCurrentUserId(): String? {
+        return userDataSource.getCurrentUserId()
     }
 
     override suspend fun getFcmToken(): String? {

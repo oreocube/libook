@@ -9,7 +9,7 @@ class CheckBookNotificationUseCase @Inject constructor(
     private val notificationRepository: NotificationRepository,
 ) {
     suspend operator fun invoke(libraryId: String, isbn: String): Boolean {
-        val uid = userRepository.getUserId() ?: return false
+        val uid = userRepository.getCurrentUserId() ?: return false
         return notificationRepository.isNotificationRegistered(uid, libraryId, isbn)
     }
 }

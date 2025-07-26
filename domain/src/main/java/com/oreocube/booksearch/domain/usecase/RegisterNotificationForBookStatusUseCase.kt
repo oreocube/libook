@@ -10,7 +10,7 @@ class RegisterNotificationForBookStatusUseCase @Inject constructor(
     private val notificationRepository: NotificationRepository,
 ) {
     suspend operator fun invoke(target: BookNotificationTarget) {
-        val userId = userRepository.getUserId() ?: return
+        val userId = userRepository.getCurrentUserId() ?: return
         notificationRepository.registerNotificationForBookStatus(
             uid = userId,
             target = target,

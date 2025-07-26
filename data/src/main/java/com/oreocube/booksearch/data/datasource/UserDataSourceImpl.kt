@@ -17,7 +17,7 @@ class UserDataSourceImpl @Inject constructor(
         auth.signInAnonymously().await()
     }
 
-    override suspend fun getUserId(): String? {
+    override suspend fun getCurrentUserId(): String? {
         return auth.currentUser?.uid
     }
 
