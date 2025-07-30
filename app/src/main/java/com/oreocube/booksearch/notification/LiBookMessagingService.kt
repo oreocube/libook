@@ -18,6 +18,9 @@ class LiBookMessagingService : FirebaseMessagingService() {
     @Inject
     lateinit var updateFcmTokenUseCase: UpdateFcmTokenUseCase
 
+    @Inject
+    lateinit var notificationHandler: LiBookNotificationHandler
+
     override fun onNewToken(token: String) {
         super.onNewToken(token)
 
@@ -28,7 +31,7 @@ class LiBookMessagingService : FirebaseMessagingService() {
 
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
-        TODO("Not yet implemented")
+        notificationHandler.sendNotification(message)
     }
 
     override fun onDestroy() {
