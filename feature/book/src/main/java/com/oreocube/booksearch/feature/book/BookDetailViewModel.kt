@@ -118,7 +118,21 @@ class BookDetailViewModel @Inject constructor(
             bookTitle = book.title,
         )
         viewModelScope.launch {
-            registerNotificationForBookStatusUseCase(target)
+            runCatching {
+                registerNotificationForBookStatusUseCase(target)
+            }.onSuccess {
+                _uiState.update {
+                    it.copy(
+                        status = it.status.map { status ->
+                            if (status.library.id == library.id) {
+                                status.copy(isNotificationRegistered = true)
+                            } else {
+                                status
+                            }
+                        }
+                    )
+                }
+            }
         }
     }
 
