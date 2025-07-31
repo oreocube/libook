@@ -1,4 +1,4 @@
-package com.oreocube.booksearch.feature.book
+package com.oreocube.booksearch.feature.book.detail
 
 import android.Manifest
 import android.content.pm.PackageManager

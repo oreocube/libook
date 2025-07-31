@@ -1,4 +1,4 @@
-package com.oreocube.booksearch.feature.book
+package com.oreocube.booksearch.feature.book.search
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder

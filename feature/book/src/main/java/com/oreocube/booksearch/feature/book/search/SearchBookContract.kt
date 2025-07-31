@@ -1,4 +1,4 @@
-package com.oreocube.booksearch.feature.book
+package com.oreocube.booksearch.feature.book.search
 
 import androidx.paging.PagingData
 import com.oreocube.booksearch.feature.book.model.BookUiState

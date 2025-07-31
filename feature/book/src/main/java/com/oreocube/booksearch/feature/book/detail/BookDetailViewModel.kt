@@ -1,10 +1,9 @@
-package com.oreocube.booksearch.feature.book
+package com.oreocube.booksearch.feature.book.detail
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.oreocube.booksearch.domain.model.BookDetail
 import com.oreocube.booksearch.domain.model.LibraryShort
 import com.oreocube.booksearch.domain.model.RecommendedBook
 import com.oreocube.booksearch.domain.model.param.BookDetailParam
@@ -15,8 +14,6 @@ import com.oreocube.booksearch.domain.usecase.GetFavoriteLibrariesUseCase
 import com.oreocube.booksearch.domain.usecase.GetRecommendedBooksWithTargetBookUseCase
 import com.oreocube.booksearch.domain.usecase.RegisterNotificationForBookStatusUseCase
 import com.oreocube.booksearch.domain.usecase.UnregisterNotificationForBookStatusUseCase
-import com.oreocube.booksearch.feature.book.model.LibraryBookStatusUiState
-import com.oreocube.booksearch.feature.book.model.RecommendedBookUiState
 import com.oreocube.booksearch.feature.book.model.toUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -156,24 +153,4 @@ class BookDetailViewModel @Inject constructor(
             }
         }
     }
-}
-
-data class BookDetailUiState(
-    val isLoading: Boolean,
-    val book: BookDetail?,
-    val status: List<LibraryBookStatusUiState>,
-    val recommendBooks: List<RecommendedBookUiState> = emptyList(),
-) {
-    companion object {
-        val initialState = BookDetailUiState(
-            isLoading = true,
-            book = null,
-            status = emptyList(),
-            recommendBooks = emptyList(),
-        )
-    }
-}
-
-sealed class BookDetailUiEvent {
-    data class Error(val message: String) : BookDetailUiEvent()
 }

@@ -1,4 +1,4 @@
-package com.oreocube.booksearch.feature.book
+package com.oreocube.booksearch.feature.book.search
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
