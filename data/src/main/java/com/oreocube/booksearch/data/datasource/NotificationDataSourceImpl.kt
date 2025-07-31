@@ -31,6 +31,17 @@ class NotificationDataSourceImpl @Inject constructor(
             .await()
     }
 
+    override suspend fun unregisterNotificationForBookStatus(
+        uid: String,
+        target: BookNotificationTarget,
+    ) {
+        val documentId = getDocumentId(uid, target.libraryId, target.isbn)
+        db.collection(NOTIFICATION_COLLECTION)
+            .document(documentId)
+            .delete()
+            .await()
+    }
+
     override suspend fun isNotificationRegistered(
         uid: String,
         libraryId: String,

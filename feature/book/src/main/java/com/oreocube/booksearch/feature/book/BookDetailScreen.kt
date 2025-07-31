@@ -100,11 +100,11 @@ fun BookDetailRoute(
         uiState = uiState,
         onBackClick = onBackClick,
         onRetryClick = viewModel::refreshBookAvailability,
-        onAlarmClick = {
+        onAlarmClick = { isRegistered, library ->
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU
                 || hasNotificationPermission
             ) {
-                viewModel.registerNotification(it)
+                viewModel.toggleNotification(isRegistered, library)
             } else {
                 requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
@@ -130,7 +130,7 @@ fun BookDetailScreen(
     uiState: BookDetailUiState,
     onBackClick: () -> Unit,
     onRetryClick: (LibraryShort) -> Unit,
-    onAlarmClick: (LibraryShort) -> Unit,
+    onAlarmClick: (Boolean, LibraryShort) -> Unit,
     onAddLibraryClick: () -> Unit,
     onBookItemClick: (String) -> Unit,
 ) {
@@ -250,7 +250,7 @@ private fun BookDetailContent(
 private fun LibraryStatusForBook(
     modifier: Modifier = Modifier,
     status: List<LibraryBookStatusUiState>,
-    onAlarmClick: (LibraryShort) -> Unit,
+    onAlarmClick: (Boolean, LibraryShort) -> Unit,
     onRetryClick: (LibraryShort) -> Unit,
     onAddLibraryClick: () -> Unit,
 ) {
@@ -303,7 +303,12 @@ private fun LibraryStatusForBook(
                         if (item.status == BookStatusUiState.ON_LOAN) {
                             IconButton(
                                 modifier = Modifier.size(20.dp),
-                                onClick = { onAlarmClick(item.library) }
+                                onClick = {
+                                    onAlarmClick(
+                                        item.isNotificationRegistered,
+                                        item.library,
+                                    )
+                                }
                             ) {
                                 Icon(
                                     imageVector = if (item.isNotificationRegistered) Icons.Filled.Notifications else Icons.Outlined.Notifications,
@@ -473,7 +478,7 @@ private fun LibraryStatusForBookPreview1() {
         ),
         onRetryClick = {},
         onAddLibraryClick = {},
-        onAlarmClick = {},
+        onAlarmClick = { _, _ -> },
     )
 }
 
@@ -484,7 +489,7 @@ private fun LibraryStatusForBookPreview2() {
         status = emptyList(),
         onRetryClick = {},
         onAddLibraryClick = {},
-        onAlarmClick = {},
+        onAlarmClick = { _, _ -> },
     )
 }
 
@@ -538,7 +543,7 @@ private fun BookDetailScreenPreview() {
         ),
         onBackClick = {},
         onRetryClick = {},
-        onAlarmClick = {},
+        onAlarmClick = { _, _ -> },
         onAddLibraryClick = {},
         onBookItemClick = {},
     )

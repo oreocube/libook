@@ -18,6 +18,13 @@ class NotificationRepositoryImpl @Inject constructor(
         notificationDataSource.registerNotificationForBookStatus(uid, target)
     }
 
+    override suspend fun unregisterNotificationForBookStatus(
+        uid: String,
+        target: BookNotificationTarget,
+    ) {
+        notificationDataSource.unregisterNotificationForBookStatus(uid, target)
+    }
+
     override suspend fun isNotificationRegistered(
         uid: String,
         libraryId: String,

@@ -14,6 +14,7 @@ import com.oreocube.booksearch.domain.usecase.GetBookDetailUseCase
 import com.oreocube.booksearch.domain.usecase.GetFavoriteLibrariesUseCase
 import com.oreocube.booksearch.domain.usecase.GetRecommendedBooksWithTargetBookUseCase
 import com.oreocube.booksearch.domain.usecase.RegisterNotificationForBookStatusUseCase
+import com.oreocube.booksearch.domain.usecase.UnregisterNotificationForBookStatusUseCase
 import com.oreocube.booksearch.feature.book.model.LibraryBookStatusUiState
 import com.oreocube.booksearch.feature.book.model.RecommendedBookUiState
 import com.oreocube.booksearch.feature.book.model.toUiState
@@ -35,6 +36,7 @@ class BookDetailViewModel @Inject constructor(
     private val getFavoriteLibrariesUseCase: GetFavoriteLibrariesUseCase,
     private val checkBookAvailabilityUseCase: CheckBookAvailabilityUseCase,
     private val registerNotificationForBookStatusUseCase: RegisterNotificationForBookStatusUseCase,
+    private val unregisterNotificationForBookStatusUseCase: UnregisterNotificationForBookStatusUseCase,
     private val getRecommendedBooksUseCase: GetRecommendedBooksWithTargetBookUseCase,
 ) : ViewModel() {
     private val isbnKey = "isbnKey"
@@ -109,7 +111,7 @@ class BookDetailViewModel @Inject constructor(
         }
     }
 
-    fun registerNotification(library: LibraryShort) {
+    fun toggleNotification(isNotificationRegistered: Boolean, library: LibraryShort) {
         val book = uiState.value.book ?: return
         val target = BookNotificationTarget(
             libraryId = library.id,
@@ -119,13 +121,17 @@ class BookDetailViewModel @Inject constructor(
         )
         viewModelScope.launch {
             runCatching {
-                registerNotificationForBookStatusUseCase(target)
+                if (isNotificationRegistered) {
+                    unregisterNotificationForBookStatusUseCase(target)
+                } else {
+                    registerNotificationForBookStatusUseCase(target)
+                }
             }.onSuccess {
                 _uiState.update {
                     it.copy(
                         status = it.status.map { status ->
                             if (status.library.id == library.id) {
-                                status.copy(isNotificationRegistered = true)
+                                status.copy(isNotificationRegistered = !isNotificationRegistered)
                             } else {
                                 status
                             }
