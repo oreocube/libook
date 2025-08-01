@@ -15,14 +15,15 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
-import com.oreocube.booksearch.navigation.TopLevelDestination
 import com.oreocube.booksearch.navigation.BookSearchNavigationBar
 import com.oreocube.booksearch.navigation.BookSearchNavigationItem
+import com.oreocube.booksearch.navigation.TopLevelDestination
 import kotlinx.coroutines.launch
 
 @Composable
 fun MainScreen(
     appState: BookSearchAppState,
+    deepLinkString: String? = null
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
@@ -62,6 +63,7 @@ fun MainScreen(
         MainNavHost(
             modifier = Modifier.padding(innerPadding),
             appState = appState,
+            deepLinkString = deepLinkString,
             onShowSnackbar = { message ->
                 coroutineScope.launch {
                     snackbarHostState.showSnackbar(message)

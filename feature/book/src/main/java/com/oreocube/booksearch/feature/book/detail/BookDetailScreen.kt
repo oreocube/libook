@@ -1,5 +1,10 @@
-package com.oreocube.booksearch.feature.book
+package com.oreocube.booksearch.feature.book.detail
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -19,7 +24,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -29,10 +36,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -41,6 +52,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
@@ -53,6 +65,7 @@ import com.oreocube.booksearch.core.ui.theme.Gray90
 import com.oreocube.booksearch.domain.model.BookDetail
 import com.oreocube.booksearch.domain.model.LibraryShort
 import com.oreocube.booksearch.feature.book.model.BookStatusUiState
+import com.oreocube.booksearch.feature.book.model.LibraryBookStatusUiState
 import com.oreocube.booksearch.feature.book.model.RecommendedBookUiState
 
 @Composable
@@ -64,12 +77,38 @@ fun BookDetailRoute(
     viewModel: BookDetailViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    var hasNotificationPermission by remember {
+        mutableStateOf(
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+                ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED
+            else true
+        )
+    }
+
+    val requestPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        hasNotificationPermission = isGranted
+    }
 
     BookDetailScreen(
         modifier = Modifier.fillMaxSize(),
         uiState = uiState,
         onBackClick = onBackClick,
         onRetryClick = viewModel::refreshBookAvailability,
+        onAlarmClick = { isRegistered, library ->
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU
+                || hasNotificationPermission
+            ) {
+                viewModel.toggleNotification(isRegistered, library)
+            } else {
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        },
         onAddLibraryClick = onAddLibraryClick,
         onBookItemClick = onBookItemClick,
     )
@@ -91,6 +130,7 @@ fun BookDetailScreen(
     uiState: BookDetailUiState,
     onBackClick: () -> Unit,
     onRetryClick: (LibraryShort) -> Unit,
+    onAlarmClick: (Boolean, LibraryShort) -> Unit,
     onAddLibraryClick: () -> Unit,
     onBookItemClick: (String) -> Unit,
 ) {
@@ -127,6 +167,7 @@ fun BookDetailScreen(
                         status = uiState.status,
                         onRetryClick = onRetryClick,
                         onAddLibraryClick = onAddLibraryClick,
+                        onAlarmClick = onAlarmClick,
                     )
                     if (uiState.recommendBooks.isNotEmpty()) {
                         HorizontalDivider()
@@ -208,7 +249,8 @@ private fun BookDetailContent(
 @Composable
 private fun LibraryStatusForBook(
     modifier: Modifier = Modifier,
-    status: List<Pair<LibraryShort, BookStatusUiState?>>,
+    status: List<LibraryBookStatusUiState>,
+    onAlarmClick: (Boolean, LibraryShort) -> Unit,
     onRetryClick: (LibraryShort) -> Unit,
     onAddLibraryClick: () -> Unit,
 ) {
@@ -227,7 +269,7 @@ private fun LibraryStatusForBook(
                 onAddLibraryClick = onAddLibraryClick
             )
         } else {
-            status.forEach { (library, availability) ->
+            status.forEach { item ->
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -240,7 +282,7 @@ private fun LibraryStatusForBook(
                 ) {
                     Text(
                         modifier = Modifier.weight(1f),
-                        text = library.name, fontSize = 16.sp,
+                        text = item.library.name, fontSize = 16.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
@@ -249,19 +291,36 @@ private fun LibraryStatusForBook(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        if (availability == null) {
+                        if (item.status == null) {
                             CircularProgressIndicator()
                         } else {
                             StatusLabel(
-                                text = availability.text,
-                                textColor = availability.textColor,
-                                containerColor = availability.containerColor,
+                                text = item.status.text,
+                                textColor = item.status.textColor,
+                                containerColor = item.status.containerColor,
                             )
                         }
-                        if (availability == BookStatusUiState.ERROR) {
+                        if (item.status == BookStatusUiState.ON_LOAN) {
                             IconButton(
                                 modifier = Modifier.size(20.dp),
-                                onClick = { onRetryClick(library) }
+                                onClick = {
+                                    onAlarmClick(
+                                        item.isNotificationRegistered,
+                                        item.library,
+                                    )
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = if (item.isNotificationRegistered) Icons.Filled.Notifications else Icons.Outlined.Notifications,
+                                    contentDescription = "notification",
+                                    tint = Color.Black,
+                                )
+                            }
+                        }
+                        if (item.status == BookStatusUiState.ERROR) {
+                            IconButton(
+                                modifier = Modifier.size(20.dp),
+                                onClick = { onRetryClick(item.library) }
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Refresh,
@@ -396,13 +455,30 @@ private fun RecommendedBookItem(
 private fun LibraryStatusForBookPreview1() {
     LibraryStatusForBook(
         status = listOf(
-            LibraryShort("1", "도서관1") to BookStatusUiState.ON_LOAN,
-            LibraryShort("1", "도서관2") to BookStatusUiState.NOT_AVAILABLE,
-            LibraryShort("1", "도서관3") to BookStatusUiState.AVAILABLE,
-            LibraryShort("1", "도서관4") to BookStatusUiState.ERROR,
+            LibraryBookStatusUiState(
+                library = LibraryShort("1", "도서관1"),
+                status = BookStatusUiState.ON_LOAN,
+                isNotificationRegistered = true,
+            ),
+            LibraryBookStatusUiState(
+                library = LibraryShort("2", "도서관2"),
+                status = BookStatusUiState.NOT_AVAILABLE,
+                isNotificationRegistered = false,
+            ),
+            LibraryBookStatusUiState(
+                library = LibraryShort("3", "도서관3"),
+                status = BookStatusUiState.AVAILABLE,
+                isNotificationRegistered = false,
+            ),
+            LibraryBookStatusUiState(
+                library = LibraryShort("4", "도서관4"),
+                status = BookStatusUiState.ERROR,
+                isNotificationRegistered = false,
+            ),
         ),
         onRetryClick = {},
         onAddLibraryClick = {},
+        onAlarmClick = { _, _ -> },
     )
 }
 
@@ -413,6 +489,7 @@ private fun LibraryStatusForBookPreview2() {
         status = emptyList(),
         onRetryClick = {},
         onAddLibraryClick = {},
+        onAlarmClick = { _, _ -> },
     )
 }
 
@@ -432,9 +509,26 @@ private fun BookDetailScreenPreview() {
                 description = "실용주의 프로그래머 20주년 기념판. 데이비드 토마스와 앤드류 헌트는 소프트웨어 산업에 큰 영향을 미친 이 책의 1판을 1999년에 썼다. 고객들이 더 나은 소프트웨어를 만들고 코딩의 기쁨을 재발견하도록 돕기 위해서였다."
             ),
             status = listOf(
-                LibraryShort("1", "도서관1") to BookStatusUiState.ON_LOAN,
-                LibraryShort("1", "도서관2") to BookStatusUiState.NOT_AVAILABLE,
-                LibraryShort("1", "도서관3") to BookStatusUiState.AVAILABLE,
+                LibraryBookStatusUiState(
+                    library = LibraryShort("1", "도서관1"),
+                    status = BookStatusUiState.ON_LOAN,
+                    isNotificationRegistered = true,
+                ),
+                LibraryBookStatusUiState(
+                    library = LibraryShort("2", "도서관2"),
+                    status = BookStatusUiState.NOT_AVAILABLE,
+                    isNotificationRegistered = false,
+                ),
+                LibraryBookStatusUiState(
+                    library = LibraryShort("3", "도서관3"),
+                    status = BookStatusUiState.AVAILABLE,
+                    isNotificationRegistered = false,
+                ),
+                LibraryBookStatusUiState(
+                    library = LibraryShort("4", "도서관4"),
+                    status = BookStatusUiState.ERROR,
+                    isNotificationRegistered = false,
+                ),
             ),
             recommendBooks = listOf(
                 RecommendedBookUiState(
@@ -449,6 +543,7 @@ private fun BookDetailScreenPreview() {
         ),
         onBackClick = {},
         onRetryClick = {},
+        onAlarmClick = { _, _ -> },
         onAddLibraryClick = {},
         onBookItemClick = {},
     )

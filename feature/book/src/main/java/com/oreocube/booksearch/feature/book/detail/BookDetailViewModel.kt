@@ -1,19 +1,19 @@
-package com.oreocube.booksearch.feature.book
+package com.oreocube.booksearch.feature.book.detail
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.oreocube.booksearch.domain.model.BookDetail
 import com.oreocube.booksearch.domain.model.LibraryShort
 import com.oreocube.booksearch.domain.model.RecommendedBook
 import com.oreocube.booksearch.domain.model.param.BookDetailParam
+import com.oreocube.booksearch.domain.model.param.BookNotificationTarget
 import com.oreocube.booksearch.domain.usecase.CheckBookAvailabilityUseCase
 import com.oreocube.booksearch.domain.usecase.GetBookDetailUseCase
 import com.oreocube.booksearch.domain.usecase.GetFavoriteLibrariesUseCase
 import com.oreocube.booksearch.domain.usecase.GetRecommendedBooksWithTargetBookUseCase
-import com.oreocube.booksearch.feature.book.model.BookStatusUiState
-import com.oreocube.booksearch.feature.book.model.RecommendedBookUiState
+import com.oreocube.booksearch.domain.usecase.RegisterNotificationForBookStatusUseCase
+import com.oreocube.booksearch.domain.usecase.UnregisterNotificationForBookStatusUseCase
 import com.oreocube.booksearch.feature.book.model.toUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -29,10 +29,12 @@ import javax.inject.Inject
 @HiltViewModel
 class BookDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    val getBookDetailUseCase: GetBookDetailUseCase,
-    val getFavoriteLibrariesUseCase: GetFavoriteLibrariesUseCase,
-    val checkBookAvailabilityUseCase: CheckBookAvailabilityUseCase,
-    val getRecommendedBooksUseCase: GetRecommendedBooksWithTargetBookUseCase,
+    private val getBookDetailUseCase: GetBookDetailUseCase,
+    private val getFavoriteLibrariesUseCase: GetFavoriteLibrariesUseCase,
+    private val checkBookAvailabilityUseCase: CheckBookAvailabilityUseCase,
+    private val registerNotificationForBookStatusUseCase: RegisterNotificationForBookStatusUseCase,
+    private val unregisterNotificationForBookStatusUseCase: UnregisterNotificationForBookStatusUseCase,
+    private val getRecommendedBooksUseCase: GetRecommendedBooksWithTargetBookUseCase,
 ) : ViewModel() {
     private val isbnKey = "isbnKey"
 
@@ -94,10 +96,41 @@ class BookDetailViewModel @Inject constructor(
                 _uiState.update { state ->
                     state.copy(
                         status = state.status.map { origin ->
-                            if (origin.first.id == library.id) {
+                            if (origin.library.id == library.id) {
                                 availability.toUiState()
                             } else {
                                 origin
+                            }
+                        }
+                    )
+                }
+            }
+        }
+    }
+
+    fun toggleNotification(isNotificationRegistered: Boolean, library: LibraryShort) {
+        val book = uiState.value.book ?: return
+        val target = BookNotificationTarget(
+            libraryId = library.id,
+            libraryName = library.name,
+            isbn = isbn13.value,
+            bookTitle = book.title,
+        )
+        viewModelScope.launch {
+            runCatching {
+                if (isNotificationRegistered) {
+                    unregisterNotificationForBookStatusUseCase(target)
+                } else {
+                    registerNotificationForBookStatusUseCase(target)
+                }
+            }.onSuccess {
+                _uiState.update {
+                    it.copy(
+                        status = it.status.map { status ->
+                            if (status.library.id == library.id) {
+                                status.copy(isNotificationRegistered = !isNotificationRegistered)
+                            } else {
+                                status
                             }
                         }
                     )
@@ -120,24 +153,4 @@ class BookDetailViewModel @Inject constructor(
             }
         }
     }
-}
-
-data class BookDetailUiState(
-    val isLoading: Boolean,
-    val book: BookDetail?,
-    val status: List<Pair<LibraryShort, BookStatusUiState?>>,
-    val recommendBooks: List<RecommendedBookUiState> = emptyList(),
-) {
-    companion object {
-        val initialState = BookDetailUiState(
-            isLoading = true,
-            book = null,
-            status = emptyList(),
-            recommendBooks = emptyList(),
-        )
-    }
-}
-
-sealed class BookDetailUiEvent {
-    data class Error(val message: String) : BookDetailUiEvent()
 }

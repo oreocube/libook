@@ -1,12 +1,14 @@
 package com.oreocube.booksearch
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.core.net.toUri
 import androidx.navigation.compose.NavHost
-import com.oreocube.booksearch.feature.book.bookDetailScreen
-import com.oreocube.booksearch.feature.book.navigateToBookDetail
-import com.oreocube.booksearch.feature.book.navigateToSearchBook
-import com.oreocube.booksearch.feature.book.searchBookScreen
+import com.oreocube.booksearch.feature.book.detail.bookDetailScreen
+import com.oreocube.booksearch.feature.book.detail.navigateToBookDetail
+import com.oreocube.booksearch.feature.book.search.navigateToSearchBook
+import com.oreocube.booksearch.feature.book.search.searchBookScreen
 import com.oreocube.booksearch.feature.favorite.favoriteLibraryScreen
 import com.oreocube.booksearch.feature.home.HomeRoute
 import com.oreocube.booksearch.feature.home.homeScreen
@@ -18,6 +20,7 @@ import com.oreocube.booksearch.feature.region.regionScreen
 @Composable
 fun MainNavHost(
     modifier: Modifier = Modifier,
+    deepLinkString: String? = null,
     appState: BookSearchAppState,
     onShowSnackbar: (String) -> Unit,
 ) {
@@ -58,5 +61,12 @@ fun MainNavHost(
         favoriteLibraryScreen(
             onSearchClick = navController::navigateToRegion
         )
+    }
+
+    LaunchedEffect(deepLinkString) {
+        deepLinkString?.let { uriString ->
+            val uri = uriString.toUri()
+            navController.navigate(deepLink = uri)
+        }
     }
 }

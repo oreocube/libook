@@ -1,4 +1,4 @@
-package com.oreocube.booksearch.feature.book
+package com.oreocube.booksearch.feature.book.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
