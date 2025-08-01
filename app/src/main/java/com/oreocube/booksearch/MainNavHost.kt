@@ -66,7 +66,7 @@ fun MainNavHost(
     LaunchedEffect(deepLinkString) {
         deepLinkString?.let { uriString ->
             val uri = uriString.toUri()
-            navController.navigate(uri)
+            navController.navigate(deepLink = uri)
         }
     }
 }

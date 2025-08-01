@@ -13,6 +13,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.google.firebase.messaging.RemoteMessage
+import com.oreocube.booksearch.DEEP_LINK_KEY
 import com.oreocube.booksearch.MainActivity
 import com.oreocube.booksearch.R
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -39,11 +40,11 @@ class LiBookNotificationHandler @Inject constructor(
         if (isPermissionGranted().not()) return
         val title = remoteMessage.notification?.title ?: return
         val body = remoteMessage.notification?.body ?: return
-        val deepLink = remoteMessage.data["deepLink"]
+        val deepLink = remoteMessage.data[DEEP_LINK_KEY]
 
         val intent = Intent(context, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            putExtra("deepLink", deepLink)
+            flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
+            putExtra(DEEP_LINK_KEY, deepLink)
         }
 
         val pendingIntent = PendingIntent.getActivity(

@@ -7,6 +7,7 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.runtime.mutableStateOf
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
 import com.oreocube.booksearch.core.ui.theme.BooksearchTheme
@@ -15,6 +16,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private val viewModel: MainViewModel by viewModels()
+    private val _deepLinkState = mutableStateOf<String?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
@@ -26,15 +28,15 @@ class MainActivity : ComponentActivity() {
         )
         super.onCreate(savedInstanceState)
         viewModel.anonymousLogin()
+        _deepLinkState.value = intent?.getStringExtra(DEEP_LINK_KEY)
         setContent {
             BooksearchTheme {
                 val navController = rememberNavController()
                 val appState = rememberBookSearchAppState(navController = navController)
-                val deepLinkString = intent?.extras?.getString("deepLink")
 
                 MainScreen(
                     appState = appState,
-                    deepLinkString = deepLinkString,
+                    deepLinkString = _deepLinkState.value,
                 )
             }
         }
@@ -43,5 +45,6 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         setIntent(intent)
+        _deepLinkState.value = intent?.getStringExtra(DEEP_LINK_KEY)
     }
 }
