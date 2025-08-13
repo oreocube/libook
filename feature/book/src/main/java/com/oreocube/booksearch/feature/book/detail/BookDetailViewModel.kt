@@ -48,26 +48,26 @@ class BookDetailViewModel @Inject constructor(
         getRecommendedBooks(isbn13)
     }
 
-    private val _eventChannel = Channel<BookDetailUiEvent>(Channel.BUFFERED)
-    val eventFlow = _eventChannel.receiveAsFlow()
+    private val _sideEffect = Channel<BookDetailSideEffect>(Channel.BUFFERED)
+    val sideEffect = _sideEffect.receiveAsFlow()
 
-    fun onAction(action: BookDetailUiAction) {
-        when (action) {
-            BookDetailUiAction.EnterScreen -> checkFavoriteLibraryChanged()
-            BookDetailUiAction.AddLibraryClick -> sendEvent(BookDetailUiEvent.NavigateToAddLibrary)
-            is BookDetailUiAction.RefreshBookAvailability -> refreshBookAvailability(action.library)
-            is BookDetailUiAction.ToggleNotification -> {
-                toggleNotification(action.isRegistered, action.library)
+    fun submitIntent(intent: BookDetailIntent) {
+        when (intent) {
+            BookDetailIntent.EnterScreen -> checkFavoriteLibraryChanged()
+            BookDetailIntent.AddLibraryClick -> postSideEffect(BookDetailSideEffect.NavigateToAddLibrary)
+            is BookDetailIntent.RefreshBookAvailability -> refreshBookAvailability(intent.library)
+            is BookDetailIntent.ToggleNotification -> {
+                toggleNotification(intent.isRegistered, intent.library)
             }
 
-            is BookDetailUiAction.BookItemClick -> {
-                sendEvent(BookDetailUiEvent.NavigateToBookDetail(action.isbn))
+            is BookDetailIntent.BookItemClick -> {
+                postSideEffect(BookDetailSideEffect.NavigateToBookDetail(intent.isbn))
             }
         }
     }
 
-    private fun sendEvent(event: BookDetailUiEvent) {
-        viewModelScope.launch { _eventChannel.send(event) }
+    private fun postSideEffect(event: BookDetailSideEffect) {
+        viewModelScope.launch { _sideEffect.send(event) }
     }
 
     private fun getBookDetail(isbn: String) {
@@ -82,7 +82,7 @@ class BookDetailViewModel @Inject constructor(
                     )
                 }
             }.onFailure {
-                sendEvent(BookDetailUiEvent.Error("도서 정보를 불러오는데 실패했습니다."))
+                postSideEffect(BookDetailSideEffect.Error("도서 정보를 불러오는데 실패했습니다."))
             }
         }
     }

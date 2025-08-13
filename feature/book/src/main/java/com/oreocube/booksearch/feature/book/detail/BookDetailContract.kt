@@ -23,25 +23,25 @@ data class BookDetailUiState(
     }
 }
 
-sealed class BookDetailUiEvent {
-    data object NavigateToAddLibrary : BookDetailUiEvent()
-    data class NavigateToBookDetail(val isbn: String) : BookDetailUiEvent()
-    data class Error(val message: String) : BookDetailUiEvent()
+sealed class BookDetailSideEffect {
+    data object NavigateToAddLibrary : BookDetailSideEffect()
+    data class NavigateToBookDetail(val isbn: String) : BookDetailSideEffect()
+    data class Error(val message: String) : BookDetailSideEffect()
 }
 
-sealed class BookDetailUiAction {
-    data object EnterScreen : BookDetailUiAction()
-    data object AddLibraryClick : BookDetailUiAction()
+sealed class BookDetailIntent {
+    data object EnterScreen : BookDetailIntent()
+    data object AddLibraryClick : BookDetailIntent()
     data class RefreshBookAvailability(
         val library: LibraryShort,
-    ) : BookDetailUiAction()
+    ) : BookDetailIntent()
 
     data class ToggleNotification(
         val isRegistered: Boolean,
         val library: LibraryShort,
-    ) : BookDetailUiAction()
+    ) : BookDetailIntent()
 
     data class BookItemClick(
         val isbn: String,
-    ) : BookDetailUiAction()
+    ) : BookDetailIntent()
 }

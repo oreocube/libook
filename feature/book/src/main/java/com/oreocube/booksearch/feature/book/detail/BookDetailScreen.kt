@@ -104,12 +104,12 @@ fun BookDetailRoute(
         modifier = Modifier.fillMaxSize(),
         uiState = uiState,
         onBackClick = onBackClick,
-        onRetryClick = { viewModel.onAction(BookDetailUiAction.RefreshBookAvailability(it)) },
+        onRetryClick = { viewModel.submitIntent(BookDetailIntent.RefreshBookAvailability(it)) },
         onAlarmClick = { isRegistered, library ->
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU
                 || hasNotificationPermission
             ) {
-                viewModel.onAction(BookDetailUiAction.ToggleNotification(isRegistered, library))
+                viewModel.submitIntent(BookDetailIntent.ToggleNotification(isRegistered, library))
             } else {
                 requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
@@ -120,13 +120,13 @@ fun BookDetailRoute(
 
     LaunchedEffect(Unit) {
         lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            viewModel.onAction(BookDetailUiAction.EnterScreen)
+            viewModel.submitIntent(BookDetailIntent.EnterScreen)
         }
-        viewModel.eventFlow.collect { event ->
+        viewModel.sideEffect.collect { event ->
             when (event) {
-                BookDetailUiEvent.NavigateToAddLibrary -> onAddLibraryClick()
-                is BookDetailUiEvent.NavigateToBookDetail -> onBookItemClick(event.isbn)
-                is BookDetailUiEvent.Error -> onShowSnackbar(event.message)
+                BookDetailSideEffect.NavigateToAddLibrary -> onAddLibraryClick()
+                is BookDetailSideEffect.NavigateToBookDetail -> onBookItemClick(event.isbn)
+                is BookDetailSideEffect.Error -> onShowSnackbar(event.message)
             }
         }
     }
