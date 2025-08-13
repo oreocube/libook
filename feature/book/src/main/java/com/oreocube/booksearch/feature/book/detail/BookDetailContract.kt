@@ -5,6 +5,7 @@ import com.oreocube.booksearch.feature.book.model.LibraryBookStatusUiState
 import com.oreocube.booksearch.feature.book.model.RecommendedBookUiState
 
 data class BookDetailUiState(
+    val isFirstEntry: Boolean = true,
     val isLoading: Boolean,
     val book: BookDetail?,
     val status: List<LibraryBookStatusUiState>,
@@ -12,6 +13,7 @@ data class BookDetailUiState(
 ) {
     companion object {
         val initialState = BookDetailUiState(
+            isFirstEntry = true,
             isLoading = true,
             book = null,
             status = emptyList(),

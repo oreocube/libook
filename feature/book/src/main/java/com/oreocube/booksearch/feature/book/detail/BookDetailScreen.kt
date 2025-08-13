@@ -54,7 +54,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import coil3.compose.AsyncImage
 import com.oreocube.booksearch.core.ui.R
 import com.oreocube.booksearch.core.ui.component.LiBookTopBar
@@ -67,6 +70,7 @@ import com.oreocube.booksearch.domain.model.LibraryShort
 import com.oreocube.booksearch.feature.book.model.BookStatusUiState
 import com.oreocube.booksearch.feature.book.model.LibraryBookStatusUiState
 import com.oreocube.booksearch.feature.book.model.RecommendedBookUiState
+import kotlinx.coroutines.launch
 
 @Composable
 fun BookDetailRoute(
@@ -78,6 +82,8 @@ fun BookDetailRoute(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+
     var hasNotificationPermission by remember {
         mutableStateOf(
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
@@ -114,10 +120,15 @@ fun BookDetailRoute(
     )
 
     LaunchedEffect(Unit) {
-        viewModel.eventFlow.collect { event ->
-            when (event) {
-                is BookDetailUiEvent.Error -> {
-                    onShowSnackbar(event.message)
+        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.checkFavoriteLibraryChanged()
+            launch {
+                viewModel.eventFlow.collect { event ->
+                    when (event) {
+                        is BookDetailUiEvent.Error -> {
+                            onShowSnackbar(event.message)
+                        }
+                    }
                 }
             }
         }

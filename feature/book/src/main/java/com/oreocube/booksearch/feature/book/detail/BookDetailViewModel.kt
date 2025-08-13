@@ -36,21 +36,16 @@ class BookDetailViewModel @Inject constructor(
     private val unregisterNotificationForBookStatusUseCase: UnregisterNotificationForBookStatusUseCase,
     private val getRecommendedBooksUseCase: GetRecommendedBooksWithTargetBookUseCase,
 ) : ViewModel() {
-    private val isbnKey = "isbnKey"
-
     private val bookDetailRoute: BookDetailRoute = savedStateHandle.toRoute()
-    private val isbn13 = savedStateHandle.getStateFlow(
-        key = isbnKey,
-        initialValue = bookDetailRoute.isbn,
-    )
+    private val isbn13 = bookDetailRoute.isbn
 
     private val _uiState = MutableStateFlow(BookDetailUiState.initialState)
     val uiState: StateFlow<BookDetailUiState> = _uiState.asStateFlow()
 
     init {
-        getBookDetail(isbn13.value)
-        getBookAvailability(isbn13.value)
-        getRecommendedBooks(isbn13.value)
+        getBookDetail(isbn13)
+        getBookAvailability()
+        getRecommendedBooks(isbn13)
     }
 
     private val _eventChannel = Channel<BookDetailUiEvent>(Channel.BUFFERED)
@@ -73,11 +68,27 @@ class BookDetailViewModel @Inject constructor(
         }
     }
 
-    private fun getBookAvailability(isbn: String) {
+    fun checkFavoriteLibraryChanged() {
+        val current = uiState.value
+        if (current.isFirstEntry) {
+            _uiState.update { it.copy(isFirstEntry = false) }
+            return
+        }
+        viewModelScope.launch {
+            val oldIds = current.status.map { it.library.id }
+            val new = getFavoriteLibrariesUseCase().first()
+            val newIds = new.map { it.id }
+            if (oldIds != newIds) {
+                getBookAvailability(new)
+            }
+        }
+    }
+
+    private fun getBookAvailability(libraries: List<LibraryShort>? = null) {
         viewModelScope.launch {
             runCatching {
-                val libraries = getFavoriteLibrariesUseCase().first()
-                checkBookAvailabilityUseCase(isbn, libraries)
+                val list = libraries ?: getFavoriteLibrariesUseCase().first()
+                checkBookAvailabilityUseCase(isbn13, list)
             }.onSuccess { availability ->
                 _uiState.update { state ->
                     state.copy(
@@ -91,7 +102,7 @@ class BookDetailViewModel @Inject constructor(
     fun refreshBookAvailability(library: LibraryShort) {
         viewModelScope.launch {
             runCatching {
-                checkBookAvailabilityUseCase(isbn13.value, library)
+                checkBookAvailabilityUseCase(isbn13, library)
             }.onSuccess { availability ->
                 _uiState.update { state ->
                     state.copy(
@@ -113,7 +124,7 @@ class BookDetailViewModel @Inject constructor(
         val target = BookNotificationTarget(
             libraryId = library.id,
             libraryName = library.name,
-            isbn = isbn13.value,
+            isbn = isbn13,
             bookTitle = book.title,
         )
         viewModelScope.launch {
