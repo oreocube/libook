@@ -70,7 +70,6 @@ import com.oreocube.booksearch.domain.model.LibraryShort
 import com.oreocube.booksearch.feature.book.model.BookStatusUiState
 import com.oreocube.booksearch.feature.book.model.LibraryBookStatusUiState
 import com.oreocube.booksearch.feature.book.model.RecommendedBookUiState
-import kotlinx.coroutines.launch
 
 @Composable
 fun BookDetailRoute(
@@ -105,12 +104,12 @@ fun BookDetailRoute(
         modifier = Modifier.fillMaxSize(),
         uiState = uiState,
         onBackClick = onBackClick,
-        onRetryClick = viewModel::refreshBookAvailability,
+        onRetryClick = { viewModel.onAction(BookDetailUiAction.RefreshBookAvailability(it)) },
         onAlarmClick = { isRegistered, library ->
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU
                 || hasNotificationPermission
             ) {
-                viewModel.toggleNotification(isRegistered, library)
+                viewModel.onAction(BookDetailUiAction.ToggleNotification(isRegistered, library))
             } else {
                 requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
@@ -121,15 +120,13 @@ fun BookDetailRoute(
 
     LaunchedEffect(Unit) {
         lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            viewModel.checkFavoriteLibraryChanged()
-            launch {
-                viewModel.eventFlow.collect { event ->
-                    when (event) {
-                        is BookDetailUiEvent.Error -> {
-                            onShowSnackbar(event.message)
-                        }
-                    }
-                }
+            viewModel.onAction(BookDetailUiAction.EnterScreen)
+        }
+        viewModel.eventFlow.collect { event ->
+            when (event) {
+                BookDetailUiEvent.NavigateToAddLibrary -> onAddLibraryClick()
+                is BookDetailUiEvent.NavigateToBookDetail -> onBookItemClick(event.isbn)
+                is BookDetailUiEvent.Error -> onShowSnackbar(event.message)
             }
         }
     }

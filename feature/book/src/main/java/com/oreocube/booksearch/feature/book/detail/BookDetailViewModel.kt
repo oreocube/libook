@@ -51,6 +51,25 @@ class BookDetailViewModel @Inject constructor(
     private val _eventChannel = Channel<BookDetailUiEvent>(Channel.BUFFERED)
     val eventFlow = _eventChannel.receiveAsFlow()
 
+    fun onAction(action: BookDetailUiAction) {
+        when (action) {
+            BookDetailUiAction.EnterScreen -> checkFavoriteLibraryChanged()
+            BookDetailUiAction.AddLibraryClick -> sendEvent(BookDetailUiEvent.NavigateToAddLibrary)
+            is BookDetailUiAction.RefreshBookAvailability -> refreshBookAvailability(action.library)
+            is BookDetailUiAction.ToggleNotification -> {
+                toggleNotification(action.isRegistered, action.library)
+            }
+
+            is BookDetailUiAction.BookItemClick -> {
+                sendEvent(BookDetailUiEvent.NavigateToBookDetail(action.isbn))
+            }
+        }
+    }
+
+    private fun sendEvent(event: BookDetailUiEvent) {
+        viewModelScope.launch { _eventChannel.send(event) }
+    }
+
     private fun getBookDetail(isbn: String) {
         viewModelScope.launch {
             runCatching {
@@ -63,23 +82,7 @@ class BookDetailViewModel @Inject constructor(
                     )
                 }
             }.onFailure {
-                _eventChannel.send(BookDetailUiEvent.Error("도서 정보를 불러오는데 실패했습니다."))
-            }
-        }
-    }
-
-    fun checkFavoriteLibraryChanged() {
-        val current = uiState.value
-        if (current.isFirstEntry) {
-            _uiState.update { it.copy(isFirstEntry = false) }
-            return
-        }
-        viewModelScope.launch {
-            val oldIds = current.status.map { it.library.id }
-            val new = getFavoriteLibrariesUseCase().first()
-            val newIds = new.map { it.id }
-            if (oldIds != newIds) {
-                getBookAvailability(new)
+                sendEvent(BookDetailUiEvent.Error("도서 정보를 불러오는데 실패했습니다."))
             }
         }
     }
@@ -99,7 +102,38 @@ class BookDetailViewModel @Inject constructor(
         }
     }
 
-    fun refreshBookAvailability(library: LibraryShort) {
+    private fun getRecommendedBooks(isbn: String) {
+        viewModelScope.launch {
+            runCatching {
+                getRecommendedBooksUseCase(isbn)
+            }.onSuccess { books ->
+                val recommendedBooks = books.map(RecommendedBook::toUiState)
+                _uiState.update { state ->
+                    state.copy(
+                        recommendBooks = recommendedBooks,
+                    )
+                }
+            }
+        }
+    }
+
+    private fun checkFavoriteLibraryChanged() {
+        val current = uiState.value
+        if (current.isFirstEntry) {
+            _uiState.update { it.copy(isFirstEntry = false) }
+            return
+        }
+        viewModelScope.launch {
+            val oldIds = current.status.map { it.library.id }
+            val new = getFavoriteLibrariesUseCase().first()
+            val newIds = new.map { it.id }
+            if (oldIds != newIds) {
+                getBookAvailability(new)
+            }
+        }
+    }
+
+    private fun refreshBookAvailability(library: LibraryShort) {
         viewModelScope.launch {
             runCatching {
                 checkBookAvailabilityUseCase(isbn13, library)
@@ -119,7 +153,7 @@ class BookDetailViewModel @Inject constructor(
         }
     }
 
-    fun toggleNotification(isNotificationRegistered: Boolean, library: LibraryShort) {
+    private fun toggleNotification(isNotificationRegistered: Boolean, library: LibraryShort) {
         val book = uiState.value.book ?: return
         val target = BookNotificationTarget(
             libraryId = library.id,
@@ -144,21 +178,6 @@ class BookDetailViewModel @Inject constructor(
                                 status
                             }
                         }
-                    )
-                }
-            }
-        }
-    }
-
-    private fun getRecommendedBooks(isbn: String) {
-        viewModelScope.launch {
-            runCatching {
-                getRecommendedBooksUseCase(isbn)
-            }.onSuccess { books ->
-                val recommendedBooks = books.map(RecommendedBook::toUiState)
-                _uiState.update { state ->
-                    state.copy(
-                        recommendBooks = recommendedBooks,
                     )
                 }
             }
