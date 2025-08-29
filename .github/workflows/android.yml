@@ -1,0 +1,46 @@
+name: Android CI
+
+on:
+  push:
+    branches: [ "develop" ]
+  pull_request:
+    branches: [ "develop" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: set up JDK 11
+      uses: actions/setup-java@v4
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+        cache: gradle
+
+    - name: Decode google-services.json
+      run: echo "${{ secrets.GOOGLE_SERVICES_JSON }}" | base64 --decode > app/google-services.json
+
+    - name: Create secrets.properties
+      run: |
+        cat <<EOF > ./secrets.defaults.properties
+        LIBRARY_API_AUTH_KEY=${{ secrets.LIBRARY_API_AUTH_KEY }}
+        EOF
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+
+    - name: Run unit tests
+      run: ./gradlew test
+
+    - name: Upload HTML test reports
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: unit-test-reports
+        path: "**/build/reports/tests/**"
+      
+    - name: Build with Gradle
+      run: ./gradlew build
