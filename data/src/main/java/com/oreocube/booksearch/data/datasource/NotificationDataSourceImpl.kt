@@ -1,6 +1,9 @@
 package com.oreocube.booksearch.data.datasource
 
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QueryDocumentSnapshot
+import com.google.firebase.firestore.toObject
+import com.oreocube.booksearch.data.response.BookNotificationResponse
 import com.oreocube.booksearch.data.response.NotificationSettingDto
 import com.oreocube.booksearch.domain.model.param.BookNotificationTarget
 import kotlinx.coroutines.tasks.await
@@ -53,6 +56,14 @@ class NotificationDataSourceImpl @Inject constructor(
             .get()
             .await()
             .exists()
+    }
+
+    override suspend fun getAllNotifications(uid: String): List<BookNotificationResponse> {
+        return db.collection(NOTIFICATION_COLLECTION)
+            .whereEqualTo("uid", uid)
+            .get()
+            .await()
+            .map(QueryDocumentSnapshot::toObject)
     }
 
     private fun getDocumentId(uid: String, libraryId: String, isbn: String): String {

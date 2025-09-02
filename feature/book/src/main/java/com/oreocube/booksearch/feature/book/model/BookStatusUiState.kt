@@ -46,7 +46,9 @@ fun BookAvailability.toUiState(): BookStatusUiState {
     }
 }
 
-fun LibraryWithAvailability.toUiState(): LibraryBookStatusUiState {
+fun LibraryWithAvailability.toUiState(
+    isNotificationRegistered: Boolean,
+): LibraryBookStatusUiState {
     val status = if (availability.isSuccess) {
         availability.getOrThrow().toUiState()
     } else {

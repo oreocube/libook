@@ -1,6 +1,7 @@
 package com.oreocube.booksearch.data.repository
 
 import com.oreocube.booksearch.data.datasource.NotificationDataSource
+import com.oreocube.booksearch.data.response.BookNotificationResponse
 import com.oreocube.booksearch.domain.model.param.BookNotificationTarget
 import com.oreocube.booksearch.domain.repository.NotificationRepository
 import javax.inject.Inject
@@ -31,5 +32,10 @@ class NotificationRepositoryImpl @Inject constructor(
         isbn: String
     ): Boolean {
         return notificationDataSource.isNotificationRegistered(uid, libraryId, isbn)
+    }
+
+    override suspend fun getAllNotifications(uid: String): List<BookNotificationTarget> {
+        return notificationDataSource.getAllNotifications(uid)
+            .map(BookNotificationResponse::toModel)
     }
 }

@@ -54,7 +54,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import coil3.compose.AsyncImage
 import com.oreocube.booksearch.core.ui.R
 import com.oreocube.booksearch.core.ui.component.LiBookTopBar
@@ -78,6 +81,8 @@ fun BookDetailRoute(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+
     var hasNotificationPermission by remember {
         mutableStateOf(
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
@@ -99,12 +104,12 @@ fun BookDetailRoute(
         modifier = Modifier.fillMaxSize(),
         uiState = uiState,
         onBackClick = onBackClick,
-        onRetryClick = viewModel::refreshBookAvailability,
+        onRetryClick = { viewModel.submitIntent(BookDetailIntent.RefreshBookAvailability(it)) },
         onAlarmClick = { isRegistered, library ->
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU
                 || hasNotificationPermission
             ) {
-                viewModel.toggleNotification(isRegistered, library)
+                viewModel.submitIntent(BookDetailIntent.ToggleNotification(isRegistered, library))
             } else {
                 requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
@@ -114,11 +119,14 @@ fun BookDetailRoute(
     )
 
     LaunchedEffect(Unit) {
-        viewModel.eventFlow.collect { event ->
+        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.submitIntent(BookDetailIntent.EnterScreen)
+        }
+        viewModel.sideEffect.collect { event ->
             when (event) {
-                is BookDetailUiEvent.Error -> {
-                    onShowSnackbar(event.message)
-                }
+                BookDetailSideEffect.NavigateToAddLibrary -> onAddLibraryClick()
+                is BookDetailSideEffect.NavigateToBookDetail -> onBookItemClick(event.isbn)
+                is BookDetailSideEffect.Error -> onShowSnackbar(event.message)
             }
         }
     }
