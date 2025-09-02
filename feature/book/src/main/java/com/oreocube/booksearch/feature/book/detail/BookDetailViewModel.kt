@@ -9,6 +9,7 @@ import com.oreocube.booksearch.domain.model.RecommendedBook
 import com.oreocube.booksearch.domain.model.param.BookDetailParam
 import com.oreocube.booksearch.domain.model.param.BookNotificationTarget
 import com.oreocube.booksearch.domain.usecase.CheckBookAvailabilityUseCase
+import com.oreocube.booksearch.domain.usecase.GetAllNotificationsUseCase
 import com.oreocube.booksearch.domain.usecase.GetBookDetailUseCase
 import com.oreocube.booksearch.domain.usecase.GetFavoriteLibrariesUseCase
 import com.oreocube.booksearch.domain.usecase.GetRecommendedBooksWithTargetBookUseCase
@@ -16,6 +17,8 @@ import com.oreocube.booksearch.domain.usecase.RegisterNotificationForBookStatusU
 import com.oreocube.booksearch.domain.usecase.UnregisterNotificationForBookStatusUseCase
 import com.oreocube.booksearch.feature.book.model.toUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -32,6 +35,7 @@ class BookDetailViewModel @Inject constructor(
     private val getBookDetailUseCase: GetBookDetailUseCase,
     private val getFavoriteLibrariesUseCase: GetFavoriteLibrariesUseCase,
     private val checkBookAvailabilityUseCase: CheckBookAvailabilityUseCase,
+    private val getAllNotificationsUseCase: GetAllNotificationsUseCase,
     private val registerNotificationForBookStatusUseCase: RegisterNotificationForBookStatusUseCase,
     private val unregisterNotificationForBookStatusUseCase: UnregisterNotificationForBookStatusUseCase,
     private val getRecommendedBooksUseCase: GetRecommendedBooksWithTargetBookUseCase,
@@ -89,17 +93,34 @@ class BookDetailViewModel @Inject constructor(
 
     private fun getBookAvailability(libraries: List<LibraryShort>? = null) {
         viewModelScope.launch {
-            runCatching {
-                val list = libraries ?: getFavoriteLibrariesUseCase().first()
-                checkBookAvailabilityUseCase(isbn13, list)
-            }.onSuccess { availability ->
-                _uiState.update { state ->
-                    state.copy(
-                        status = availability.map { it.toUiState() },
-                    )
-                }
+            val notificationsDeferred = getAllNotificationsDeferred()
+            val availabilityDeferred = async {
+                runCatching {
+                    val list = libraries ?: getFavoriteLibrariesUseCase().first()
+                    checkBookAvailabilityUseCase(isbn13, list)
+                }.getOrDefault(emptyList())
+            }
+            val notifications = notificationsDeferred.await()
+            val availability = availabilityDeferred.await()
+            val status = availability.map {
+                it.toUiState(
+                    isNotificationRegistered = notifications.contains(it.library.id)
+                )
+            }
+            _uiState.update { state ->
+                state.copy(
+                    status = status,
+                )
             }
         }
+    }
+
+    private fun CoroutineScope.getAllNotificationsDeferred() = async {
+        runCatching { getAllNotificationsUseCase() }
+            .getOrDefault(emptyList())
+            .filter { it.isbn == isbn13 }
+            .map { it.libraryId }
+            .toSet()
     }
 
     private fun getRecommendedBooks(isbn: String) {
@@ -135,14 +156,22 @@ class BookDetailViewModel @Inject constructor(
 
     private fun refreshBookAvailability(library: LibraryShort) {
         viewModelScope.launch {
-            runCatching {
+            val notificationsDeferred = getAllNotificationsDeferred()
+            val availabilityDeferred = async {
                 checkBookAvailabilityUseCase(isbn13, library)
+            }
+
+            val notifications = notificationsDeferred.await()
+            runCatching {
+                availabilityDeferred.await()
             }.onSuccess { availability ->
                 _uiState.update { state ->
                     state.copy(
                         status = state.status.map { origin ->
                             if (origin.library.id == library.id) {
-                                availability.toUiState()
+                                availability.toUiState(
+                                    isNotificationRegistered = notifications.contains(library.id)
+                                )
                             } else {
                                 origin
                             }

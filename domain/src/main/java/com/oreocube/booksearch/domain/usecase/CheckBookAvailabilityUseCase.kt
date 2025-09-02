@@ -1,6 +1,5 @@
 package com.oreocube.booksearch.domain.usecase
 
-import com.oreocube.booksearch.domain.model.BookAvailability
 import com.oreocube.booksearch.domain.model.LibraryShort
 import com.oreocube.booksearch.domain.model.LibraryWithAvailability
 import com.oreocube.booksearch.domain.model.param.BookAvailabilityCheckParam
@@ -12,7 +11,6 @@ import javax.inject.Inject
 
 class CheckBookAvailabilityUseCase @Inject constructor(
     private val libraryRepository: LibraryRepository,
-    private val checkBookNotificationUseCase: CheckBookNotificationUseCase,
 ) {
     suspend operator fun invoke(
         isbn: String,
@@ -40,23 +38,9 @@ class CheckBookAvailabilityUseCase @Inject constructor(
             )
         }
 
-        val isNotificationRegistered =
-            if (availability.getOrNull().shouldCheckNotificationStatus()) {
-                runCatching {
-                    checkBookNotificationUseCase(library.id, isbn)
-                }.getOrDefault(false)
-            } else {
-                false
-            }
-
         return LibraryWithAvailability(
             library = library,
             availability = availability,
-            isNotificationRegistered = isNotificationRegistered,
         )
-    }
-
-    private fun BookAvailability?.shouldCheckNotificationStatus(): Boolean {
-        return this?.hasBook == true && !this.loanAvailable
     }
 }
