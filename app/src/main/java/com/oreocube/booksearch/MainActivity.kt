@@ -10,7 +10,7 @@ import androidx.activity.viewModels
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
-import com.oreocube.booksearch.core.ui.theme.BooksearchTheme
+import com.oreocube.booksearch.core.ui.theme.LiBookTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -30,7 +30,7 @@ class MainActivity : ComponentActivity() {
         viewModel.anonymousLogin()
         _deepLinkState.value = intent?.getStringExtra(DEEP_LINK_KEY)
         setContent {
-            BooksearchTheme {
+            LiBookTheme {
                 val navController = rememberNavController()
                 val appState = rememberBookSearchAppState(navController = navController)
 

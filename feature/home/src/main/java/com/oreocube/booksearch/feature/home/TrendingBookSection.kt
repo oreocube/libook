@@ -43,6 +43,7 @@ import coil3.compose.AsyncImage
 import com.oreocube.booksearch.core.ui.component.icon.LiBookIcons
 import com.oreocube.booksearch.core.ui.component.icon.TrendingUp
 import com.oreocube.booksearch.core.ui.theme.Gray80
+import com.oreocube.booksearch.core.ui.theme.LiBookPreviewTheme
 import com.oreocube.booksearch.domain.model.TrendingBook
 
 @Composable
@@ -329,18 +330,20 @@ private fun TrendingBookSkeletonPreview() {
 @Composable
 @Preview(showBackground = true)
 private fun TrendingBooksSectionPreview() {
-    TrendingBooksSection(
-        books = listOf(
-            TrendingBook(
-                1, difference = 12,
-                title = "실용주의 프로그래머 :20주년 기념판 ",
-                authors = "데이비드 토머스,정지용 옮김",
-                publisher = "인사이트",
-                publicationYear = "2022",
-                isbn13 = "9788966263363",
-                imageUrl = "",
-            )
-        ),
-        onBookItemClick = {},
-    )
+    LiBookPreviewTheme {
+        TrendingBooksSection(
+            books = listOf(
+                TrendingBook(
+                    1, difference = 12,
+                    title = "실용주의 프로그래머 :20주년 기념판 ",
+                    authors = "데이비드 토머스,정지용 옮김",
+                    publisher = "인사이트",
+                    publicationYear = "2022",
+                    isbn13 = "9788966263363",
+                    imageUrl = "",
+                )
+            ),
+            onBookItemClick = {},
+        )
+    }
 }
