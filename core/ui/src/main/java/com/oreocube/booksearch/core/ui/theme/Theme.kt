@@ -8,7 +8,14 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import coil3.ColorImage
+import coil3.annotation.ExperimentalCoilApi
+import coil3.compose.AsyncImagePreviewHandler
+import coil3.compose.LocalAsyncImagePreviewHandler
 
 private val DarkColorScheme = darkColorScheme(
     primary = Purple80,
@@ -33,7 +40,7 @@ private val LightColorScheme = lightColorScheme(
 )
 
 @Composable
-fun BooksearchTheme(
+fun LiBookTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
@@ -54,4 +61,21 @@ fun BooksearchTheme(
         typography = Typography,
         content = content
     )
+}
+
+@OptIn(ExperimentalCoilApi::class)
+@Composable
+fun LiBookPreviewTheme(
+    content: @Composable () -> Unit
+) {
+    val previewHandler = AsyncImagePreviewHandler {
+        ColorImage(Color.Gray.toArgb(), 200, 200)
+    }
+    CompositionLocalProvider(
+        LocalAsyncImagePreviewHandler provides previewHandler
+    ) {
+        LiBookTheme {
+            content()
+        }
+    }
 }

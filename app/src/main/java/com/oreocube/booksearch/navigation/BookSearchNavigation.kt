@@ -18,7 +18,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
-import com.oreocube.booksearch.core.ui.theme.BooksearchTheme
+import com.oreocube.booksearch.core.ui.theme.LiBookTheme
 import com.oreocube.booksearch.core.ui.theme.Brown20
 
 @Composable
@@ -84,7 +84,7 @@ object BookSearchNavigationDefaults {
 private fun BookSearchNavigationItemPreview() {
     val topLevelDestination = TopLevelDestination.entries
 
-    BooksearchTheme {
+    LiBookTheme {
         Row {
             topLevelDestination.forEach { destination ->
                 BookSearchNavigationItem(

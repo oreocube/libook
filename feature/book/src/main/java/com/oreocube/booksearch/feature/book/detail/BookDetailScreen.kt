@@ -61,6 +61,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import coil3.compose.AsyncImage
 import com.oreocube.booksearch.core.ui.R
 import com.oreocube.booksearch.core.ui.component.LiBookTopBar
+import com.oreocube.booksearch.core.ui.theme.LiBookPreviewTheme
 import com.oreocube.booksearch.core.ui.theme.Brown20
 import com.oreocube.booksearch.core.ui.theme.Gray10
 import com.oreocube.booksearch.core.ui.theme.Gray20
@@ -504,55 +505,57 @@ private fun LibraryStatusForBookPreview2() {
 @Composable
 @Preview(showBackground = true)
 private fun BookDetailScreenPreview() {
-    BookDetailScreen(
-        uiState = BookDetailUiState(
-            isLoading = false,
-            book = BookDetail(
-                title = "실용주의 프로그래머 :20주년 기념판 ",
-                authors = "데이비드 토머스,정지용 옮김",
-                publisher = "인사이트",
-                publicationYear = "2022",
-                isbn13 = "9788966263363",
-                imageUrl = "https://image.aladin.co.kr/product/28878/64/cover/8966263364_1.jpg",
-                description = "실용주의 프로그래머 20주년 기념판. 데이비드 토마스와 앤드류 헌트는 소프트웨어 산업에 큰 영향을 미친 이 책의 1판을 1999년에 썼다. 고객들이 더 나은 소프트웨어를 만들고 코딩의 기쁨을 재발견하도록 돕기 위해서였다."
-            ),
-            status = listOf(
-                LibraryBookStatusUiState(
-                    library = LibraryShort("1", "도서관1"),
-                    status = BookStatusUiState.ON_LOAN,
-                    isNotificationRegistered = true,
-                ),
-                LibraryBookStatusUiState(
-                    library = LibraryShort("2", "도서관2"),
-                    status = BookStatusUiState.NOT_AVAILABLE,
-                    isNotificationRegistered = false,
-                ),
-                LibraryBookStatusUiState(
-                    library = LibraryShort("3", "도서관3"),
-                    status = BookStatusUiState.AVAILABLE,
-                    isNotificationRegistered = false,
-                ),
-                LibraryBookStatusUiState(
-                    library = LibraryShort("4", "도서관4"),
-                    status = BookStatusUiState.ERROR,
-                    isNotificationRegistered = false,
-                ),
-            ),
-            recommendBooks = listOf(
-                RecommendedBookUiState(
+    LiBookPreviewTheme {
+        BookDetailScreen(
+            uiState = BookDetailUiState(
+                isLoading = false,
+                book = BookDetail(
                     title = "실용주의 프로그래머 :20주년 기념판 ",
                     authors = "데이비드 토머스,정지용 옮김",
                     publisher = "인사이트",
                     publicationYear = "2022",
-                    isbn13 = "978",
+                    isbn13 = "9788966263363",
                     imageUrl = "https://image.aladin.co.kr/product/28878/64/cover/8966263364_1.jpg",
+                    description = "실용주의 프로그래머 20주년 기념판. 데이비드 토마스와 앤드류 헌트는 소프트웨어 산업에 큰 영향을 미친 이 책의 1판을 1999년에 썼다. 고객들이 더 나은 소프트웨어를 만들고 코딩의 기쁨을 재발견하도록 돕기 위해서였다."
+                ),
+                status = listOf(
+                    LibraryBookStatusUiState(
+                        library = LibraryShort("1", "도서관1"),
+                        status = BookStatusUiState.ON_LOAN,
+                        isNotificationRegistered = true,
+                    ),
+                    LibraryBookStatusUiState(
+                        library = LibraryShort("2", "도서관2"),
+                        status = BookStatusUiState.NOT_AVAILABLE,
+                        isNotificationRegistered = false,
+                    ),
+                    LibraryBookStatusUiState(
+                        library = LibraryShort("3", "도서관3"),
+                        status = BookStatusUiState.AVAILABLE,
+                        isNotificationRegistered = false,
+                    ),
+                    LibraryBookStatusUiState(
+                        library = LibraryShort("4", "도서관4"),
+                        status = BookStatusUiState.ERROR,
+                        isNotificationRegistered = false,
+                    ),
+                ),
+                recommendBooks = listOf(
+                    RecommendedBookUiState(
+                        title = "실용주의 프로그래머 :20주년 기념판 ",
+                        authors = "데이비드 토머스,정지용 옮김",
+                        publisher = "인사이트",
+                        publicationYear = "2022",
+                        isbn13 = "978",
+                        imageUrl = "https://image.aladin.co.kr/product/28878/64/cover/8966263364_1.jpg",
+                    ),
                 ),
             ),
-        ),
-        onBackClick = {},
-        onRetryClick = {},
-        onAlarmClick = { _, _ -> },
-        onAddLibraryClick = {},
-        onBookItemClick = {},
-    )
+            onBackClick = {},
+            onRetryClick = {},
+            onAlarmClick = { _, _ -> },
+            onAddLibraryClick = {},
+            onBookItemClick = {},
+        )
+    }
 }
