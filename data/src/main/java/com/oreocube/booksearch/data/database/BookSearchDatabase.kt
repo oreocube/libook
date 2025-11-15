@@ -21,7 +21,7 @@ import com.oreocube.booksearch.data.response.RecentBookHistoryEntity
     exportSchema = true,
 )
 abstract class BookSearchDatabase : RoomDatabase() {
-    abstract fun favoriteDao(): FavoriteDao
+    abstract fun favoriteLibraryDao(): FavoriteLibraryDao
     abstract fun favoriteBookDao(): FavoriteBookDao
     abstract fun recentBookHistoryDao(): RecentBookHistoryDao
 }
