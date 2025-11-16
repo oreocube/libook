@@ -24,8 +24,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
@@ -43,6 +45,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -61,11 +64,11 @@ import androidx.lifecycle.repeatOnLifecycle
 import coil3.compose.AsyncImage
 import com.oreocube.booksearch.core.ui.R
 import com.oreocube.booksearch.core.ui.component.LiBookTopBar
-import com.oreocube.booksearch.core.ui.theme.LiBookPreviewTheme
 import com.oreocube.booksearch.core.ui.theme.Brown20
 import com.oreocube.booksearch.core.ui.theme.Gray10
 import com.oreocube.booksearch.core.ui.theme.Gray20
 import com.oreocube.booksearch.core.ui.theme.Gray90
+import com.oreocube.booksearch.core.ui.theme.LiBookPreviewTheme
 import com.oreocube.booksearch.domain.model.BookDetail
 import com.oreocube.booksearch.domain.model.LibraryShort
 import com.oreocube.booksearch.feature.book.model.BookStatusUiState
@@ -115,6 +118,7 @@ fun BookDetailRoute(
                 requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
         },
+        onHeartClick = { viewModel.submitIntent(BookDetailIntent.ToggleHeart) },
         onAddLibraryClick = onAddLibraryClick,
         onBookItemClick = onBookItemClick,
     )
@@ -140,11 +144,28 @@ fun BookDetailScreen(
     onBackClick: () -> Unit,
     onRetryClick: (LibraryShort) -> Unit,
     onAlarmClick: (Boolean, LibraryShort) -> Unit,
+    onHeartClick: () -> Unit,
     onAddLibraryClick: () -> Unit,
     onBookItemClick: (String) -> Unit,
 ) {
+    val heartIcon = if (uiState.isFavorite) {
+        Icons.Filled.Favorite
+    } else {
+        Icons.Outlined.FavoriteBorder
+    }
+
     Column(modifier = modifier) {
-        LiBookTopBar(onNavigationIconClick = onBackClick)
+        LiBookTopBar(
+            menuIcon = {
+                IconButton(onClick = onHeartClick) {
+                    Icon(
+                        painter = rememberVectorPainter(heartIcon),
+                        contentDescription = stringResource(R.string.menu_back),
+                    )
+                }
+            },
+            onNavigationIconClick = onBackClick,
+        )
         when {
             uiState.isLoading -> {
                 Box(
@@ -509,6 +530,7 @@ private fun BookDetailScreenPreview() {
         BookDetailScreen(
             uiState = BookDetailUiState(
                 isLoading = false,
+                isFavorite = false,
                 book = BookDetail(
                     title = "실용주의 프로그래머 :20주년 기념판 ",
                     authors = "데이비드 토머스,정지용 옮김",
@@ -554,6 +576,7 @@ private fun BookDetailScreenPreview() {
             onBackClick = {},
             onRetryClick = {},
             onAlarmClick = { _, _ -> },
+            onHeartClick = {},
             onAddLibraryClick = {},
             onBookItemClick = {},
         )

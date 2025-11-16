@@ -59,6 +59,10 @@ class BookDetailViewModel @Inject constructor(
         when (intent) {
             BookDetailIntent.EnterScreen -> checkFavoriteLibraryChanged()
             BookDetailIntent.AddLibraryClick -> postSideEffect(BookDetailSideEffect.NavigateToAddLibrary)
+            BookDetailIntent.ToggleHeart -> { /* TODO */
+
+            }
+
             is BookDetailIntent.RefreshBookAvailability -> refreshBookAvailability(intent.library)
             is BookDetailIntent.ToggleNotification -> {
                 toggleNotification(intent.isRegistered, intent.library)

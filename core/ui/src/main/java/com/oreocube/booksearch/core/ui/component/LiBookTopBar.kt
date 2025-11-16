@@ -99,6 +99,30 @@ fun LiBookTopBar(
 }
 
 @Composable
+fun LiBookTopBar(
+    modifier: Modifier = Modifier,
+    title: String = "",
+    description: String = "",
+    menuIcon: (@Composable () -> Unit)? = null,
+    onNavigationIconClick: () -> Unit,
+) {
+    LiBookTopBar(
+        modifier = modifier,
+        title = title,
+        description = description,
+        navigationIcon = {
+            IconButton(onClick = onNavigationIconClick) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_arrow_back_24),
+                    contentDescription = stringResource(R.string.menu_back),
+                )
+            }
+        },
+        menuIcon = menuIcon,
+    )
+}
+
+@Composable
 @Preview
 private fun LiBookTopBarPreview1() {
     LiBookTopBar(
