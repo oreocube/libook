@@ -10,6 +10,10 @@ import javax.inject.Inject
 class FavoriteBookRepositoryImpl @Inject constructor(
     private val favoriteBookDao: FavoriteBookDao
 ): FavoriteBookRepository {
+    override suspend fun checkFavoriteBook(isbn: String): Boolean {
+        return favoriteBookDao.existsByIsbn(isbn)
+    }
+
     override suspend fun getFavoriteBooks(): List<BookInfo> {
         return favoriteBookDao.getFavoriteBooks().map { it.toModel() }
     }

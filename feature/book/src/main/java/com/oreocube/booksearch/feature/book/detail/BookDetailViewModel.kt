@@ -9,6 +9,7 @@ import com.oreocube.booksearch.domain.model.RecommendedBook
 import com.oreocube.booksearch.domain.model.param.BookDetailParam
 import com.oreocube.booksearch.domain.model.param.BookNotificationTarget
 import com.oreocube.booksearch.domain.usecase.CheckBookAvailabilityUseCase
+import com.oreocube.booksearch.domain.usecase.CheckFavoriteBookUserCase
 import com.oreocube.booksearch.domain.usecase.GetAllNotificationsUseCase
 import com.oreocube.booksearch.domain.usecase.GetBookDetailUseCase
 import com.oreocube.booksearch.domain.usecase.GetFavoriteLibrariesUseCase
@@ -33,6 +34,7 @@ import javax.inject.Inject
 class BookDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val getBookDetailUseCase: GetBookDetailUseCase,
+    private val checkFavoriteBookUserCase: CheckFavoriteBookUserCase,
     private val getFavoriteLibrariesUseCase: GetFavoriteLibrariesUseCase,
     private val checkBookAvailabilityUseCase: CheckBookAvailabilityUseCase,
     private val getAllNotificationsUseCase: GetAllNotificationsUseCase,
@@ -48,6 +50,7 @@ class BookDetailViewModel @Inject constructor(
 
     init {
         getBookDetail(isbn13)
+        checkFavoriteBook()
         getBookAvailability()
         getRecommendedBooks(isbn13)
     }
@@ -91,6 +94,20 @@ class BookDetailViewModel @Inject constructor(
                 }
             }.onFailure {
                 postSideEffect(BookDetailSideEffect.Error("도서 정보를 불러오는데 실패했습니다."))
+            }
+        }
+    }
+
+    private fun checkFavoriteBook() {
+        viewModelScope.launch {
+            runCatching {
+                checkFavoriteBookUserCase(isbn13)
+            }.onSuccess { isFavorite ->
+                _uiState.update { state ->
+                    state.copy(
+                        isFavorite = isFavorite
+                    )
+                }
             }
         }
     }
