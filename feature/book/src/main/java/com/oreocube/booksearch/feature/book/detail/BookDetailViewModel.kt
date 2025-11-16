@@ -4,12 +4,15 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.oreocube.booksearch.domain.model.BookInfo
 import com.oreocube.booksearch.domain.model.LibraryShort
 import com.oreocube.booksearch.domain.model.RecommendedBook
 import com.oreocube.booksearch.domain.model.param.BookDetailParam
 import com.oreocube.booksearch.domain.model.param.BookNotificationTarget
+import com.oreocube.booksearch.domain.usecase.AddFavoriteBookUseCase
 import com.oreocube.booksearch.domain.usecase.CheckBookAvailabilityUseCase
 import com.oreocube.booksearch.domain.usecase.CheckFavoriteBookUserCase
+import com.oreocube.booksearch.domain.usecase.DeleteFavoriteBookUseCase
 import com.oreocube.booksearch.domain.usecase.GetAllNotificationsUseCase
 import com.oreocube.booksearch.domain.usecase.GetBookDetailUseCase
 import com.oreocube.booksearch.domain.usecase.GetFavoriteLibrariesUseCase
@@ -35,6 +38,8 @@ class BookDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val getBookDetailUseCase: GetBookDetailUseCase,
     private val checkFavoriteBookUserCase: CheckFavoriteBookUserCase,
+    private val addFavoriteBookUseCase: AddFavoriteBookUseCase,
+    private val deleteFavoriteBookUseCase: DeleteFavoriteBookUseCase,
     private val getFavoriteLibrariesUseCase: GetFavoriteLibrariesUseCase,
     private val checkBookAvailabilityUseCase: CheckBookAvailabilityUseCase,
     private val getAllNotificationsUseCase: GetAllNotificationsUseCase,
@@ -62,9 +67,7 @@ class BookDetailViewModel @Inject constructor(
         when (intent) {
             BookDetailIntent.EnterScreen -> checkFavoriteLibraryChanged()
             BookDetailIntent.AddLibraryClick -> postSideEffect(BookDetailSideEffect.NavigateToAddLibrary)
-            BookDetailIntent.ToggleHeart -> { /* TODO */
-
-            }
+            BookDetailIntent.ToggleHeart -> toggleFavoriteBook()
 
             is BookDetailIntent.RefreshBookAvailability -> refreshBookAvailability(intent.library)
             is BookDetailIntent.ToggleNotification -> {
@@ -106,6 +109,33 @@ class BookDetailViewModel @Inject constructor(
                 _uiState.update { state ->
                     state.copy(
                         isFavorite = isFavorite
+                    )
+                }
+            }
+        }
+    }
+
+    private fun toggleFavoriteBook() {
+        val isFavorite = uiState.value.isFavorite
+        val book = uiState.value.book ?: return
+        viewModelScope.launch {
+            runCatching {
+                if (isFavorite) {
+                    deleteFavoriteBookUseCase(isbn13)
+                } else {
+                    addFavoriteBookUseCase(
+                        book = BookInfo(
+                            isbn = isbn13,
+                            title = book.title,
+                            authors = book.authors,
+                            imageUrl = book.imageUrl,
+                        )
+                    )
+                }
+            }.onSuccess {
+                _uiState.update { state ->
+                    state.copy(
+                        isFavorite = !isFavorite
                     )
                 }
             }
