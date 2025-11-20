@@ -1,5 +1,6 @@
 package com.oreocube.booksearch.feature.discovery
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -7,54 +8,78 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import com.oreocube.booksearch.core.ui.component.LiBookTopBar
 import com.oreocube.booksearch.core.ui.theme.LiBookPreviewTheme
-import com.oreocube.booksearch.core.ui.theme.Typography
 
 @Composable
 internal fun DiscoveryScreen(
-    viewModel: DiscoveryViewModel = hiltViewModel()
+    modifier: Modifier = Modifier,
+    uiState: DiscoveryUiState,
+    onBookItemClick: (String) -> Unit,
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-    DiscoveryScreen(
-        uiState = uiState,
-    )
+    Column(
+        modifier = modifier.fillMaxSize()
+    ) {
+        LiBookTopBar(
+            title = "탐색",
+            description = "활동 기록으로 읽을 책을 찾을 수 있어요",
+        )
+        DiscoveryBookSection(
+            title = "관심 도서",
+            books = uiState.favoriteBooks,
+            onItemClick = onBookItemClick,
+        )
+        DiscoveryBookSection(
+            title = "최근 검색한 도서",
+            books = uiState.recentBooks,
+            onItemClick = onBookItemClick,
+        )
+    }
 }
 
 @Composable
-private fun DiscoveryScreen(
+private fun DiscoveryBookSection(
     modifier: Modifier = Modifier,
-    uiState: DiscoveryUiState,
+    title: String,
+    books: List<DiscoveryBookUiModel>,
+    onItemClick: (String) -> Unit,
 ) {
     Column(
         modifier = modifier
-            .fillMaxSize()
-            .padding(vertical = 64.dp, horizontal = 24.dp)
+            .fillMaxWidth()
+            .padding(24.dp)
     ) {
         Text(
-            text = "즐겨찾기한 도서",
-            style = Typography.titleLarge,
+            text = title,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF374151)
         )
         Spacer(modifier = Modifier.height(12.dp))
         LazyRow(
-            modifier = modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            items(uiState.favoriteBooks) {
+            items(books) {
                 DiscoveryItem(
-                    book = it
+                    book = it,
+                    onItemClick = { onItemClick(it.isbn) },
                 )
             }
         }
@@ -64,18 +89,34 @@ private fun DiscoveryScreen(
 @Composable
 private fun DiscoveryItem(
     book: DiscoveryBookUiModel,
+    onItemClick: () -> Unit,
 ) {
-    Column(Modifier.width(100.dp)) {
+    Column(
+        Modifier
+            .width(100.dp)
+            .clickable(onClick = onItemClick)
+    ) {
         AsyncImage(
-            modifier = Modifier.width(100.dp),
+            modifier = Modifier
+                .size(width = 120.dp, height = 150.dp)
+                .clip(RoundedCornerShape(16.dp)),
             model = book.imageUrl,
             contentDescription = null,
         )
+        Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = book.title,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 14.sp,
+            color = Color(0xFF1F2937),
+            maxLines = 3,
+            overflow = TextOverflow.Ellipsis
         )
+        Spacer(modifier = Modifier.height(2.dp))
         Text(
             text = book.authors,
+            fontSize = 12.sp,
+            color = Color(0xFF6B7280)
         )
     }
 }
@@ -105,8 +146,17 @@ private fun DiscoveryScreenPreview() {
                         authors = "authors",
                         imageUrl = "",
                     ),
+                ),
+                recentBooks = listOf(
+                    DiscoveryBookUiModel(
+                        isbn = "",
+                        title = "title",
+                        authors = "authors",
+                        imageUrl = "",
+                    ),
                 )
-            )
+            ),
+            onBookItemClick = {},
         )
     }
 }

@@ -17,18 +17,14 @@ class DiscoveryViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<DiscoveryUiState>(DiscoveryUiState.initialState)
     val uiState = _uiState.asStateFlow()
 
-    init {
-        getFavoriteBooks()
-    }
-
     fun getFavoriteBooks() {
         viewModelScope.launch {
             runCatching {
                 getFavoriteBookUseCase()
-            }.onSuccess {
-                _uiState.update {
-                    it.copy(
-                        favoriteBooks = it.favoriteBooks.map {
+            }.onSuccess { books ->
+                _uiState.update { state ->
+                    state.copy(
+                        favoriteBooks = books.map {
                             DiscoveryBookUiModel(
                                 isbn = it.isbn,
                                 title = it.title,

@@ -60,6 +60,7 @@ dependencies {
     implementation(project(":feature:library"))
     implementation(project(":feature:region"))
     implementation(project(":feature:book"))
+    implementation(project(":feature:discovery"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.material3)
