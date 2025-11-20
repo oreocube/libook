@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import androidx.paging.map
 import com.oreocube.booksearch.domain.model.Book
+import com.oreocube.booksearch.domain.model.BookInfo
 import com.oreocube.booksearch.domain.model.RecentBookHistory
 import com.oreocube.booksearch.domain.usecase.AddHistoryUseCase
 import com.oreocube.booksearch.domain.usecase.ClearHistoryUseCase
@@ -13,6 +14,7 @@ import com.oreocube.booksearch.domain.usecase.GetAllHistoriesUseCase
 import com.oreocube.booksearch.domain.usecase.SearchBooksUseCase
 import com.oreocube.booksearch.feature.book.model.BookUiState
 import com.oreocube.booksearch.feature.book.model.RecentHistoryUiState
+import com.oreocube.booksearch.feature.book.model.toBook
 import com.oreocube.booksearch.feature.book.model.toUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
@@ -92,10 +94,12 @@ class SearchBookViewModel @Inject constructor(
         }
     }
 
-    private fun addHistory(title: String, isbn: String) {
+    private fun addHistory(book: BookInfo) {
         val newHistory = RecentBookHistory(
-            isbn = isbn,
-            title = title,
+            isbn = book.isbn,
+            title = book.title,
+            authors = book.authors,
+            imageUrl = book.imageUrl,
             searchedAt = System.currentTimeMillis(),
         )
         viewModelScope.launch {
@@ -107,14 +111,14 @@ class SearchBookViewModel @Inject constructor(
 
     private fun onBookClicked(book: BookUiState) {
         viewModelScope.launch {
-            addHistory(title = book.title, isbn = book.isbn13)
+            addHistory(book.toBook())
             _eventChannel.send(SearchBookUiEvent.NavigateToBookDetail(isbn = book.isbn13))
         }
     }
 
     private fun onHistoryItemClick(history: RecentHistoryUiState) {
         viewModelScope.launch {
-            addHistory(title = history.title, isbn = history.isbn)
+            addHistory(history.toBook())
             _eventChannel.send(SearchBookUiEvent.NavigateToBookDetail(isbn = history.isbn))
         }
     }

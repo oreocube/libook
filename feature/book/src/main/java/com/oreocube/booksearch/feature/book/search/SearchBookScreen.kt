@@ -347,11 +347,15 @@ private fun RecentHistoryPreview() {
             RecentHistoryUiState(
                 isbn = "1",
                 title = "가나다라마바사아자차카타파하",
+                authors = "",
+                imageUrl = "",
                 searchedAt = "04.19",
             ),
             RecentHistoryUiState(
                 isbn = "2",
                 title = "가나다라마바사아자차카타파하",
+                authors = "",
+                imageUrl = "",
                 searchedAt = "04.19",
             ),
         ).toImmutableList(),
