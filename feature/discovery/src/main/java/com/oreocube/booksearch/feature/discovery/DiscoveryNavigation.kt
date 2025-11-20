@@ -43,6 +43,6 @@ internal fun DiscoveryRoute(
     )
 
     LaunchedEffect(Unit) {
-        viewModel.getFavoriteBooks()
+        viewModel.fetchData()
     }
 }
