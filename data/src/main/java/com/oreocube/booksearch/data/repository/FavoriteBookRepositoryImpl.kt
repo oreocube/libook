@@ -1,7 +1,7 @@
 package com.oreocube.booksearch.data.repository
 
 import com.oreocube.booksearch.data.database.FavoriteBookDao
-import com.oreocube.booksearch.data.response.toEntity
+import com.oreocube.booksearch.data.response.toFavoriteBookEntity
 import com.oreocube.booksearch.data.response.toModel
 import com.oreocube.booksearch.domain.model.BookInfo
 import com.oreocube.booksearch.domain.repository.FavoriteBookRepository
@@ -19,7 +19,7 @@ class FavoriteBookRepositoryImpl @Inject constructor(
     }
 
     override suspend fun addFavoriteBook(book: BookInfo) {
-        favoriteBookDao.addFavoriteBook(book.toEntity())
+        favoriteBookDao.addFavoriteBook(book.toFavoriteBookEntity())
     }
 
     override suspend fun deleteFavoriteBook(isbn: String) {

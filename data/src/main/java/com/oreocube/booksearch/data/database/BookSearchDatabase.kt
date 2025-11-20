@@ -3,7 +3,7 @@ package com.oreocube.booksearch.data.database
 import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.oreocube.booksearch.data.response.BookShortEntity
+import com.oreocube.booksearch.data.response.FavoriteBookEntity
 import com.oreocube.booksearch.data.response.LibraryShortEntity
 import com.oreocube.booksearch.data.response.RecentBookHistoryEntity
 
@@ -11,7 +11,7 @@ import com.oreocube.booksearch.data.response.RecentBookHistoryEntity
     entities = [
         LibraryShortEntity::class,
         RecentBookHistoryEntity::class,
-        BookShortEntity::class,
+        FavoriteBookEntity::class,
     ],
     version = 3,
     autoMigrations = [
