@@ -1,6 +1,7 @@
 package com.oreocube.booksearch.data.worker
 
 import android.content.Context
+import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
@@ -9,6 +10,7 @@ import com.oreocube.booksearch.domain.repository.HistoryRepository
 import com.oreocube.booksearch.domain.repository.LibraryRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.supervisorScope
@@ -23,6 +25,7 @@ class UpdateRecentHistoryWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result {
         return try {
+            Log.d("TAG", "doWork: ?????")
             val books = historyRepository.getAll().filter { it.imageUrl.isBlank() }
             val failures = mutableListOf<String>()
             supervisorScope {
