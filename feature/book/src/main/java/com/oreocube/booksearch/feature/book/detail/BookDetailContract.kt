@@ -8,6 +8,7 @@ import com.oreocube.booksearch.feature.book.model.RecommendedBookUiState
 data class BookDetailUiState(
     val isFirstEntry: Boolean = true,
     val isLoading: Boolean,
+    val isFavorite: Boolean,
     val book: BookDetail?,
     val status: List<LibraryBookStatusUiState>,
     val recommendBooks: List<RecommendedBookUiState> = emptyList(),
@@ -16,6 +17,7 @@ data class BookDetailUiState(
         val initialState = BookDetailUiState(
             isFirstEntry = true,
             isLoading = true,
+            isFavorite = false,
             book = null,
             status = emptyList(),
             recommendBooks = emptyList(),
@@ -40,6 +42,8 @@ sealed class BookDetailIntent {
         val isRegistered: Boolean,
         val library: LibraryShort,
     ) : BookDetailIntent()
+
+    data object ToggleHeart : BookDetailIntent()
 
     data class BookItemClick(
         val isbn: String,

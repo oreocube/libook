@@ -3,7 +3,8 @@ package com.oreocube.booksearch.data.di
 import android.content.Context
 import androidx.room.Room
 import com.oreocube.booksearch.data.database.BookSearchDatabase
-import com.oreocube.booksearch.data.database.FavoriteDao
+import com.oreocube.booksearch.data.database.FavoriteBookDao
+import com.oreocube.booksearch.data.database.FavoriteLibraryDao
 import com.oreocube.booksearch.data.database.RecentBookHistoryDao
 import dagger.Module
 import dagger.Provides
@@ -17,7 +18,7 @@ import javax.inject.Singleton
 class DatabaseModule {
     @Provides
     @Singleton
-    fun providesNiaDatabase(
+    fun providesLiBookDatabase(
         @ApplicationContext context: Context,
     ): BookSearchDatabase = Room.databaseBuilder(
         context,
@@ -27,9 +28,15 @@ class DatabaseModule {
 
     @Provides
     @Singleton
-    fun providesFavoriteDao(
+    fun providesFavoriteLibraryDao(
         database: BookSearchDatabase,
-    ): FavoriteDao = database.favoriteDao()
+    ): FavoriteLibraryDao = database.favoriteLibraryDao()
+
+    @Provides
+    @Singleton
+    fun providesFavoriteBookDao(
+        database: BookSearchDatabase,
+    ): FavoriteBookDao = database.favoriteBookDao()
 
     @Provides
     @Singleton

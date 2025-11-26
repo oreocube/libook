@@ -22,6 +22,5 @@ dependencyResolutionManagement {
         }
     }
 }
-rootProject.name = "build-logic"
+rootProject.name = "book-search"
 include(":convention")
-gradle.startParameter.excludedTaskNames.addAll(listOf(":build-logic:convention:testClasses"))

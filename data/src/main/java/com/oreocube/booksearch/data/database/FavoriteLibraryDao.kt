@@ -8,7 +8,7 @@ import com.oreocube.booksearch.data.response.LibraryShortEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface FavoriteDao {
+interface FavoriteLibraryDao {
     @Query("SELECT * FROM library")
     fun getFavoriteLibraries(): Flow<List<LibraryShortEntity>>
 

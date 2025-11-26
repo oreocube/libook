@@ -1,12 +1,14 @@
 package com.oreocube.booksearch.data.di
 
-import com.oreocube.booksearch.data.repository.FavoriteRepositoryImpl
+import com.oreocube.booksearch.data.repository.FavoriteBookRepositoryImpl
+import com.oreocube.booksearch.data.repository.FavoriteLibraryLibraryRepositoryImpl
 import com.oreocube.booksearch.data.repository.HistoryRepositoryImpl
 import com.oreocube.booksearch.data.repository.LibraryRepositoryImpl
 import com.oreocube.booksearch.data.repository.NotificationRepositoryImpl
 import com.oreocube.booksearch.data.repository.RegionRepositoryImpl
 import com.oreocube.booksearch.data.repository.UserRepositoryImpl
-import com.oreocube.booksearch.domain.repository.FavoriteRepository
+import com.oreocube.booksearch.domain.repository.FavoriteBookRepository
+import com.oreocube.booksearch.domain.repository.FavoriteLibraryRepository
 import com.oreocube.booksearch.domain.repository.HistoryRepository
 import com.oreocube.booksearch.domain.repository.LibraryRepository
 import com.oreocube.booksearch.domain.repository.NotificationRepository
@@ -27,7 +29,10 @@ interface RepositoryModule {
     fun bindsLibraryRepository(repositoryImpl: LibraryRepositoryImpl): LibraryRepository
 
     @Binds
-    fun bindsFavoriteRepository(repositoryImpl: FavoriteRepositoryImpl): FavoriteRepository
+    fun bindsFavoriteLibraryRepository(repositoryImpl: FavoriteLibraryLibraryRepositoryImpl): FavoriteLibraryRepository
+
+    @Binds
+    fun bindsFavoriteBookRepository(repositoryImpl: FavoriteBookRepositoryImpl): FavoriteBookRepository
 
     @Binds
     fun bindsHistoryRepository(repositoryImpl: HistoryRepositoryImpl): HistoryRepository

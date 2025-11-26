@@ -1,6 +1,7 @@
 package com.oreocube.booksearch.feature.book.model
 
 import com.oreocube.booksearch.domain.model.Book
+import com.oreocube.booksearch.domain.model.BookInfo
 
 data class BookUiState(
     val title: String,
@@ -24,4 +25,11 @@ fun Book.toUiState() = BookUiState(
     imageUrl = imageUrl,
     detailUrl = detailUrl,
     loanCount = loanCount
+)
+
+fun BookUiState.toBook() = BookInfo(
+    isbn = isbn13,
+    title = title,
+    authors = authors,
+    imageUrl = imageUrl
 )
