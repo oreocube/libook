@@ -154,6 +154,12 @@ fun BookDetailScreen(
         Icons.Outlined.FavoriteBorder
     }
 
+    val iconTint = if (uiState.isFavorite) {
+        Color.Red
+    } else {
+        Color.Unspecified
+    }
+
     Column(modifier = modifier) {
         LiBookTopBar(
             menuIcon = {
@@ -161,6 +167,7 @@ fun BookDetailScreen(
                     Icon(
                         painter = rememberVectorPainter(heartIcon),
                         contentDescription = stringResource(R.string.menu_back),
+                        tint = iconTint,
                     )
                 }
             },
