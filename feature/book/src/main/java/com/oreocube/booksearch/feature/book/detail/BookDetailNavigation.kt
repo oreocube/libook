@@ -2,6 +2,7 @@ package com.oreocube.booksearch.feature.book.detail
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
 import kotlinx.serialization.Serializable
@@ -11,8 +12,8 @@ data class BookDetailRoute(
     val isbn: String,
 )
 
-fun NavController.navigateToBookDetail(isbn: String) {
-    navigate(route = BookDetailRoute(isbn = isbn))
+fun NavController.navigateToBookDetail(isbn: String, options: NavOptions? = null) {
+    navigate(route = BookDetailRoute(isbn = isbn), navOptions = options)
 }
 
 fun NavGraphBuilder.bookDetailScreen(
