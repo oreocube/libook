@@ -4,6 +4,7 @@ import Empty
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,7 +14,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,7 +44,9 @@ internal fun DiscoveryScreen(
     onBookItemClick: (String) -> Unit,
 ) {
     Column(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
     ) {
         LiBookTopBar(
             title = "탐색",
@@ -70,9 +75,9 @@ private fun DiscoveryBookSection(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(24.dp)
     ) {
         Text(
+            modifier = Modifier.padding(top = 24.dp, start = 24.dp),
             text = title,
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
@@ -83,6 +88,7 @@ private fun DiscoveryBookSection(
             LazyRow(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
+                contentPadding = PaddingValues(horizontal = 24.dp)
             ) {
                 items(books) {
                     DiscoveryItem(
