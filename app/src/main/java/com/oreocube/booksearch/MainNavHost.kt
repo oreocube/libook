@@ -6,11 +6,11 @@ import androidx.compose.ui.Modifier
 import androidx.core.net.toUri
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.NavHost
+import com.oreocube.booksearch.barcode.BookBarcodeScannerRoute
+import com.oreocube.booksearch.barcode.bookBarcodeScannerScreen
+import com.oreocube.booksearch.barcode.navigateToBookBarcodeScanner
 import com.oreocube.booksearch.feature.book.detail.bookDetailScreen
 import com.oreocube.booksearch.feature.book.detail.navigateToBookDetail
-import com.oreocube.booksearch.feature.book.search.barcode.BookBarcodeScannerRoute
-import com.oreocube.booksearch.feature.book.search.barcode.bookBarcodeScannerScreen
-import com.oreocube.booksearch.feature.book.search.barcode.navigateToBookBarcodeScanner
 import com.oreocube.booksearch.feature.book.search.navigateToSearchBook
 import com.oreocube.booksearch.feature.book.search.searchBookScreen
 import com.oreocube.booksearch.feature.discovery.discoveryScreen

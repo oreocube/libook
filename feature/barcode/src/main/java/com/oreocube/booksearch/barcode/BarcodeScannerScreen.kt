@@ -1,4 +1,4 @@
-package com.oreocube.booksearch.feature.book.search.barcode
+package com.oreocube.booksearch.barcode
 
 import android.graphics.RectF
 import androidx.camera.core.CameraSelector
