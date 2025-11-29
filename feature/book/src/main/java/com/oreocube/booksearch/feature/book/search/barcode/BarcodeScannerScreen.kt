@@ -88,8 +88,10 @@ private fun CameraPreview(
                     COORDINATE_SYSTEM_VIEW_REFERENCED,
                     ContextCompat.getMainExecutor(context)
                 ) { result ->
-                    val item = result?.getValue(barcodeScanner)?.first() ?: return@MlKitAnalyzer
+                    val items = result?.getValue(barcodeScanner)
+                    if (items.isNullOrEmpty()) return@MlKitAnalyzer
 
+                    val item = items.first()
                     val guideRect = provideGuideRect(previewView)
 
                     item.boundingBox?.let { box ->
