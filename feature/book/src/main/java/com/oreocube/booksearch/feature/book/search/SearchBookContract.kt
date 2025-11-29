@@ -17,6 +17,7 @@ data class SearchBookUiState(
 sealed class SearchBookUiEvent {
     data class Error(val message: String) : SearchBookUiEvent()
     data class NavigateToBookDetail(val isbn: String) : SearchBookUiEvent()
+    data object NavigateToBarcodeScanner : SearchBookUiEvent()
 }
 
 sealed class SearchBookUiAction {
@@ -25,4 +26,5 @@ sealed class SearchBookUiAction {
     data class HistoryItemClick(val history: RecentHistoryUiState) : SearchBookUiAction()
     data class DeleteHistoryClick(val history: RecentHistoryUiState) : SearchBookUiAction()
     data object ClearHistoryClick : SearchBookUiAction()
+    data object BarcodeScanClick : SearchBookUiAction()
 }

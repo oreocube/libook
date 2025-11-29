@@ -1,5 +1,6 @@
 package com.oreocube.booksearch.core.ui.component
 
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -17,6 +18,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.oreocube.booksearch.core.ui.R
 import com.oreocube.booksearch.core.ui.theme.Brown30
+import com.oreocube.booksearch.core.ui.theme.Gray20
 import com.oreocube.booksearch.core.ui.theme.Gray30
 
 @Composable
@@ -27,6 +29,7 @@ fun LiBookTextField(
     leadingIcon: @Composable (() -> Unit)? = null,
     onInputChanged: (String) -> Unit,
     onClearClicked: () -> Unit,
+    onBarcodeScanClick: () -> Unit,
     onQuerySubmitted: () -> Unit,
 ) {
     TextField(
@@ -36,13 +39,21 @@ fun LiBookTextField(
         placeholder = { Text(text = placeholder) },
         leadingIcon = leadingIcon,
         trailingIcon = {
-            if (input.isNotBlank())
-                IconButton(onClick = onClearClicked) {
+            Row {
+                if (input.isNotBlank())
+                    IconButton(onClick = onClearClicked) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_clear_24),
+                            contentDescription = null,
+                        )
+                    }
+                IconButton(onClick = onBarcodeScanClick) {
                     Icon(
-                        painter = painterResource(R.drawable.ic_clear_24),
+                        painter = painterResource(R.drawable.ic_barcode_scanner_24),
                         contentDescription = null,
                     )
                 }
+            }
         },
         singleLine = true,
         keyboardOptions = KeyboardOptions.Default.copy(
@@ -85,7 +96,7 @@ fun LiBookTextField(
 object LiBookTextFieldDefaults {
     val containerColor = Color.White
     val textColor = Color.Black
-    val trailingIconColor = Brown30
+    val trailingIconColor = Gray20
     val placeholderColor = Gray30
     val indicatorColor = Brown30
     val cursorColor = Brown30

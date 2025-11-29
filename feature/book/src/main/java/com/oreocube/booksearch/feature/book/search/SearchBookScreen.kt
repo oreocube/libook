@@ -1,5 +1,9 @@
 package com.oreocube.booksearch.feature.book.search
 
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -35,6 +40,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
@@ -61,9 +67,20 @@ import kotlinx.coroutines.flow.flowOf
 fun SearchBookRoute(
     onBackClick: () -> Unit,
     onBookClick: (String) -> Unit,
+    onBarcodeScanClick: () -> Unit,
     onShowSnackbar: (String) -> Unit,
     viewModel: SearchBookViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            onBarcodeScanClick()
+        } else {
+            onShowSnackbar("도서 바코드 스캔을 위해 카메라 권한이 필요합니다")
+        }
+    }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     SearchBookScreen(
@@ -81,6 +98,19 @@ fun SearchBookRoute(
 
                 is SearchBookUiEvent.NavigateToBookDetail -> {
                     onBookClick(event.isbn)
+                }
+
+                SearchBookUiEvent.NavigateToBarcodeScanner -> {
+                    val permission = Manifest.permission.CAMERA
+                    if (ContextCompat.checkSelfPermission(
+                            context,
+                            permission
+                        ) == PackageManager.PERMISSION_GRANTED
+                    ) {
+                        onBarcodeScanClick()
+                    } else {
+                        permissionLauncher.launch(permission)
+                    }
                 }
             }
         }
@@ -119,6 +149,7 @@ fun SearchBookScreen(
             },
             onInputChanged = { onAction(SearchBookUiAction.InputChanged(it)) },
             onClearClicked = { onAction(SearchBookUiAction.InputChanged()) },
+            onBarcodeScanClick = { onAction(SearchBookUiAction.BarcodeScanClick) },
             onQuerySubmitted = {
                 keyboardController?.hide()
                 focusManager.clearFocus()
