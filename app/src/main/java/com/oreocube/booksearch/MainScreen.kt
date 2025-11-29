@@ -30,8 +30,7 @@ fun MainScreen(
 
     Scaffold(
         modifier = Modifier
-            .fillMaxSize()
-            .imePadding(),
+            .fillMaxSize(),
         containerColor = Color.White,
         snackbarHost = {
             SnackbarHost(

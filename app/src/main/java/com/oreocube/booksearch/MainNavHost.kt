@@ -4,7 +4,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.core.net.toUri
+import androidx.navigation.NavOptions
 import androidx.navigation.compose.NavHost
+import com.oreocube.booksearch.barcode.BookBarcodeScannerRoute
+import com.oreocube.booksearch.barcode.bookBarcodeScannerScreen
+import com.oreocube.booksearch.barcode.navigateToBookBarcodeScanner
 import com.oreocube.booksearch.feature.book.detail.bookDetailScreen
 import com.oreocube.booksearch.feature.book.detail.navigateToBookDetail
 import com.oreocube.booksearch.feature.book.search.navigateToSearchBook
@@ -51,6 +55,7 @@ fun MainNavHost(
         searchBookScreen(
             onBackClick = navController::popBackStack,
             onBookClick = navController::navigateToBookDetail,
+            onBarcodeScanClick = navController::navigateToBookBarcodeScanner,
             onShowSnackbar = onShowSnackbar,
         )
         bookDetailScreen(
@@ -64,6 +69,17 @@ fun MainNavHost(
         )
         discoveryScreen(
             onBookItemClick = navController::navigateToBookDetail,
+        )
+        bookBarcodeScannerScreen(
+            onBackClick = navController::popBackStack,
+            onScanSuccess = { isbn ->
+                navController.navigateToBookDetail(
+                    isbn,
+                    NavOptions.Builder()
+                        .setPopUpTo<BookBarcodeScannerRoute>(inclusive = true)
+                        .build()
+                )
+            },
         )
     }
 

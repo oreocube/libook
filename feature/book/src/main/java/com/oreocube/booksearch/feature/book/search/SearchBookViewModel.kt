@@ -59,6 +59,11 @@ class SearchBookViewModel @Inject constructor(
             is SearchBookUiAction.HistoryItemClick -> onHistoryItemClick(action.history)
             is SearchBookUiAction.DeleteHistoryClick -> onDeleteHistoryClick(action.history)
             is SearchBookUiAction.ClearHistoryClick -> onClearHistoryClick()
+            is SearchBookUiAction.BarcodeScanClick -> {
+                viewModelScope.launch {
+                    _eventChannel.send(SearchBookUiEvent.NavigateToBarcodeScanner)
+                }
+            }
         }
     }
 
