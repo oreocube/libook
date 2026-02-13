@@ -5,16 +5,20 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -40,6 +44,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -67,6 +72,7 @@ import com.oreocube.booksearch.core.ui.component.LiBookTopBar
 import com.oreocube.booksearch.core.ui.theme.Brown20
 import com.oreocube.booksearch.core.ui.theme.Gray10
 import com.oreocube.booksearch.core.ui.theme.Gray20
+import com.oreocube.booksearch.core.ui.theme.Gray30
 import com.oreocube.booksearch.core.ui.theme.Gray90
 import com.oreocube.booksearch.core.ui.theme.LiBookPreviewTheme
 import com.oreocube.booksearch.domain.model.BookDetail
@@ -266,18 +272,61 @@ private fun BookDetailContent(
             fontWeight = FontWeight.Bold,
         )
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp)
-                .clip(RoundedCornerShape(16.dp))
-                .background(color = Gray90)
-                .padding(16.dp),
-        ) {
+        if (book.description.isNotBlank()) {
+            ExpandableDescription(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(color = Gray90)
+                    .padding(16.dp),
+                description = book.description,
+            )
+        }
+    }
+}
+
+@Composable
+fun ExpandableDescription(
+    modifier: Modifier = Modifier,
+    description: String,
+) {
+    var isExpanded by rememberSaveable { mutableStateOf(false) }
+    var isOverflowing by remember { mutableStateOf(false) }
+
+    Column(
+        modifier = modifier.animateContentSize()
+    ) {
+        Text(
+            text = description,
+            fontSize = 16.sp,
+            color = Gray10,
+            maxLines = if (isExpanded) Int.MAX_VALUE else 6,
+            overflow = TextOverflow.Ellipsis,
+            onTextLayout = { textLayoutResult ->
+                if (!isExpanded) {
+                    isOverflowing = textLayoutResult.hasVisualOverflow
+                }
+            }
+        )
+
+        if (isOverflowing) {
+            Spacer(modifier = Modifier.height(8.dp))
+
             Text(
-                text = book.description,
-                fontSize = 16.sp,
-                color = Gray10
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(10.dp))
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                    ) {
+                        isExpanded = !isExpanded
+                    },
+                text = if (isExpanded) "접기" else "펼쳐보기",
+                fontSize = 14.sp,
+                color = Gray30,
+                textAlign = TextAlign.Center
             )
         }
     }
